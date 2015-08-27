@@ -1,10 +1,6 @@
-# Java
-JAVA_SOURCES = \
-	../../../../java/org/ofi/libfab_java_bindings/HelloJNI.java 
-
 #above and below is a \ separated list
 
-JNI_CLASSES = \
+#JNI_CLASSES = \
 	org.ofi.libfab_java_bindings.HelloJNI
 
 #
@@ -13,19 +9,15 @@ JNI_CLASSES = \
 
 CFLAGS=-g -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin
 
-LDFLAGS=-ldl
+LDFLAGS= #-ldl
 
-all: libhello.so
+all: libhello.dylib
 
-libhello.so: org_ofi_libfab_java_bindings_HelloJNI.h HelloJNI.o
-	gcc ${CFLAGS} -shared HelloJNI.o -o libhello.so  ${LDFLAGS}
+libhello.dylib: HelloJNI.o
+	gcc ${CFLAGS} -dynamiclib HelloJNI.o -o libhello.dylib  ${LDFLAGS}
 
 HelloJNI.o: HelloJNI.c
 	gcc -c ${CFLAGS} HelloJNI.c
-
-org_ofi_libfab_java_bindings_HelloJNI.h: ${JAVA_SOURCES}
-	javac ${JAVA_SOURCES}
-	javah ${JNI_CLASSES}
 
 clean:
 	rm -f *.class *.o

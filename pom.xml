@@ -33,9 +33,38 @@
                 <version>6.2</version>
             </plugin>
             <plugin>
+                <!-- Build an executable JAR -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>org.ofi.libfabjavabindings.HelloJNI</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>native-maven-plugin</artifactId>
                 <version>1.0-alpha-8</version>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>javah</goal>
+						</goals>
+						<configuration>
+							<javahPath>${env.JAVA_HOME}/bin/javah</javahPath>
+							<javahClassNames>
+								<javahClassName>org.ofi.libfabjavabindings.HelloJNI</javahClassName>
+							</javahClassNames>
+							<javahOutputDirectory>${project.native.directory}/org/ofi/libfab_native</javahOutputDirectory>
+						</configuration>
+					</execution>
+				</executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -98,12 +127,13 @@
                                 </goals>
                                 <configuration>
                                     <target>
+                                    	<!--
                                         <property name="compile_classpath" refid="maven.compile.classpath"/>
                                         <property name="runtime_classpath" refid="maven.runtime.classpath"/>
                                         <property name="test_classpath" refid="maven.test.classpath"/>
                                         <property name="plugin_classpath" refid="maven.plugin.classpath"/>
                                         <property name="test_classpath" value="."/>
-                                        <!--
+                                        
                                         <echo message="compile classpath: ${compile_classpath}"/>
                                         <echo message="runtime classpath: ${runtime_classpath}"/>
                                         <echo message="test classpath:    ${test_classpath}"/>
@@ -114,7 +144,6 @@
                                             <arg line="-f Makefile all"/>
                                             <env key="CLASSPATH" value="${test_classpath}:${compile_classpath}"/>
                                             <env key="JAVA_HOME" value="${JAVA_HOME}"/>
-											<env key="LUSTRE_INC_FLAGS" value="${lustre.incs}"/>
                                         </exec>
                                     </target>
                                 </configuration>

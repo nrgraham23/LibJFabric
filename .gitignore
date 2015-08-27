@@ -2,7 +2,9 @@
 .classpath
 .project
 .settings
-.class
-.so
-.dylib
-.dll
+*.class
+*.so
+*.dylib
+*.dll
+.cproject
+*.o
