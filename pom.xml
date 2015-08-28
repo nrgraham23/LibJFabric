@@ -10,9 +10,9 @@
 	<properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--
-        skipTests by default, only run the tests if required via the -DskipTests=false
+        skipTests by default, only run the tests if required via the -DskipTests=false //changed for now
         -->
-        <skipTests>true</skipTests>
+        <skipTests>false</skipTests>
 	<project.native.directory>${basedir}/src/main/native</project.native.directory>
     </properties>
 	
@@ -33,20 +33,6 @@
                 <version>6.2</version>
             </plugin>
             <plugin>
-                <!-- Build an executable JAR -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>org.ofi.libfabjavabindings.HelloJNI</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>native-maven-plugin</artifactId>
                 <version>1.0-alpha-8</version>
@@ -59,9 +45,15 @@
 						<configuration>
 							<javahPath>${env.JAVA_HOME}/bin/javah</javahPath>
 							<javahClassNames>
-								<javahClassName>org.ofi.libfabjavabindings.HelloJNI</javahClassName>
+								<javahClassName>org.ofi.libjfabric.enums.AVType</javahClassName>
+								<javahClassName>org.ofi.libjfabric.enums.MRMode</javahClassName>
+								<javahClassName>org.ofi.libjfabric.enums.Progress</javahClassName>
+								<javahClassName>org.ofi.libjfabric.enums.Threading</javahClassName>
+								<javahClassName>org.ofi.libjfabric.enums.ResourceMgmt</javahClassName>
+								<javahClassName>org.ofi.libjfabric.enums.EPType</javahClassName>
+								<javahClassName>org.ofi.libjfabric.enums.Protocol</javahClassName>
 							</javahClassNames>
-							<javahOutputDirectory>${project.native.directory}/org/ofi/libfab_native</javahOutputDirectory>
+							<javahOutputDirectory>${project.native.directory}/org/ofi/libjfabric_native</javahOutputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -76,6 +68,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
+                	<parallel>methods</parallel>
+					<threadCount>10</threadCount>
                     <skipTests>${skipTests}</skipTests>
                     <includes>
                         <include>**/Test*.java</include>
@@ -140,7 +134,7 @@
                                         <echo message="plugin classpath:  ${plugin_classpath}"/>
                                         -->
                                         <!-- normally Hadoop/Apache use CMake -->
-                                        <exec executable="make" dir="${project.native.directory}/org/ofi/libfab_native" failonerror="true">
+                                        <exec executable="make" dir="${project.native.directory}/org/ofi/libjfabric_native" failonerror="true">
                                             <arg line="-f Makefile all"/>
                                             <env key="CLASSPATH" value="${test_classpath}:${compile_classpath}"/>
                                             <env key="JAVA_HOME" value="${JAVA_HOME}"/>

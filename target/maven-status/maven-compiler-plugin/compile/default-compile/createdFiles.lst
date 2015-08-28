@@ -1,0 +1,11 @@
+org/ofi/libjfabric/enums/Progress.class
+org/ofi/libjfabric/enums/Protocol.class
+org/ofi/libjfabric/attributes/RecieveAttr.class
+org/ofi/libjfabric/enums/MRMode.class
+org/ofi/libjfabric/enums/Threading.class
+org/ofi/libjfabric/enums/EPType.class
+org/ofi/libjfabric/attributes/TransmitAttr.class
+org/ofi/libjfabric/attributes/EndPointAttr.class
+org/ofi/libjfabric/enums/ResourceMgmt.class
+org/ofi/libjfabric/attributes/DomainAttr.class
+org/ofi/libjfabric/enums/AVType.class

@@ -1,0 +1,41 @@
+#
+# Maven sets JAVA_HOME aka java.home to ${JAVA_HOME}/jre wow !!! need to add a funky include for this.
+#
+
+CFLAGS=-g -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin -I/Users/ngraham/libfabric-cray/include/rdma
+
+LDFLAGS= #-ldl
+
+C_SOURCES = 		\
+	av_type.c		\
+	mr_mode.c		\
+	progress.c		\
+	threading.c		\
+	resource_mgmt.c	\
+	ep_type.c		\
+	protocol.c
+
+O_FILES =			\
+	av_type.o		\
+	mr_mode.o		\
+	progress.o		\
+	threading.o		\
+	resource_mgmt.o	\
+	ep_type.o		\
+	protocol.o
+
+all: libjfab_native.dylib
+
+libjfab_native.dylib: av_type.o
+	gcc ${CFLAGS} -dynamiclib ${O_FILES} -o libjfab_native.dylib  ${LDFLAGS}
+
+${O_FILES}: ${C_SOURCES}
+	gcc -c ${CFLAGS} ${C_SOURCES}
+
+clean:
+	rm -f *.class *.o
+	rm -f libhello.so
+	rm -f org_*.h
+
+#test:
+#	javac -g -Xlint:deprecation -classpath ${CLASSPATH} Test.java

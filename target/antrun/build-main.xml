@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project name="maven-antrun-" default="main"  >
 <target name="main">
-  <exec failonerror="true" dir="/Users/ngraham/Documents/workspace/libfabric_java/src/main/native/org/ofi/libfab_native" executable="make">
+  <exec failonerror="true" dir="/Users/ngraham/Documents/workspace/LibJFabric/src/main/native/org/ofi/libjfabric_native" executable="make">
     <arg line="-f Makefile all"/>
     <env value="${test_classpath}:${compile_classpath}" key="CLASSPATH"/>
     <env value="/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home" key="JAVA_HOME"/>
