@@ -10,7 +10,7 @@ public class TransmitAttr {
 	private int iovLimit;
 	private int rmaIovLimit;
 
-	TransmitAttr(long caps, long mode, long opFlags, long msgOrder, int injectSize, int size, int iovLimit, int rmaIovLimit) {
+	public TransmitAttr(long caps, long mode, long opFlags, long msgOrder, int injectSize, int size, int iovLimit, int rmaIovLimit) {
 		this.caps = caps;
 		this.mode = mode;
 		this.opFlags = opFlags;
@@ -20,7 +20,7 @@ public class TransmitAttr {
 		this.iovLimit = iovLimit;
 		this.rmaIovLimit = rmaIovLimit;
 	}
-	
+
 	//gets
 	public long getCaps() {
 		return this.caps;
@@ -37,7 +37,7 @@ public class TransmitAttr {
 	public int getInjectSize() {
 		return this.injectSize;
 	}
-	public int size() {
+	public int getSize() {
 		return this.size;
 	}
 	public int getIovLimit() {
@@ -45,5 +45,31 @@ public class TransmitAttr {
 	}
 	public int getRmaIovLimit() {
 		return this.rmaIovLimit;
+	}
+
+	//sets
+	public void setCaps(long caps) {
+		this.caps = caps;
+	}
+	public void setMode(long mode) {
+		this.mode = mode;
+	}
+	public void setOpFlags(long opFlags) {
+		this.opFlags = opFlags;
+	}
+	public void setMsgOrder(long msgOrder) {
+		this.msgOrder = msgOrder;
+	}
+	public void setInjectSize(int injectSize) {
+		this.injectSize = injectSize;
+	}
+	public void setSize(int size) {
+		this.size = size;
+	}
+	public void setIovLimit(int iovLimit) {
+		this.iovLimit = iovLimit;
+	}
+	public void setRmaIovLimit(int rmaIovLimit) {
+		this.rmaIovLimit = rmaIovLimit;
 	}
 }

@@ -12,7 +12,7 @@ public class EndPointAttr {
 	private long memTagFormat;
 	private int txCtxCnt;
 	private int rxCtxCnt;
-	
+
 	public EndPointAttr(EPType epType, int protocol, int protoVersion, int maxMsgSize, int msgPrefixSize,
 			int maxOrderWawSize, long memTagFormat, int txCtxCnt, int rxCtxCnt) {
 		this.epType = epType;
@@ -25,7 +25,7 @@ public class EndPointAttr {
 		this.txCtxCnt = txCtxCnt;
 		this.rxCtxCnt = rxCtxCnt;
 	}
-	
+
 	//gets
 	public EPType getEpType() {
 		return this.epType;
@@ -53,5 +53,34 @@ public class EndPointAttr {
 	}
 	public int getRxCtxCnt() {
 		return this.rxCtxCnt;
+	}
+
+	//sets
+	public void setEpType(EPType epType) {
+		this.epType = epType;
+	}
+	public void setProtocol(int protocol) {
+		this.protocol = protocol;
+	}
+	public void setProtoVersion(int protoVersion) {
+		this.protoVersion = protoVersion;
+	}
+	public void setMaxMsgSize(int maxMsgSize) {
+		this.maxMsgSize = maxMsgSize;
+	}
+	public void setMsgPrefixSize(int msgPrefixSize) {
+		this.msgPrefixSize = msgPrefixSize;
+	}
+	public void setMaxOrderWawSize(int maxOrderWawSize) {
+		this.maxOrderWawSize = maxOrderWawSize;
+	}
+	public void setMemTagFormat(long memTagFormat) {
+		this.memTagFormat = memTagFormat;
+	}
+	public void setTxCtxCnt(int txCtxCnt) {
+		this.txCtxCnt = txCtxCnt;
+	}
+	public void setRxCtxCnt(int rxCtxCnt) {
+		this.rxCtxCnt = rxCtxCnt;
 	}
 }
