@@ -5,9 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.ofi.libjfabric.LibFabric;
-import org.ofi.libjfabric.enums.Progress;
 
-public class TestProgress {
+public class TestGetInfo {
 
 	@Before
 	public void setUp() throws Exception {
@@ -15,10 +14,8 @@ public class TestProgress {
 	}
 
 	@Test
-	public void test() {
-		assertEquals(Progress.UNSPEC.getVal(), 0);
-		assertEquals(Progress.AUTO.getVal(), 1);
-		assertEquals(Progress.MANUAL.getVal(), 2);
+	public void testGetInfo() {
+		
 	}
 
 }

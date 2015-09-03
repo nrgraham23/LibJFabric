@@ -1,17 +1,14 @@
 package org.ofi.libjfabric;
 
-import java.util.ArrayList;
-
 public class Fabric {
 	
 	static {
-		System.out.println("LOADING LIBRARY");
 		System.loadLibrary("jfab_native");	
 	}
 	
-	public static ArrayList<Info> getInfo() {
-		
-		
-		return null;
+	public static Info[] getInfo(int version, String node, String service, long flags, Info hints) {
+		return getInfoJNI(version, node, service, flags, hints);
 	}
+	
+	private static native Info[] getInfoJNI(int version, String node, String service, long flags, Info hints);
 }

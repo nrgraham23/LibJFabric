@@ -1,5 +1,5 @@
 #
-# Maven sets JAVA_HOME aka java.home to ${JAVA_HOME}/jre wow !!! need to add a funky include for this.
+# Maven sets JAVA_HOME aka java.home to ${JAVA_HOME}/jre.  Need to add a funky include for this.
 #
 
 CFLAGS=-g -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin -I/Users/ngraham/libfabric-cray/include/rdma
@@ -13,7 +13,9 @@ C_SOURCES = 		\
 	threading.c		\
 	resource_mgmt.c	\
 	ep_type.c		\
-	protocol.c
+	protocol.c		\
+	fabric.c		\
+	libfabric.c
 
 O_FILES =			\
 	av_type.o		\
@@ -22,7 +24,9 @@ O_FILES =			\
 	threading.o		\
 	resource_mgmt.o	\
 	ep_type.o		\
-	protocol.o
+	protocol.o		\
+	fabric.o		\
+	libfabric.o
 
 all: libjfab_native.dylib
 

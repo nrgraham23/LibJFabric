@@ -52,6 +52,8 @@
 								<javahClassName>org.ofi.libjfabric.enums.ResourceMgmt</javahClassName>
 								<javahClassName>org.ofi.libjfabric.enums.EPType</javahClassName>
 								<javahClassName>org.ofi.libjfabric.enums.Protocol</javahClassName>
+								<javahClassName>org.ofi.libjfabric.Fabric</javahClassName>
+								<javahClassName>org.ofi.libjfabric.LibFabric</javahClassName>
 							</javahClassNames>
 							<javahOutputDirectory>${project.native.directory}/org/ofi/libjfabric_native</javahOutputDirectory>
 						</configuration>

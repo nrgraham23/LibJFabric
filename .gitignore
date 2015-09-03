@@ -10,3 +10,4 @@
 *.o
 /target/
 *.jar
+*.h

@@ -1,4 +1,4 @@
-#include "org_ofi_libjfabric_ResourceMgmt.h"
+#include "org_ofi_libjfabric_enums_ResourceMgmt.h"
 #include "fabric.h"
 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_ResourceMgmt_getUNSPEC(JNIEnv *env, jclass jthis) {

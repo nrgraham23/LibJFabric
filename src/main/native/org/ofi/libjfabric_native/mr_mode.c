@@ -1,4 +1,4 @@
-#include "org_ofi_libjfabric_MRMode.h"
+#include "org_ofi_libjfabric_enums_MRMode.h"
 #include "fabric.h"
 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_MRMode_getUNSPEC(JNIEnv *env, jclass jthis) {

@@ -1,4 +1,4 @@
-#include "org_ofi_libjfabric_AVType.h"
+#include "org_ofi_libjfabric_enums_AVType.h"
 #include "fabric.h"
 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_AVType_getUNSPEC(JNIEnv *env, jclass jthis) {

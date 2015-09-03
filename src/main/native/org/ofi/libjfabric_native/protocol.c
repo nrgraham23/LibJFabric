@@ -1,4 +1,4 @@
-#include "org_ofi_libjfabric_Protocol.h"
+#include "org_ofi_libjfabric_enums_Protocol.h"
 #include "fabric.h"
 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getUNSPEC(JNIEnv *env, jclass jthis) {

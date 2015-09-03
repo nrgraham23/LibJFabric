@@ -1,4 +1,4 @@
-#include "org_ofi_libjfabric_EPType.h"
+#include "org_ofi_libjfabric_enums_EPType.h"
 #include "fabric.h"
 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_EPType_getUNSPEC(JNIEnv *env, jclass jthis) {

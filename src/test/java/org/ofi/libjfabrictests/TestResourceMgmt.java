@@ -11,7 +11,7 @@ public class TestResourceMgmt {
 
 	@Before
 	public void setUp() throws Exception {
-		LibFabric lib = new LibFabric();
+		LibFabric.load();
 	}
 
 	@Test

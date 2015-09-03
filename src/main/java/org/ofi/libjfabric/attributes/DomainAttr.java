@@ -1,169 +1,201 @@
 package org.ofi.libjfabric.attributes;
 
-import org.ofi.libjfabric.Domain;
 import org.ofi.libjfabric.enums.*;
 
 public class DomainAttr {
-	private Domain domain;
-	private String name;
-	private Threading threading;
-	private Progress cntrlProgress;
-	private Progress dataProgress;
-	private ResourceMgmt resourceMgmt;
-	private AVType avType;
-	private MRMode mrMode;
-	private int mrKeySize;
-	private int cqDataSize;
-	private int cqCnt;
-	private int endpointCount;
-	private int txCtxCnt;
-	private int rxCtxCnt;
-	private int maxEpTxCtx;
-	private int maxEpRxCtx;
-	private int maxEpStxCtx;
-	private int maxEpSrxCtx;
+	private long handle;
 	
-	public DomainAttr(Domain domain, String name, Threading threading, Progress cntrlProgress, Progress dataProgress, 
+	public DomainAttr(String name, Threading threading, Progress cntrlProgress, Progress dataProgress, 
 			ResourceMgmt resourceMgmt, AVType avType, MRMode mrMode, int mrKeySize, int cqDataSize, int cqCnt, 
-			int endpointCount, int txCtxCnt, int rxCtxCnt, int maxEpTxCtx, int maxEpRxCtx, int maxEpStxCtx, int maxEpSrxCtx) {
-		this.domain = domain;
-		this.name = name;
-		this.threading = threading;
-		this.cntrlProgress = cntrlProgress;
-		this.dataProgress = dataProgress;
-		this.resourceMgmt = resourceMgmt;
-		this.avType = avType;
-		this.mrMode = mrMode;
-		this.mrKeySize = mrKeySize;
-		this.cqDataSize = cqDataSize;
-		this.cqCnt = cqCnt;
-		this.endpointCount = endpointCount;
-		this.txCtxCnt = txCtxCnt;
-		this.rxCtxCnt = rxCtxCnt;
-		this.maxEpTxCtx = maxEpTxCtx;
-		this.maxEpRxCtx = maxEpRxCtx;
-		this.maxEpStxCtx = maxEpStxCtx;
-		this.maxEpSrxCtx = maxEpSrxCtx;
+			int endpointCount, int txCtxCnt, int rxCtxCnt, int maxEpTxCtx, int maxEpRxCtx, int maxEpStxCtx, int maxEpSrxCtx) 
+	{
+		this.handle = initDomainAttr(name, threading.getVal(), cntrlProgress.getVal(), dataProgress.getVal(), 
+				resourceMgmt.getVal(), avType.getVal(), mrMode.getVal(), mrKeySize, cqDataSize, cqCnt, endpointCount, 
+				txCtxCnt, rxCtxCnt, maxEpTxCtx, maxEpRxCtx, maxEpStxCtx, maxEpSrxCtx);
 	}
 	
+	private native long initDomainAttr(String name, int threading, int cntrlProgress, int dataProgress, 
+			int resourceMgmt, int avType, int mrMode, int mrKeySize, int cqDataSize, int cqCnt, 
+			int endpointCount, int txCtxCnt, int rxCtxCnt, int maxEpTxCtx, int maxEpRxCtx, int maxEpStxCtx, int maxEpSrxCtx);
+	
 	public DomainAttr() {
-		this.threading = Threading.UNSPEC;
-		this.cntrlProgress = Progress.UNSPEC;
-		this.dataProgress = Progress.UNSPEC;
-		this.resourceMgmt = ResourceMgmt.UNSPEC;
-		this.avType = AVType.UNSPEC;
-		this.mrMode = MRMode.UNSPEC;
+		
 	}
 	
 	//gets
-	public Domain getDomain() {
-		return this.domain;
-	}
 	public String getName() {
-		return this.name;
+		return getName(this.handle);
 	}
+	private native String getName(long handle);
+	
 	public Threading getThreading() {
-		return this.threading;
+		return getThreading(this.handle);
 	}
+	private native Threading getThreading(long handle);
+	
 	public Progress getCntrlProgress() {
-		return this.cntrlProgress;
+		return getCntrlProgress(this.handle);
 	}
+	private native Progress getCntrlProgress(long handle);
+	
 	public Progress getDataProgress() {
-		return this.dataProgress;
+		return getdataProgress(this.handle);
 	}
+	private native Progress getdataProgress(long handle);
+	
 	public ResourceMgmt getResourceMgmt() {
-		return this.resourceMgmt;
+		return this.getResourceMgmt(this.handle);
 	}
+	private native ResourceMgmt getResourceMgmt(long handle);
+	
 	public AVType getAvType() {
-		return this.avType;
+		return getAVType(this.handle);
 	}
+	private native AVType getAVType(long handle);
+	
 	public MRMode getMRMode() {
-		return this.mrMode;
+		return this.getMRMode(this.handle);
 	}
+	private native MRMode getMRMode(long handle);
+	
 	public int getMrKeySize() {
-		return this.mrKeySize;
+		return getMrKeySize(this.handle);
 	}
-	public int getCqDataSize() {
-		return this.cqDataSize;
+	private native int getMrKeySize(long handle);
+	
+	public int getCQDataSize() {
+		return getCQDataSize(this.handle);
 	}
-	public int getCqCnt() {
-		return this.cqCnt;
+	private native int getCQDataSize(long handle);
+	
+	public int getCQCnt() {
+		return getCQCnt(this.handle);
 	}
-	public int getEndpointCount() {
-		return this.endpointCount;
-	}
-	public int getTxCtxCnt() {
-		return this.txCtxCnt;
-	}
-	public int getRxCtxCnt() {
-		return this.rxCtxCnt;
-	}
-	public int getMaxEpTxCtx() {
-		return this.maxEpTxCtx;
-	}
-	public int getMaxEpRxCtx() {
-		return this.maxEpRxCtx;
-	}
-	public int getMaxEpStxCtx() {
-		return this.maxEpStxCtx;
-	}
-	public int getMaxEpSrxCtx() {
-		return this.maxEpSrxCtx;
+	private native int getCQCnt(long handle);
+	
+	public int getEndPointCnt() {
+		return getEndPointCnt(handle);
 	}
 	
+	private native int getEndPointCnt(long handle);
+	
+	public int getTxCtxCnt() {
+		return getTxCtxCnt(handle);
+	}
+	
+	private native int getTxCtxCnt(long handle);
+	
+	public int getRxCtxCnt() {
+		return getRxCtxCnt(handle);
+	}
+	
+	private native int getRxCtxCnt(long handle);
+	
+	public int getMaxEpTxCtx() {
+		return getMaxEpTxCtx(handle);
+	}
+	
+	private native int getMaxEpTxCtx(long handle);
+	
+	public int getMaxEpRxCtx() {
+		return getMaxEpRxCtx(handle);
+	}
+	
+	private native int getMaxEpRxCtx(long handle);
+	
+	public int getMaxEpStxCtx() {
+		return getMaxEpStxCtx(this.handle);
+	}
+	private native int getMaxEpStxCtx(long handle);
+	
+	public int getMaxEpSrxCtx() {
+		return getMaxEpSrxCtx(this.handle);
+	}
+	private native int getMaxEpSrxCtx(long handle);
+	
 	//sets
-	public void setDomain(Domain domain) {
-		this.domain = domain;
-	}
 	public void setName(String name) {
-		this.name = name;
+		setName(name, this.handle);
 	}
+	private native void setName(String name, long handle);
+	
 	public void setThreading(Threading threading) {
-		this.threading = threading;
+		setThreading(threading, this.handle);
 	}
+	private native void setThreading(Threading threading, long handle);
+	
 	public void setCntrlProgress(Progress cntrlProgress) {
-		this.cntrlProgress = cntrlProgress;
+		setCntrlProgress(cntrlProgress, this.handle);
 	}
+	private native void setCntrlProgress(Progress cntrlProgress, long handle);
+	
 	public void setDataProgress(Progress dataProgress) {
-		this.dataProgress = dataProgress;
+		setDataProgress(dataProgress, this.handle);
 	}
+	private native void setDataProgress(Progress dataProgress, long handle);
+	
 	public void setResourceMgmt(ResourceMgmt resourceMgmt) {
-		this.resourceMgmt = resourceMgmt;
+		setResourceMgmt(resourceMgmt, this.handle);
 	}
-	public void setAvType(AVType avType) {
-		this.avType = avType;
+	private native void setResourceMgmt(ResourceMgmt resourceMgmt, long handle);
+	
+	public void setAVType(AVType avType) {
+		setAVType(avType, this.handle);
 	}
+	private native void setAVType(AVType avType, long handle);
+	
 	public void setMRMode(MRMode mrMode) {
-		this.mrMode = mrMode;
+		setMRMode(mrMode, this.handle);
 	}
-	public void setMrKeySize(int mrKeySize) {
-		this.mrKeySize = mrKeySize;
+	private native void setMRMode(MRMode mrMode, long handle);
+	
+	public void setMRKeySize(int mrKeySize) {
+		setMRKeySize(mrKeySize, this.handle);
 	}
-	public void setCqDataSize(int cqDataSize) {
-		this.cqDataSize = cqDataSize;
+	private native void setMRKeySize(int mrKeySize, long handle);
+	
+	public void setCQDataSize(int cqDataSize) {
+		setCQDataSize(cqDataSize, this.handle);
 	}
-	public void setCqCnt(int cqCnt) {
-		this.cqCnt = cqCnt;
+	private native void setCQDataSize(int mrKeySize, long handle);
+	
+	public void setCQCnt(int cqCnt) {
+		setCQCnt(cqCnt, this.handle);
 	}
-	public void setEndpointCount(int endpointCount) {
-		this.endpointCount = endpointCount;
+	private native void setCQCnt(int cqCnt, long handle);
+	
+	public void setEndpointCnt(int endpointCnt) {
+		setEndpointCnt(endpointCnt, this.handle);
 	}
+	private native void setEndpointCnt(int endpointCnt, long handle);
+	
 	public void setTxCtxCnt(int txCtxCnt) {
-		this.txCtxCnt = txCtxCnt;
+		setTxCtxCnt(txCtxCnt, this.handle);
 	}
+	private native void setTxCtxCnt(int txCtxCnt, long handle);
+	
 	public void setRxCtxCnt(int rxCtxCnt) {
-		this.rxCtxCnt = rxCtxCnt;
+		setRxCtxCnt(rxCtxCnt, this.handle);
 	}
-	public void setMaxEpTxCtx(int mapEpTxCtx) {
-		this.maxEpTxCtx = mapEpTxCtx;
+	private native void setRxCtxCnt(int rxCtxCnt, long handle);
+	
+	public void setMaxEpTxCtx(int maxEpTxCtx) {
+		setMaxEpTxCtx(maxEpTxCtx, this.handle);
 	}
-	public void setMaxEpRxCtx(int mapEpRxCtx) {
-		this.maxEpRxCtx = mapEpRxCtx;
+	private native void setMaxEpTxCtx(int maxEpTxCtx, long handle);
+	
+	public void setMaxEpRxCtx(int maxEpRxCtx) {
+		setMaxEpRxCtx(maxEpRxCtx, this.handle);
 	}
+	private native void setMaxEpRxCtx(int maxEpRxCtx, long handle);
+	
 	public void setMaxEpStxCtx(int maxEpStxCtx) {
-		this.maxEpStxCtx = maxEpStxCtx;
+		setMaxEpStxCtx(maxEpStxCtx, this.handle);
 	}
+	private native void setMaxEpStxCtx(int maxEpStxCtx, long handle);
+	
 	public void setMaxEpSrxCtx(int maxEpSrxCtx) {
-		this.maxEpSrxCtx = maxEpSrxCtx;
+		setMaxEpSrxCtx(maxEpSrxCtx, this.handle);
 	}
+	private native void setMaxEpSrxCtx(int maxEpSrxCtx, long handle);
 }
