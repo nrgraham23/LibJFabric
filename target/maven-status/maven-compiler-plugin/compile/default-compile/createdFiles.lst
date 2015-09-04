@@ -3,6 +3,7 @@ org/ofi/libjfabric/EventQueue.class
 org/ofi/libjfabric/enums/Protocol.class
 org/ofi/libjfabric/enums/MRMode.class
 org/ofi/libjfabric/Wait.class
+org/ofi/libjfabric/attributes/SpecifiedFabricAttr.class
 org/ofi/libjfabric/enums/Threading.class
 org/ofi/libjfabric/Counter.class
 org/ofi/libjfabric/attributes/ReceiveAttr.class
@@ -16,6 +17,7 @@ org/ofi/libjfabric/Poll.class
 org/ofi/libjfabric/EndPoint.class
 org/ofi/libjfabric/ScalableEP.class
 org/ofi/libjfabric/AddressVector.class
+org/ofi/libjfabric/attributes/SpecifiedDomainAttr.class
 org/ofi/libjfabric/attributes/EndPointAttr.class
 org/ofi/libjfabric/enums/ResourceMgmt.class
 org/ofi/libjfabric/attributes/DomainAttr.class

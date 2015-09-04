@@ -54,6 +54,7 @@
 								<javahClassName>org.ofi.libjfabric.enums.Protocol</javahClassName>
 								<javahClassName>org.ofi.libjfabric.Fabric</javahClassName>
 								<javahClassName>org.ofi.libjfabric.LibFabric</javahClassName>
+								<javahClassName>org.ofi.libjfabric.attributes.DomainAttr</javahClassName>
 							</javahClassNames>
 							<javahOutputDirectory>${project.native.directory}/org/ofi/libjfabric_native</javahOutputDirectory>
 						</configuration>

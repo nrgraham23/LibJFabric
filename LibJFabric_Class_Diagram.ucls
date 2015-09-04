@@ -1,268 +1,325 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.1.8" icons="true" automaticImage="JPEG" always-add-relationships="false" 
   generalizations="true" realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <class id="1" language="java" name="org.ofi.libjfabric.attributes.TransmitAttr" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/TransmitAttr.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="368" width="268" x="358" y="481"/>    
+  <class id="1" language="java" name="org.ofi.libjfabric.ScalableEP" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/ScalableEP.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="80" width="100" x="1191" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="2" language="java" name="org.ofi.libjfabric.attributes.ReceiveAttr" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/ReceiveAttr.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="368" width="277" x="41" y="481"/>    
+  <class id="2" language="java" name="org.ofi.libjfabric.LibFabric" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/LibFabric.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="134" width="130" x="2117" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="3" language="java" name="org.ofi.libjfabric.attributes.EndPointAttr" project="LibJFabric" 
+  <class id="3" language="java" name="org.ofi.libjfabric.Counter" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/Counter.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="80" width="98" x="831" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="org.ofi.libjfabric.Info" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/Info.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="548" width="477" x="2789" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="org.ofi.libjfabric.Domain" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/Domain.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="80" width="98" x="1556" y="2341"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="6" language="java" name="org.ofi.libjfabric.Fabric" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/Fabric.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="116" width="251" x="2555" y="2341"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="7" language="java" name="org.ofi.libjfabric.MemoryRegistration" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/MemoryRegistration.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="80" width="162" x="629" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="8" language="java" name="org.ofi.libjfabric.Wait" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/Wait.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="80" width="98" x="1469" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="9" language="java" name="org.ofi.libjfabric.CompletionQueue" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/CompletionQueue.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="80" width="148" x="441" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="10" language="java" name="org.ofi.libjfabric.EndPoint" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/EndPoint.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="98" width="98" x="1331" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="11" language="java" name="org.ofi.libjfabric.AddressVector" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/AddressVector.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="80" width="125" x="1814" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="12" language="java" name="org.ofi.libjfabric.EventQueue" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/EventQueue.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="80" width="108" x="2464" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="13" language="java" name="org.ofi.libjfabric.Poll" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/Poll.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="80" width="98" x="1979" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="14" language="java" name="org.ofi.libjfabric.attributes.FabricAttr" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/FabricAttr.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="296" width="206" x="2555" y="625"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="15" language="java" name="org.ofi.libjfabric.attributes.EndPointAttr" project="LibJFabric" 
     file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/EndPointAttr.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="386" width="284" x="1387" y="481"/>    
+    <position height="548" width="284" x="2231" y="625"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="4" language="java" name="org.ofi.libjfabric.LibFabric" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/LibFabric.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="80" width="98" x="130" y="37"/>    
+  <class id="16" language="java" name="org.ofi.libjfabric.attributes.SpecifiedDomainAttr" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/SpecifiedDomainAttr.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="80" width="165" x="1556" y="2041"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <enumeration id="5" language="java" name="org.ofi.libjfabric.enums.EPType" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/EPType.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="260" width="137" x="1387" y="1123"/>    
+  <class id="17" language="java" name="org.ofi.libjfabric.attributes.SpecifiedFabricAttr" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/SpecifiedFabricAttr.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="80" width="156" x="2555" y="2041"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
-  </enumeration>  
-  <enumeration id="6" language="java" name="org.ofi.libjfabric.enums.ResourceMgmt" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/ResourceMgmt.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="224" width="175" x="128" y="1123"/>    
+  </class>  
+  <class id="18" language="java" name="org.ofi.libjfabric.attributes.ReceiveAttr" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/ReceiveAttr.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="512" width="277" x="3109" y="625"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
-  </enumeration>  
-  <enumeration id="7" language="java" name="org.ofi.libjfabric.enums.Progress" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/Progress.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="224" width="137" x="873" y="1123"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </enumeration>  
-  <enumeration id="8" language="java" name="org.ofi.libjfabric.enums.MRMode" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/MRMode.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="224" width="145" x="343" y="1123"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </enumeration>  
-  <enumeration id="9" language="java" name="org.ofi.libjfabric.enums.Threading" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/Threading.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="332" width="167" x="666" y="1123"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </enumeration>  
-  <enumeration id="10" language="java" name="org.ofi.libjfabric.enums.Protocol" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/Protocol.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="404" width="182" x="356" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </enumeration>  
-  <enumeration id="11" language="java" name="org.ofi.libjfabric.enums.AVType" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/AVType.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="224" width="137" x="1050" y="1123"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </enumeration>  
-  <class id="12" language="java" name="org.ofi.libjfabric.attributes.DomainAttr" project="LibJFabric" 
+  </class>  
+  <class id="19" language="java" name="org.ofi.libjfabric.attributes.DomainAttr" project="LibJFabric" 
     file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/DomainAttr.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="602" width="681" x="666" y="481"/>    
+    <position height="1376" width="635" x="1556" y="625"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="13" language="java" name="org.ofi.libjfabric.Info" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/Info.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="170" width="477" x="666" y="37"/>    
+  <class id="20" language="java" name="org.ofi.libjfabric.attributes.TransmitAttr" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/TransmitAttr.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="512" width="268" x="2801" y="625"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="14" language="java" name="org.ofi.libjfabric.Fabric" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/Fabric.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="80" width="98" x="1711" y="1123"/>    
+  <enumeration id="21" language="java" name="org.ofi.libjfabric.enums.ResourceMgmt" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/ResourceMgmt.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="224" width="175" x="226" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
-  </class>  
-  <class id="15" language="java" name="org.ofi.libjfabric.Domain" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/Domain.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="80" width="98" x="528" y="1123"/>    
+  </enumeration>  
+  <enumeration id="22" language="java" name="org.ofi.libjfabric.enums.Progress" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/Progress.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="224" width="137" x="2612" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
-  </class>  
-  <class id="16" language="java" name="org.ofi.libjfabric.attributes.FabricAttr" project="LibJFabric" 
-    file="/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/FabricAttr.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="206" width="206" x="1711" y="481"/>    
+  </enumeration>  
+  <enumeration id="23" language="java" name="org.ofi.libjfabric.enums.MRMode" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/MRMode.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="224" width="145" x="41" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
-  </class>  
-  <association id="17">    
-    <end type="SOURCE" refId="13" navigable="false">      
-      <attribute id="18" name="receiveAttr"/>      
-      <multiplicity id="19" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="20">    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="21" name="threading"/>      
-      <multiplicity id="22" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="9" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="23">    
-    <end type="SOURCE" refId="16" navigable="false">      
-      <attribute id="24" name="fabric"/>      
-      <multiplicity id="25" minimum="0" maximum="1"/>    
+  </enumeration>  
+  <enumeration id="24" language="java" name="org.ofi.libjfabric.enums.Threading" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/Threading.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="332" width="167" x="1607" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </enumeration>  
+  <enumeration id="25" language="java" name="org.ofi.libjfabric.enums.EPType" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/EPType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="260" width="137" x="2231" y="2041"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </enumeration>  
+  <enumeration id="26" language="java" name="org.ofi.libjfabric.enums.Protocol" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/Protocol.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="404" width="182" x="969" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </enumeration>  
+  <enumeration id="27" language="java" name="org.ofi.libjfabric.enums.AVType" project="LibJFabric" 
+    file="/LibJFabric/src/main/java/org/ofi/libjfabric/enums/AVType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="224" width="137" x="2287" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </enumeration>  
+  <association id="28">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="29" name="fabricAttr"/>      
+      <multiplicity id="30" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="14" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="26">    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="27" name="avType"/>      
-      <multiplicity id="28" minimum="0" maximum="1"/>    
+  <association id="31">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="32" name="transmitAttr"/>      
+      <multiplicity id="33" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="11" navigable="true"/>    
+    <end type="TARGET" refId="20" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="29">    
-    <end type="SOURCE" refId="13" navigable="false">      
-      <attribute id="30" name="domainAttr"/>      
-      <multiplicity id="31" minimum="0" maximum="1"/>    
+  <association id="34">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="35" name="receiveAttr"/>      
+      <multiplicity id="36" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="12" navigable="true"/>    
+    <end type="TARGET" refId="18" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="32">    
-    <end type="SOURCE" refId="13" navigable="false">      
-      <attribute id="33" name="endpointAttr"/>      
-      <multiplicity id="34" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="35">    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="36" name="mrMode"/>      
-      <multiplicity id="37" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="8" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="38">    
-    <end type="SOURCE" refId="13" navigable="false">      
-      <attribute id="39" name="fabricAttr"/>      
-      <multiplicity id="40" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="16" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="41">    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="42" name="domain"/>      
-      <multiplicity id="43" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="15" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="44">    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="45" name="resourceMgmt"/>      
-      <multiplicity id="46" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="6" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="47">    
-    <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="48" name="epType">        
-        <position height="0" width="0" x="-1" y="-15"/>      
-      </attribute>      
-      <multiplicity id="49" minimum="0" maximum="1">        
-        <position height="0" width="0" x="-1" y="-15"/>      
-      </multiplicity>    
+  <association id="37">    
+    <end type="SOURCE" refId="16" navigable="false">      
+      <attribute id="38" name="domain"/>      
+      <multiplicity id="39" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="5" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="50">    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="51" name="dataProgress"/>      
-      <multiplicity id="52" minimum="0" maximum="1"/>    
+  <association id="40">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="41" name="endpointAttr"/>      
+      <multiplicity id="42" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="7" navigable="true"/>    
+    <end type="TARGET" refId="15" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="53">    
-    <end type="SOURCE" refId="13" navigable="false">      
-      <attribute id="54" name="transmitAttr"/>      
-      <multiplicity id="55" minimum="0" maximum="1"/>    
+  <association id="43">    
+    <end type="SOURCE" refId="15" navigable="false">      
+      <attribute id="44" name="epType"/>      
+      <multiplicity id="45" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
+    <end type="TARGET" refId="25" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="56">    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="57" name="cntrlProgress"/>      
-      <multiplicity id="58" minimum="0" maximum="1"/>    
+  <association id="46">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="47" name="domainAttr"/>      
+      <multiplicity id="48" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="7" navigable="true"/>    
+    <end type="TARGET" refId="19" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+  <association id="49">    
+    <end type="SOURCE" refId="17" navigable="false">      
+      <attribute id="50" name="fabric"/>      
+      <multiplicity id="51" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="52">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="14"/>  
+  </generalization>  
+  <generalization id="53">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="19"/>  
+  </generalization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     sort-features="false" accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    

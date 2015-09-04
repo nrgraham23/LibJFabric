@@ -1,3 +1,4 @@
+/Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/SpecifiedFabricAttr.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/TransmitAttr.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/CompletionQueue.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/MemoryRegistration.java
@@ -16,6 +17,7 @@
 /Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/enums/Threading.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/EndPoint.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/enums/Protocol.java
+/Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/SpecifiedDomainAttr.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/enums/ResourceMgmt.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/attributes/DomainAttr.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/main/java/org/ofi/libjfabric/AddressVector.java

@@ -19,8 +19,9 @@ public class DomainAttr {
 			int endpointCount, int txCtxCnt, int rxCtxCnt, int maxEpTxCtx, int maxEpRxCtx, int maxEpStxCtx, int maxEpSrxCtx);
 	
 	public DomainAttr() {
-		
+		this.handle = initEmpty();
 	}
+	private native static long initEmpty();
 	
 	//gets
 	public String getName() {
@@ -120,34 +121,34 @@ public class DomainAttr {
 	private native void setName(String name, long handle);
 	
 	public void setThreading(Threading threading) {
-		setThreading(threading, this.handle);
+		setThreading(threading.getVal(), this.handle);
 	}
-	private native void setThreading(Threading threading, long handle);
+	private native void setThreading(int threading, long handle);
 	
 	public void setCntrlProgress(Progress cntrlProgress) {
-		setCntrlProgress(cntrlProgress, this.handle);
+		setCntrlProgress(cntrlProgress.getVal(), this.handle);
 	}
-	private native void setCntrlProgress(Progress cntrlProgress, long handle);
+	private native void setCntrlProgress(int cntrlProgress, long handle);
 	
 	public void setDataProgress(Progress dataProgress) {
-		setDataProgress(dataProgress, this.handle);
+		setDataProgress(dataProgress.getVal(), this.handle);
 	}
-	private native void setDataProgress(Progress dataProgress, long handle);
+	private native void setDataProgress(int dataProgress, long handle);
 	
 	public void setResourceMgmt(ResourceMgmt resourceMgmt) {
-		setResourceMgmt(resourceMgmt, this.handle);
+		setResourceMgmt(resourceMgmt.getVal(), this.handle);
 	}
-	private native void setResourceMgmt(ResourceMgmt resourceMgmt, long handle);
+	private native void setResourceMgmt(int resourceMgmt, long handle);
 	
 	public void setAVType(AVType avType) {
-		setAVType(avType, this.handle);
+		setAVType(avType.getVal(), this.handle);
 	}
-	private native void setAVType(AVType avType, long handle);
+	private native void setAVType(int avType, long handle);
 	
 	public void setMRMode(MRMode mrMode) {
-		setMRMode(mrMode, this.handle);
+		setMRMode(mrMode.getVal(), this.handle);
 	}
-	private native void setMRMode(MRMode mrMode, long handle);
+	private native void setMRMode(int mrMode, long handle);
 	
 	public void setMRKeySize(int mrKeySize) {
 		setMRKeySize(mrKeySize, this.handle);

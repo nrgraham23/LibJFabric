@@ -15,6 +15,20 @@ public enum MRMode {
 		return val;
 	}
 	
+	//private because it should only be used from the JNI code
+	private static MRMode getMRMode(int val) {
+		if(val == MRMode.UNSPEC.getVal()) {
+			return MRMode.UNSPEC;
+		}
+		if(val == MRMode.BASIC.getVal()) {
+			return MRMode.BASIC;
+		}
+		if(val == MRMode.SCALABLE.getVal()) {
+			return MRMode.SCALABLE;
+		}
+		throw new IllegalArgumentException("Invalid integer value for method getMRMode!");
+	}
+	
 	private static native int getUNSPEC();
 	private static native int getBASIC();
 	private static native int getSCALABLE();

@@ -15,6 +15,20 @@ public enum AVType {
 		return val;
 	}
 	
+	//private because it should only be used from the JNI code
+	private static AVType getAVType(int val) {
+		if(val == AVType.UNSPEC.getVal()) {
+			return AVType.UNSPEC;
+		}
+		if(val == AVType.MAP.getVal()) {
+			return AVType.MAP;
+		}
+		if(val == AVType.TABLE.getVal()) {
+			return AVType.TABLE;
+		}
+		throw new IllegalArgumentException("Invalid integer value for method getAVType!");
+	}
+	
 	private static native int getUNSPEC();
 	private static native int getMAP();
 	private static native int getTABLE();

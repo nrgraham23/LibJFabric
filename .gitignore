@@ -10,4 +10,4 @@
 *.o
 /target/
 *.jar
-*.h
+org_*.h
