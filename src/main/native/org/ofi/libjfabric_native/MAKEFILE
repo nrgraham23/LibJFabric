@@ -16,7 +16,7 @@ C_SOURCES = 		\
 	ep_type.c		\
 	protocol.c		\
 	fabric.c		\
-	lib_fabric.c		\
+	lib_fabric.c	\
 	domain_attr.c
 
 O_FILES =			\
@@ -28,7 +28,7 @@ O_FILES =			\
 	ep_type.o		\
 	protocol.o		\
 	fabric.o		\
-	lib_fabric.o		\
+	lib_fabric.o	\
 	domain_attr.o
 
 all: libjfab_native.dylib

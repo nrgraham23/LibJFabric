@@ -6,6 +6,7 @@ public class LibFabric {
 		try {
 			System.loadLibrary("jfab_native");
 			init();
+			registerNativeCleanup();
 		} catch (UnsatisfiedLinkError e) {
 			throw new RuntimeException("Could not load the libfabric native library");
 		}
@@ -15,6 +16,7 @@ public class LibFabric {
 		try {
 			System.loadLibrary("jfab_native");
 			init();
+			registerNativeCleanup();
 			return true;
 		} catch (UnsatisfiedLinkError e) {
 			return false;
@@ -23,4 +25,19 @@ public class LibFabric {
 	
 	private static native void init();
 	
+	private static void registerNativeCleanup() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				nativeCleanup();
+			}
+		});
+	}
+	
+	private static void nativeCleanup() {
+		System.out.println("Cleaning up native variables");
+		deleteCachedVars();
+	}
+	
+	private static native void deleteCachedVars();
 }

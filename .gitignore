@@ -11,3 +11,4 @@
 /target/
 *.jar
 org_*.h
+*.log
