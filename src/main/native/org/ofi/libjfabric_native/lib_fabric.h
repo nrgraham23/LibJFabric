@@ -8,6 +8,9 @@
 extern struct fi_domain_attr *domain_attr_list[];
 extern int domain_attr_list_tail;
 
+extern  void *simple_attr_list[];
+extern int simple_attr_list_tail;
+
 typedef struct {
 	jclass AVTypeClass;
 	jclass EPTypeClass;
@@ -29,5 +32,8 @@ extern libfabric_enum_globals_t lib_enums;
 
 void initEnumMethods(JNIEnv *env);
 void deleteEnumMethods(JNIEnv *env);
+void deleteDomainAttrList();
+void deleteSimpleAttrList();
+void nullListsOut();
 
 #endif

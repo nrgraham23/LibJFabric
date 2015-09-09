@@ -1,16 +1,25 @@
 #include "org_ofi_libjfabric_LibFabric.h"
 #include "lib_fabric.h"
 
-struct fi_domain_attr *domain_attr_list[1000];
+#define LISTSIZE 1000
+
+struct fi_domain_attr *domain_attr_list[LISTSIZE];
 int domain_attr_list_tail = 0;
+
+void *simple_attr_list[LISTSIZE];
+int simple_attr_list_tail = 0;
+
 libfabric_enum_globals_t lib_enums;
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclass jthis) {
 	initEnumMethods(env);
+
+	nullListsOut(); //can be removed when we move to a different method of keeping track of C things
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv *env, jclass jthis) {
 	deleteEnumMethods(env);
+	deleteSimpleAttrList();
 }
 
 void initEnumMethods(JNIEnv *env) {
@@ -38,4 +47,35 @@ void deleteEnumMethods(JNIEnv *env) {
 	(*env)->DeleteGlobalRef(env, lib_enums.ProtocolClass);
 	(*env)->DeleteGlobalRef(env, lib_enums.ResourceMgmtClass);
 	(*env)->DeleteGlobalRef(env, lib_enums.ThreadingClass);
+}
+
+void deleteDomainAttrList() {
+	int i = 0;
+
+	while(domain_attr_list[i] != NULL && i < LISTSIZE) {
+		domain_attr_list[i]->domain = NULL;
+		if(domain_attr_list[i]->name != 0) {
+			free(domain_attr_list[i]->name);
+		}
+		free(domain_attr_list[i]);
+		i++;
+	}
+}
+
+void deleteSimpleAttrList() {
+	int i = 0;
+
+	while(simple_attr_list[i] != NULL && i < LISTSIZE) {
+		free(simple_attr_list[i]);
+		i++;
+	}
+}
+
+void nullListsOut() {
+	int i;
+
+	for(i = 0; i < LISTSIZE; i++) {
+		domain_attr_list[i] = NULL;
+		simple_attr_list[i] = NULL;
+	}
 }

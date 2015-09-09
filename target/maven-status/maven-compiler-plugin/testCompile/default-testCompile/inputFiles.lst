@@ -2,6 +2,7 @@
 /Users/ngraham/Documents/workspace/LibJFabric/src/test/java/org/ofi/libjfabrictests/TestGetInfo.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/test/java/org/ofi/libjfabrictests/TestProtocol.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/test/java/org/ofi/libjfabrictests/TestResourceMgmt.java
+/Users/ngraham/Documents/workspace/LibJFabric/src/test/java/org/ofi/libjfabrictests/TestEndPointAttr.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/test/java/org/ofi/libjfabrictests/TestAVType.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/test/java/org/ofi/libjfabrictests/TestEPType.java
 /Users/ngraham/Documents/workspace/LibJFabric/src/test/java/org/ofi/libjfabrictests/TestThreading.java

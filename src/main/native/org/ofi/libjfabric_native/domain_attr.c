@@ -9,9 +9,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_initDomain
 		jint jepCnt, jint jtxCtxCnt, jint jrxCtxCnt, jint jmaxEpTxCtx, jint jmaxEpRxCtx,
 		jint jmaxEpStxCtx, jint jmaxEpSrxCtx)
 {
-	struct fi_domain_attr *domain_attr = (struct fi_domain_attr*)malloc(sizeof(struct fi_domain_attr));
-	domain_attr->domain = NULL;
-	domain_attr->name = NULL;
+	struct fi_domain_attr *domain_attr = (struct fi_domain_attr*)calloc(1, sizeof(struct fi_domain_attr));
 
 	setName(env, domain_attr, name);
 
@@ -34,7 +32,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_initDomain
 
 	domain_attr_list[domain_attr_list_tail] = domain_attr;
 	domain_attr_list_tail++;
-	return (jlong)domain_attr_list[domain_attr_list_tail - 1];
+	return (jlong)domain_attr;
 }
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_initEmpty

@@ -35,7 +35,6 @@ public class LibFabric {
 	}
 	
 	private static void nativeCleanup() {
-		System.out.println("Cleaning up native variables");
 		deleteCachedVars();
 	}
 	

@@ -1,47 +1,49 @@
 package org.ofi.libjfabric.attributes;
 
-import org.ofi.libjfabric.*;
-
 public class FabricAttr {
-	private String name;
-	private String providerName;
-	private int providerVersion;
+	protected long handle;
 
-	public FabricAttr(Fabric fabric, String name, String providerName, int providerVersion) {
-		this.name = name;
-		this.providerName = providerName;
-		this.providerVersion = providerVersion;
+	public FabricAttr(String name, String providerName, int providerVersion) {
+		this.handle = initFabricAttr(name, providerName, providerVersion);
 	}
 	
+	private native long initFabricAttr(String name, String providerName, int providerVersion);
+	
 	public FabricAttr() {
-		
+		this.handle = initEmpty();
 	}
+	
+	private native long initEmpty();
 
 	//gets
-	/*public Fabric getFabric() {
-		return this.fabric;
-	}*/
 	public String getName() {
-		return this.name;
+		return getName(this.handle);
 	}
+	private native String getName(long handle);
+	
 	public String getProviderName() {
-		return this.providerName;
+		return getProviderName(this.handle);
 	}
+	private native String getProviderName( long handle);
+	
 	public int getProviderVersion() {
-		return this.providerVersion;
+		return getProviderVersion(this.handle);
 	}
+	private native int getProviderVersion(long handle);
 
 	//sets
-	/*public void setFabric(Fabric fabric) {
-		this.fabric = fabric;
-	}*/
 	public void setName(String name) {
-		this.name = name;
+		setName(name, this.handle);
 	}
+	private native void setName(String name, long handle);
+	
 	public void setProviderName(String providerName) {
-		this.providerName = providerName;
+		setProviderName(providerName, this.handle);
 	}
+	private native void setProviderName(String providerName, long handle);
+	
 	public void setProviderVersion(int providerVersion) {
-		this.providerVersion = providerVersion;
+		setProviderVersion(providerVersion, this.handle);
 	}
+	private native void setProviderVersion(int providerVersion, long handle);
 }

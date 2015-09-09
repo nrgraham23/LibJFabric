@@ -3,7 +3,7 @@ package org.ofi.libjfabric.attributes;
 import org.ofi.libjfabric.enums.*;
 
 public class DomainAttr {
-	private long handle;
+	protected long handle;
 	
 	public DomainAttr(String name, Threading threading, Progress cntrlProgress, Progress dataProgress, 
 			ResourceMgmt resourceMgmt, AVType avType, MRMode mrMode, int mrKeySize, int cqDataSize, int cqCnt, 

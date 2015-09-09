@@ -3,84 +3,131 @@ package org.ofi.libjfabric.attributes;
 import org.ofi.libjfabric.enums.EPType;
 
 public class EndPointAttr {
-	private EPType epType;
-	private int protocol;
-	private int protoVersion;
-	private int maxMsgSize;
-	private int msgPrefixSize;
-	private int maxOrderWawSize;
-	private long memTagFormat;
-	private int txCtxCnt;
-	private int rxCtxCnt;
+	private long handle;
 
 	public EndPointAttr(EPType epType, int protocol, int protoVersion, int maxMsgSize, int msgPrefixSize,
-			int maxOrderWawSize, long memTagFormat, int txCtxCnt, int rxCtxCnt) {
-		this.epType = epType;
-		this.protocol = protocol;
-		this.protoVersion = protoVersion;
-		this.maxMsgSize = maxMsgSize;
-		this.msgPrefixSize = msgPrefixSize;
-		this.maxOrderWawSize = maxOrderWawSize;
-		this.memTagFormat = memTagFormat;
-		this.txCtxCnt = txCtxCnt;
-		this.rxCtxCnt = rxCtxCnt;
+			int maxOrderRawSize, int maxOrderWarSize, int maxOrderWawSize, long memTagFormat, int txCtxCnt, int rxCtxCnt) {
+		this.handle = initEndPointAttr(epType.getVal(), protocol, protoVersion, maxMsgSize, msgPrefixSize,
+				maxOrderRawSize, maxOrderWarSize, maxOrderWawSize, memTagFormat, txCtxCnt, rxCtxCnt);
 	}
-
+	private native long initEndPointAttr(int epType, int protocol, int protoVersion, int maxMsgSize, int msgPrefixSize,
+			int maxOrderRawSize, int maxOrderWarSize, int maxOrderWawSize, long memTagFormat, int txCtxCnt, int rxCtxCnt);
+	
+	public EndPointAttr() {
+		this.handle = initEmpty();
+	}
+	private native long initEmpty();
+	
 	//gets
 	public EPType getEpType() {
-		return this.epType;
+		return getEpType(this.handle);
 	}
+	private native EPType getEpType(long handle);
+	
 	public int getProtocol() {
-		return this.protocol;
+		return getProtocol(this.handle);
 	}
+	private native int getProtocol(long handle);
+	
 	public int getProtoVersion() {
-		return this.protoVersion;
+		return getProtoVersion(this.handle);
 	}
+	private native int getProtoVersion(long handle);
+	
 	public int getMaxMsgSize() {
-		return this.maxMsgSize;
+		return getMaxMsgSize(this.handle);
 	}
+	private native int getMaxMsgSize(long handle);
+	
 	public int getMsgPrefixSize() {
-		return this.msgPrefixSize;
+		return getMsgPrefixSize(this.handle);
 	}
+	private native int getMsgPrefixSize(long handle);
+	
+	public int getMaxOrderRawSize() {
+		return getMaxOrderRawSize(this.handle);
+	}
+	private native int getMaxOrderRawSize(long handle);
+	
+	public int getMaxOrderWarSize() {
+		return getMaxOrderWarSize(this.handle);
+	}
+	private native int getMaxOrderWarSize(long handle);
+	
 	public int getMaxOrderWawSize() {
-		return this.maxOrderWawSize;
+		return getMaxOrderWawSize(this.handle);
 	}
+	private native int getMaxOrderWawSize(long handle);
+	
 	public long getMemTagFormat() {
-		return this.memTagFormat;
+		return getMemTagFormat(this.handle);
 	}
+	private native long getMemTagFormat(long handle);
+	
 	public int getTxCtxCnt() {
-		return this.txCtxCnt;
+		return getTxCtxCnt(this.handle);
 	}
+	private native int getTxCtxCnt(long handle);
+	
 	public int getRxCtxCnt() {
-		return this.rxCtxCnt;
+		return getRxCtxCnt(this.handle);
 	}
+	private native int getRxCtxCnt(long handle);
 
 	//sets
 	public void setEpType(EPType epType) {
-		this.epType = epType;
+		setEpType(epType.getVal(), this.handle);
 	}
+	private native void setEpType(int epType, long handle);
+	
 	public void setProtocol(int protocol) {
-		this.protocol = protocol;
+		setProtocol(protocol, this.handle);
 	}
+	private native void setProtocol(int protocol, long handle);
+	
 	public void setProtoVersion(int protoVersion) {
-		this.protoVersion = protoVersion;
+		setProtoVersion(protoVersion, this.handle);
 	}
+	private native void setProtoVersion(int protoVersion, long handle);
+	
 	public void setMaxMsgSize(int maxMsgSize) {
-		this.maxMsgSize = maxMsgSize;
+		setMaxMsgSize(maxMsgSize, this.handle);
 	}
+	private native void setMaxMsgSize(int maxMdgSize, long handle);
+	
 	public void setMsgPrefixSize(int msgPrefixSize) {
-		this.msgPrefixSize = msgPrefixSize;
+		setMsgPrefixSize(msgPrefixSize, this.handle);
 	}
+	private native void setMsgPrefixSize(int msgPrefixSize, long handle);
+	
+	public void setMaxOrderRawSize(int maxOrderRawSize) {
+		setMaxOrderRawSize(maxOrderRawSize, this.handle);
+	}
+	private native void setMaxOrderRawSize(int maxOrderRawSize, long handle);
+	
+	public void setMaxOrderWarSize(int maxOrderWarSize) {
+		setMaxOrderWarSize(maxOrderWarSize, this.handle);
+	}
+	private native void setMaxOrderWarSize(int maxOrderWarSize, long handle);
+	
 	public void setMaxOrderWawSize(int maxOrderWawSize) {
-		this.maxOrderWawSize = maxOrderWawSize;
+		setMaxOrderWawSize(maxOrderWawSize, this.handle);
 	}
+	private native void setMaxOrderWawSize(int maxOrderWawSize, long handle);
+	
 	public void setMemTagFormat(long memTagFormat) {
-		this.memTagFormat = memTagFormat;
+		setMemTagFormat(memTagFormat, this.handle);
 	}
+	private native void setMemTagFormat(long memTagFormat, long handle);
+	
 	public void setTxCtxCnt(int txCtxCnt) {
-		this.txCtxCnt = txCtxCnt;
+		setTxCtxCnt(txCtxCnt, this.handle);
 	}
+	private native void setTxCtxCnt(int txCtxCnt, long handle);
+	
 	public void setRxCtxCnt(int rxCtxCnt) {
-		this.rxCtxCnt = rxCtxCnt;
+		setRxCtxCnt(rxCtxCnt, this.handle);
 	}
+	private native void setRxCtxCnt(int rxCtxCnt, long handle);
+	
 }
