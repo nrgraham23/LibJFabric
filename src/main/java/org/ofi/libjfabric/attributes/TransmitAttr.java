@@ -3,11 +3,12 @@ package org.ofi.libjfabric.attributes;
 public class TransmitAttr {
 	private long handle;
 	
-	public TransmitAttr(long caps, long mode, long opFlags, long msgOrder, int injectSize, int size, int iovLimit, int rmaIovLimit) {
-		this.handle = initTransmitAttr(caps, mode, opFlags, msgOrder, injectSize, size, iovLimit, rmaIovLimit);
+	public TransmitAttr(long caps, long mode, long opFlags, long msgOrder, long compOrder, int injectSize, 
+			int size, int iovLimit, int rmaIovLimit) {
+		this.handle = initTransmitAttr(caps, mode, opFlags, msgOrder, compOrder, injectSize, size, iovLimit, rmaIovLimit);
 	}
-	private native long initTransmitAttr(long caps, long mode, long opFlags, long msgOrder, int injectSize, int size, 
-			int iovLimit, int rmaIovLimit);
+	private native long initTransmitAttr(long caps, long mode, long opFlags, long msgOrder, long compOrder, 
+			int injectSize, int size, int iovLimit, int rmaIovLimit);
 
 	public TransmitAttr() {
 		this.handle = initEmpty();
@@ -34,6 +35,11 @@ public class TransmitAttr {
 		return getMsgOrder(this.handle);
 	}
 	private native long getMsgOrder(long handle);
+	
+	public long getCompOrder() {
+		return getCompOrder(this.handle);
+	}
+	private native long getCompOrder(long handle);
 	
 	public int getInjectSize() {
 		return getInjectSize(this.handle);
@@ -75,6 +81,11 @@ public class TransmitAttr {
 		setMsgOrder(msgOrder, this.handle);
 	}
 	private native void setMsgOrder(long msgOrder, long handle);
+	
+	public void setCompOrder(long compOrder) {
+		setCompOrder(compOrder, this.handle);
+	}
+	private native void setCompOrder(long compOrder, long handle);
 	
 	public void setInjectSize(int injectSize) {
 		setInjectSize(injectSize, this.handle);

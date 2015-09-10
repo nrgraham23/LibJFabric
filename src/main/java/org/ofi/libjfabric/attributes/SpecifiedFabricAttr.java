@@ -5,10 +5,9 @@ import org.ofi.libjfabric.Fabric;
 public class SpecifiedFabricAttr extends FabricAttr {
 	
 	public SpecifiedFabricAttr(Fabric fabric, String name, String providerName, int providerVersion) {
-		this.handle = initSpecifiedFabricAttr(fabric.getHandle(), name, providerName, providerVersion);
+		super(name, providerName, providerVersion);
+		setFabric(fabric.getHandle(), this.handle);
 	}
-	
-	private native long initSpecifiedFabricAttr(long fabricHandle, String name, String providerName, int providerVersion);
 	
 	public SpecifiedFabricAttr(Fabric fabric) {
 		this.handle = initWithFabric(fabric.getHandle());

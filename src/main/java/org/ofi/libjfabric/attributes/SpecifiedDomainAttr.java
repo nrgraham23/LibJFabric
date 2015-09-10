@@ -12,14 +12,11 @@ public class SpecifiedDomainAttr extends DomainAttr {
 	public SpecifiedDomainAttr(Domain domain, String name, Threading threading, Progress cntrlProgress, Progress dataProgress, 
 			ResourceMgmt resourceMgmt, AVType avType, MRMode mrMode, int mrKeySize, int cqDataSize, int cqCnt, 
 			int endpointCount, int txCtxCnt, int rxCtxCnt, int maxEpTxCtx, int maxEpRxCtx, int maxEpStxCtx, int maxEpSrxCtx) {
-		this.handle = initSpecifiedDomainAttr(domain, name, threading.getVal(), cntrlProgress.getVal(), dataProgress.getVal(), 
-				resourceMgmt.getVal(), avType.getVal(), mrMode.getVal(), mrKeySize, cqDataSize, cqCnt, endpointCount, 
-				txCtxCnt, rxCtxCnt, maxEpTxCtx, maxEpRxCtx, maxEpStxCtx, maxEpSrxCtx);
+		super(name, threading, cntrlProgress, dataProgress, resourceMgmt, avType, mrMode, 
+				mrKeySize, cqDataSize, cqCnt, endpointCount, txCtxCnt, rxCtxCnt, maxEpTxCtx, maxEpRxCtx, 
+				maxEpStxCtx, maxEpSrxCtx);
+		setDomain(domain.getHandle(), this.handle);
 	}
-	
-	private native long initSpecifiedDomainAttr(Domain domain, String name, int threading, int cntrlProgress, int dataProgress, 
-			int resourceMgmt, int avType, int mrMode, int mrKeySize, int cqDataSize, int cqCnt, int endpointCount, int txCtxCnt, 
-			int rxCtxCnt, int maxEpTxCtx, int maxEpRxCtx, int maxEpStxCtx, int maxEpSrxCtx);
 	
 	public SpecifiedDomainAttr(Domain domain) {
 		this.handle = initWithDomain(domain.getHandle());
