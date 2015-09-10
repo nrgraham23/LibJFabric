@@ -1,6 +1,6 @@
 #include "org_ofi_libjfabric_attributes_FabricAttr.h"
 #include "fabric.h"
-#include "lib_fabric.h"
+#include "libfabric.h"
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_FabricAttr_initFabricAttr
 (JNIEnv *env, jobject jthis, jstring jname, jstring providerName, jint providerVersion)

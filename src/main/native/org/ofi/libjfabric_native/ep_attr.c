@@ -1,6 +1,6 @@
 #include "org_ofi_libjfabric_attributes_EndPointAttr.h"
 #include "fabric.h"
-#include "lib_fabric.h"
+#include "libfabric.h"
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_EndPointAttr_initEndPointAttr
 	(JNIEnv *env, jobject jthis, jint epType, jint jprotocol, jint protoVersion, jint maxMsgSize,

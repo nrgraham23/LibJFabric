@@ -16,10 +16,11 @@ C_SOURCES = 		\
 	ep_type.c		\
 	protocol.c		\
 	fabric.c		\
-	lib_fabric.c	\
+	libfabric.c		\
 	domain_attr.c	\
 	ep_attr.c		\
-	fabric_attr.c
+	fabric_attr.c	\
+	receive_attr.c
 
 O_FILES =			\
 	av_type.o		\
@@ -30,10 +31,11 @@ O_FILES =			\
 	ep_type.o		\
 	protocol.o		\
 	fabric.o		\
-	lib_fabric.o	\
+	libfabric.o		\
 	domain_attr.o	\
 	ep_attr.o		\
-	fabric_attr.o
+	fabric_attr.o	\
+	receive_attr.c
 
 all: libjfab_native.dylib
 

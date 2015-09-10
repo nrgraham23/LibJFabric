@@ -1,6 +1,6 @@
 #include "org_ofi_libjfabric_attributes_DomainAttr.h"
 #include "fabric.h"
-#include "lib_fabric.h"
+#include "libfabric.h"
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_initDomainAttr
 (JNIEnv *env, jobject jthis, jstring name, jint jthreading, jint jcntrlProgress, jint jdataProgress,

@@ -1,5 +1,5 @@
+#include "libfabric.h"
 #include "org_ofi_libjfabric_LibFabric.h"
-#include "lib_fabric.h"
 
 #define LISTSIZE 1000
 
