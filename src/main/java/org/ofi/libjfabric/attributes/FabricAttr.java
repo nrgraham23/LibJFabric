@@ -6,13 +6,11 @@ public class FabricAttr {
 	public FabricAttr(String name, String providerName, int providerVersion) {
 		this.handle = initFabricAttr(name, providerName, providerVersion);
 	}
-	
 	private native long initFabricAttr(String name, String providerName, int providerVersion);
 	
 	public FabricAttr() {
 		this.handle = initEmpty();
 	}
-	
 	private native long initEmpty();
 
 	//gets

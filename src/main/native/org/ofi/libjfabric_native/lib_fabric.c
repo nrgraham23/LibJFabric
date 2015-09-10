@@ -6,6 +6,9 @@
 struct fi_domain_attr *domain_attr_list[LISTSIZE];
 int domain_attr_list_tail = 0;
 
+struct fi_fabric_attr *fabric_attr_list[LISTSIZE];
+int fabric_attr_list_tail = 0;
+
 void *simple_attr_list[LISTSIZE];
 int simple_attr_list_tail = 0;
 
@@ -19,6 +22,8 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclas
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv *env, jclass jthis) {
 	deleteEnumMethods(env);
+	deleteDomainAttrList();
+	deleteFabricAttrList();
 	deleteSimpleAttrList();
 }
 
@@ -49,15 +54,41 @@ void deleteEnumMethods(JNIEnv *env) {
 	(*env)->DeleteGlobalRef(env, lib_enums.ThreadingClass);
 }
 
+void convertJNIString(JNIEnv *env, char **charPointer, jstring javaString) {
+	if(*charPointer != NULL) {
+		free(*charPointer);
+	}
+	*charPointer = (char*)malloc((int)(*env)->GetStringLength(env, javaString));
+	const char *jniName = (*env)->GetStringUTFChars(env, javaString, NULL);
+	strcpy(*charPointer, jniName);
+	(*env)->ReleaseStringUTFChars(env, javaString, jniName);
+}
+
 void deleteDomainAttrList() {
 	int i = 0;
 
 	while(domain_attr_list[i] != NULL && i < LISTSIZE) {
 		domain_attr_list[i]->domain = NULL;
-		if(domain_attr_list[i]->name != 0) {
+		if(domain_attr_list[i]->name != NULL) {
 			free(domain_attr_list[i]->name);
 		}
 		free(domain_attr_list[i]);
+		i++;
+	}
+}
+
+void deleteFabricAttrList() {
+	int i = 0;
+
+	while(fabric_attr_list[i] != NULL && i < LISTSIZE) {
+		fabric_attr_list[i]->fabric = NULL;
+		if(fabric_attr_list[i]->name != NULL) {
+			free(fabric_attr_list[i]->name);
+		}
+		if(fabric_attr_list[i]->name != NULL) {
+			free(fabric_attr_list[i]->prov_name);
+		}
+		free(fabric_attr_list[i]);
 		i++;
 	}
 }
@@ -76,6 +107,7 @@ void nullListsOut() {
 
 	for(i = 0; i < LISTSIZE; i++) {
 		domain_attr_list[i] = NULL;
+		fabric_attr_list[i] = NULL;
 		simple_attr_list[i] = NULL;
 	}
 }

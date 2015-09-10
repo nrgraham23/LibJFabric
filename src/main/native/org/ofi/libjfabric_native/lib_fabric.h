@@ -8,6 +8,9 @@
 extern struct fi_domain_attr *domain_attr_list[];
 extern int domain_attr_list_tail;
 
+extern struct fi_fabric_attr *fabric_attr_list[];
+extern int fabric_attr_list_tail;
+
 extern  void *simple_attr_list[];
 extern int simple_attr_list_tail;
 
@@ -32,7 +35,9 @@ extern libfabric_enum_globals_t lib_enums;
 
 void initEnumMethods(JNIEnv *env);
 void deleteEnumMethods(JNIEnv *env);
+void convertJNIString(JNIEnv *env, char **charPointer, jstring javaString);
 void deleteDomainAttrList();
+void deleteFabricAttrList();
 void deleteSimpleAttrList();
 void nullListsOut();
 

@@ -1,7 +1,6 @@
 #include "org_ofi_libjfabric_attributes_DomainAttr.h"
 #include "fabric.h"
 #include "lib_fabric.h"
-#include "domain_attr.h"
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_initDomainAttr
 (JNIEnv *env, jobject jthis, jstring name, jint jthreading, jint jcntrlProgress, jint jdataProgress,
@@ -11,7 +10,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_initDomain
 {
 	struct fi_domain_attr *domain_attr = (struct fi_domain_attr*)calloc(1, sizeof(struct fi_domain_attr));
 
-	setName(env, domain_attr, name);
+	convertJNIString(env, &(domain_attr->name), name);
 
 	domain_attr->threading = jthreading;
 	domain_attr->control_progress = jcntrlProgress;
@@ -154,7 +153,7 @@ JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMaxEpSrx
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setName
 (JNIEnv *env, jobject jthis, jstring name, jlong handle)
 {
-	setName(env, (struct fi_domain_attr*)handle, name);
+	convertJNIString(env, &(((struct fi_domain_attr*)handle)->name), name);
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setThreading
@@ -251,14 +250,4 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setMaxEpSrx
 (JNIEnv *env, jobject jthis, jint maxEpSrxCtx, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->max_ep_srx_ctx = maxEpSrxCtx;
-}
-
-void setName(JNIEnv *env, struct fi_domain_attr *domain_attr, jstring name) {
-	if(domain_attr->name != NULL) {
-		free(domain_attr->name);
-	}
-	domain_attr->name = (char*)malloc((int)(*env)->GetStringLength(env, name));
-	const char *jniName = (*env)->GetStringUTFChars(env, name, NULL);
-	strcpy(domain_attr->name, jniName);
-	(*env)->ReleaseStringUTFChars(env, name, jniName);
 }
