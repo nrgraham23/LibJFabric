@@ -53,6 +53,7 @@
 								<javahClassName>org.ofi.libjfabric.enums.EPType</javahClassName>
 								<javahClassName>org.ofi.libjfabric.enums.Protocol</javahClassName>
 								<javahClassName>org.ofi.libjfabric.Fabric</javahClassName>
+								<javahClassName>org.ofi.libjfabric.Info</javahClassName>
 								<javahClassName>org.ofi.libjfabric.LibFabric</javahClassName>
 								<javahClassName>org.ofi.libjfabric.attributes.DomainAttr</javahClassName>
 								<javahClassName>org.ofi.libjfabric.attributes.EndPointAttr</javahClassName>

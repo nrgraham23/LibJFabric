@@ -18,7 +18,15 @@ public class EndPointAttr {
 	}
 	private native long initEmpty();
 	
+	public EndPointAttr(long handle) {
+		this.handle = handle;
+	}
+	
 	//gets
+	public long getHandle() {
+		return this.handle;
+	}
+	
 	public EPType getEpType() {
 		return getEpType(this.handle);
 	}

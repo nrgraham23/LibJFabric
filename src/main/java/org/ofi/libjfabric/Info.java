@@ -3,96 +3,121 @@ package org.ofi.libjfabric;
 import org.ofi.libjfabric.attributes.*;
 
 public class Info {
-	private long caps;
-	private long mode;
-	private int addrFormat;
-	private int srcAddrLen;
-	private int destAddrLen;
-	private TransmitAttr transmitAttr;
-	private ReceiveAttr receiveAttr;
-	private EndPointAttr endpointAttr;
-	private DomainAttr domainAttr;
-	private FabricAttr fabricAttr;
+	private long handle;
 	
 	public Info(long caps, long mode, int addrFormat, int srcAddrLen, int destAddrLen, TransmitAttr transmitAttr,
 			ReceiveAttr receiveAttr, EndPointAttr endpointAttr, DomainAttr domainAttr, FabricAttr fabricAttr) {
-		this.caps = caps;
-		this.mode = mode;
-		this.addrFormat = addrFormat;
-		this.srcAddrLen = srcAddrLen;
-		this.destAddrLen = destAddrLen;
-		this.transmitAttr = transmitAttr;
-		this.receiveAttr = receiveAttr;
-		this.endpointAttr = endpointAttr;
-		this.domainAttr = domainAttr;
-		this.fabricAttr = fabricAttr;
+		this.handle = initInfo(caps, mode, addrFormat, srcAddrLen, destAddrLen, transmitAttr.getHandle(), 
+				receiveAttr.getHandle(), endpointAttr.getHandle(), domainAttr.getHandle(), fabricAttr.getHandle());
 	}
+	private native long initInfo(long caps, long mode, int addrFormat, int srcAddrLen, int destAddrLen, long transmitAttrHandle,
+			long receiveAttrHandle, long endpointAttrHandle, long domainAttrHandle, long fabricAttrHandle);
 	
 	public Info() {
-		
+		this.handle = initEmpty();
 	}
+	private native long initEmpty();
 	
 	//gets
 	public long getCaps() {
-		return this.caps;
+		return getCaps(this.handle);
 	}
+	private native long getCaps(long handle);
+	
 	public long getMode() {
-		return this.mode;
+		return getMode(this.handle);
 	}
+	private native long getMode(long handle);
+	
 	public int getAddrFormat() {
-		return this.addrFormat;
+		return getAddrFormat(this.handle);
 	}
+	private native int getAddrFormat(long handle);
+	
 	public int getSrcAddrLen() {
-		return this.srcAddrLen;
+		return getSrcAddrLen(this.handle);
 	}
+	private native int getSrcAddrLen(long handle);
+	
 	public int getDestAddrLen() {
-		return this.destAddrLen;
+		return getDestAddrLen(this.handle);
 	}
+	private native int getDestAddrLen(long handle);
+	
 	public TransmitAttr getTransmitAttr() {
-		return this.transmitAttr;
+		return new TransmitAttr(getTransmitAttr(this.handle));
 	}
-	public ReceiveAttr getRecieveAttr() {
-		return this.receiveAttr;
+	private native long getTransmitAttr(long handle);
+	
+	public ReceiveAttr getReceiveAttr() {
+		return new ReceiveAttr(getReceiveAttr(this.handle));
 	}
+	private native long getReceiveAttr(long handle);
+	
 	public EndPointAttr getEndPointAttr() {
-		return this.endpointAttr;
+		return new EndPointAttr(getEndPointAttr(this.handle));
 	}
+	private native long getEndPointAttr(long handle);
+	
 	public DomainAttr getDomainAttr() {
-		return this.domainAttr;
+		return new DomainAttr(getDomainAttr(this.handle));
 	}
+	private native long getDomainAttr(long handle);
+	
 	public FabricAttr getFabricAttr() {
-		return this.fabricAttr;
+		return new FabricAttr(getFabricAttr(this.handle));
 	}
+	private native long getFabricAttr(long handle);
 	
 	//sets
 	public void setCaps(long caps) {
-		this.caps = caps;
+		setCaps(caps, this.handle);
 	}
+	private native void setCaps(long caps, long handle);
+	
 	public void setMode(long mode) {
-		this.mode = mode;
+		setMode(mode, this.handle);
 	}
+	private native void setMode(long mode, long handle);
+	
 	public void setAddrFormat(int addrFormat) {
-		this.addrFormat = addrFormat;
+		setAddrFormat(addrFormat, this.handle);
 	}
+	private native void setAddrFormat(int addrFormat, long handle);
+	
 	public void setSrcAddrLen(int srcAddrLen) {
-		this.srcAddrLen = srcAddrLen;
+		setSrcAddrLen(srcAddrLen, this.handle);
 	}
+	private native void setSrcAddrLen(int srcAddrLen, long handle);
+	
 	public void setDestAddrLen(int destAddrLen) {
-		this.destAddrLen = destAddrLen;
+		setDestAddrLen(destAddrLen, this.handle);
 	}
+	private native void setDestAddrLen(int destAddrLen, long handle);
+	
 	public void setTransmitAttr(TransmitAttr transmitAttr) {
-		this.transmitAttr = transmitAttr;
+		setTransmitAttr(transmitAttr.getHandle(), this.handle);
 	}
-	public void setRecieveAttr(ReceiveAttr receiveAttr) {
-		this.receiveAttr = receiveAttr;
+	private native void setTransmitAttr(long transmitAttrHandle, long thisHandle);
+	
+	public void setReceiveAttr(ReceiveAttr receiveAttr) {
+		setReceiveAttr(receiveAttr.getHandle(), this.handle);
 	}
-	public void setEndPointAttr(EndPointAttr endPointattr) {
-		this.endpointAttr = endPointattr;
+	private native void setReceiveAttr(long receiveAttrHandle, long thisHandle);
+	
+	public void setEndPointAttr(EndPointAttr endPointAttr) {
+		setEndPointAttr(endPointAttr.getHandle(), this.handle);
 	}
+	private native void setEndPointAttr(long endPointAttrHandle, long thisHandle);
+	
 	public void setDomainAttr(DomainAttr domainAttr) {
-		this.domainAttr = domainAttr;
+		setDomainAttr(domainAttr.getHandle(), this.handle);
 	}
+	private native void setDomainAttr(long domainAttrHandle, long thisHandle);
+	
 	public void setFabricAttr(FabricAttr fabricAttr) {
-		this.fabricAttr = fabricAttr;
+		setFabricAttr(fabricAttr.getHandle(), this.handle);
 	}
+	private native void setFabricAttr(long fabricAttrHandle, long thisHandle);
+	
 }

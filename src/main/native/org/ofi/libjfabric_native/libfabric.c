@@ -9,6 +9,9 @@ int domain_attr_list_tail = 0;
 struct fi_fabric_attr *fabric_attr_list[LISTSIZE];
 int fabric_attr_list_tail = 0;
 
+struct fi_info *info_list[LISTSIZE];
+int info_list_tail = 0;
+
 void *simple_attr_list[LISTSIZE];
 int simple_attr_list_tail = 0;
 
@@ -22,8 +25,10 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclas
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv *env, jclass jthis) {
 	deleteEnumMethods(env);
+
 	deleteDomainAttrList();
 	deleteFabricAttrList();
+	deleteInfoList();
 	deleteSimpleAttrList();
 }
 
@@ -93,6 +98,24 @@ void deleteFabricAttrList() {
 	}
 }
 
+void deleteInfoList() {
+	int i = 0;
+
+	while(info_list[i] != NULL && i < LISTSIZE) {
+		info_list[i]->next = NULL;
+		info_list[i]->src_addr = NULL;
+		info_list[i]->dest_addr = NULL;
+		info_list[i]->tx_attr = NULL;
+		info_list[i]->rx_attr = NULL;
+		info_list[i]->ep_attr = NULL;
+		info_list[i]->domain_attr = NULL;
+		info_list[i]->fabric_attr = NULL;
+
+		free(info_list[i]);
+		i++;
+	}
+}
+
 void deleteSimpleAttrList() {
 	int i = 0;
 
@@ -108,6 +131,7 @@ void nullListsOut() {
 	for(i = 0; i < LISTSIZE; i++) {
 		domain_attr_list[i] = NULL;
 		fabric_attr_list[i] = NULL;
+		info_list[i] = NULL;
 		simple_attr_list[i] = NULL;
 	}
 }

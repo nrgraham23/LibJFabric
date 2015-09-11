@@ -23,7 +23,8 @@ C_SOURCES = 				\
 	receive_attr.c			\
 	tx_attr.c				\
 	specified_domain_attr.c	\
-	specified_fabric_attr.c
+	specified_fabric_attr.c	\
+	info.c
 
 O_FILES =					\
 	av_type.o				\
@@ -41,7 +42,8 @@ O_FILES =					\
 	receive_attr.c			\
 	tx_attr.o				\
 	specified_domain_attr.o	\
-	specified_fabric_attr.o
+	specified_fabric_attr.o	\
+	info.o
 
 all: libjfab_native.dylib
 

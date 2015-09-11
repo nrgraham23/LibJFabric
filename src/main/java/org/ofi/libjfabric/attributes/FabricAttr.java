@@ -13,7 +13,15 @@ public class FabricAttr {
 	}
 	private native long initEmpty();
 
+	public FabricAttr(long handle) {
+		this.handle = handle;
+	}
+	
 	//gets
+	public long getHandle() {
+		return this.handle;
+	}
+	
 	public String getName() {
 		return getName(this.handle);
 	}

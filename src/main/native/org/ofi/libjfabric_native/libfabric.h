@@ -11,7 +11,10 @@ extern int domain_attr_list_tail;
 extern struct fi_fabric_attr *fabric_attr_list[];
 extern int fabric_attr_list_tail;
 
-extern  void *simple_attr_list[];
+extern struct fi_info *info_list[];
+extern int info_list_tail;
+
+extern  void *simple_attr_list[]; //any struct that can be freed without additional free calls for pointers
 extern int simple_attr_list_tail;
 
 typedef struct {
@@ -38,6 +41,7 @@ void deleteEnumMethods(JNIEnv *env);
 void convertJNIString(JNIEnv *env, char **charPointer, jstring javaString);
 void deleteDomainAttrList();
 void deleteFabricAttrList();
+void deleteInfoList();
 void deleteSimpleAttrList();
 void nullListsOut();
 

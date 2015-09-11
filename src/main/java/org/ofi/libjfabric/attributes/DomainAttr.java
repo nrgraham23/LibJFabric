@@ -23,7 +23,15 @@ public class DomainAttr {
 	}
 	private native static long initEmpty();
 	
+	public DomainAttr(long handle) {
+		this.handle = handle;
+	}
+	
 	//gets
+	public long getHandle() {
+		return this.handle;
+	}
+	
 	public String getName() {
 		return getName(this.handle);
 	}

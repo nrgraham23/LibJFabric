@@ -15,7 +15,15 @@ public class TransmitAttr {
 	}
 	private native long initEmpty();
 	
+	public TransmitAttr(long handle) {
+		this.handle = handle;
+	}
+	
 	//gets
+	public long getHandle() {
+		return this.handle;
+	}
+	
 	public long getCaps() {
 		return getCaps(this.handle);
 	}
