@@ -2,6 +2,8 @@
 #include "fabric.h"
 #include "libfabric.h"
 
+void *dlhandle;
+
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initInfo
 	(JNIEnv *env, jobject jthis, jlong caps, jlong mode, jint addrFormat, jint srcAddrLen, jint destAddrLen,
 		jlong transmitAttrHandle, jlong receiveAttrHandle, jlong endpointAttrHandle, jlong domainAttrHandle,
@@ -10,22 +12,14 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initInfo
 	struct fi_info *(*dup_info_ptr)(const struct fi_info *info);
 	char *error;
 
-	void *handle = dlopen("libfabric.1.dylib", RTLD_LAZY);
-	if ( handle == NULL ){
-		fprintf(stdout,"dlopen failure: %s\n",dlerror());
-		exit(1);
-	}
-
-	*(void **) (&dup_info_ptr) = dlsym(handle, "fi_dupinfo");
+	*(void **) (&dup_info_ptr) = dlsym(dlhandle, "fi_dupinfo");
 	if ((error = dlerror()) != NULL) {
 		fprintf (stderr, "%s\n", error);
 		exit(1);
 	}
 	struct fi_info *info = (*dup_info_ptr)(NULL);
 
-	dlclose(handle);
-
-	info->next = (struct fi_info*)calloc(1, sizeof(struct fi_info));
+	info->next = NULL;
 	info->caps = caps;
 	info->mode = mode;
 	info->addr_format = addrFormat;
@@ -50,12 +44,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initEmpty
 	struct fi_info *(*dup_info_ptr)(const struct fi_info *info);
 	char *error;
 
-	void *handle = dlopen("libfabric.1.dylib", RTLD_LAZY);
-	if ( handle == NULL ){
-		fprintf(stdout,"dlopen failure: %s\n", dlerror());
-		exit(1);
-	}
-	*(void **) (&dup_info_ptr) = dlsym(handle, "fi_dupinfo");
+	*(void **) (&dup_info_ptr) = dlsym(dlhandle, "fi_dupinfo");
 	if ((error = dlerror()) != NULL) {
 		fprintf (stderr, "%s\n", error);
 		exit(1);
@@ -63,7 +52,6 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initEmpty
 
 
 	info_list[info_list_tail] = (*dup_info_ptr)(NULL);
-	dlclose(handle);
 	info_list_tail++;
 	return (jlong)info_list[info_list_tail - 1];
 }

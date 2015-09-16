@@ -16,9 +16,16 @@ int info_list_tail = 0;
 void *simple_attr_list[LISTSIZE];
 int simple_attr_list_tail = 0;
 
+void * dlhandle;
+
 libfabric_enum_globals_t lib_enums;
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclass jthis) {
+	dlhandle = dlopen("libfabric.1.dylib", RTLD_LAZY);
+	if ( dlhandle == NULL ){
+		fprintf(stdout,"dlopen failure: %s\n",dlerror());
+		exit(1);
+	}
 	initEnumMethods(env);
 
 	nullListsOut(); //can be removed when we move to a different method of keeping track of C things
@@ -31,6 +38,7 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv
 	deleteFabricAttrList();
 	deleteInfoList();
 	deleteSimpleAttrList();
+	dlclose(dlhandle);
 }
 
 void initEnumMethods(JNIEnv *env) {

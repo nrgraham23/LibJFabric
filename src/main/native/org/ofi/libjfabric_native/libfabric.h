@@ -20,6 +20,8 @@ extern int info_list_tail;
 extern  void *simple_attr_list[]; //any struct that can be freed without additional free calls for pointers
 extern int simple_attr_list_tail;
 
+extern void *dlhandle;
+
 typedef struct {
 	jclass AVTypeClass;
 	jclass EPTypeClass;
