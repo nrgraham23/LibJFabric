@@ -50,7 +50,7 @@ O_FILES =					\
 all: libjfab_native.dylib
 
 libjfab_native.dylib: ${O_FILES}
-	gcc ${CFLAGS} -dynamiclib -install_name /Users/ngraham/libfabric_install/lib/libfabric.dylib ${O_FILES} -o libjfab_native.dylib ${LDFLAGS} 
+	gcc ${CFLAGS} -dynamiclib -install_name /Users/ngraham/libfabric_install/lib/libfabric.dylib ${O_FILES} -o libjfab_native.dylib ${LDFLAGS} ${LIBFAB_LIB_LOCATION} -lfabric
 
 ${O_FILES}: ${C_SOURCES}
 	gcc -c ${CFLAGS} ${C_SOURCES}
