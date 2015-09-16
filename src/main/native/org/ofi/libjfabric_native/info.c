@@ -7,10 +7,21 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initInfo
 		jlong transmitAttrHandle, jlong receiveAttrHandle, jlong endpointAttrHandle, jlong domainAttrHandle,
 		jlong fabricAttrHandle)
 {
-	void *handle = dlopen("libfabric.1.dylib", RTLD_LAZY);
-	struct fi_info (*fi_allocinfo) = dlsym(handle, "fi_getinfo");
+	struct fi_info *(*dup_info_ptr)(const struct fi_info *info);
+	char *error;
 
-	struct fi_info *info = fi_allocinfo;
+	void *handle = dlopen("libfabric.1.dylib", RTLD_LAZY);
+	if ( handle == NULL ){
+		fprintf(stdout,"dlopen failure: %s\n",dlerror());
+		exit(1);
+	}
+
+	*(void **) (&dup_info_ptr) = dlsym(handle, "fi_dupinfo");
+	if ((error = dlerror()) != NULL) {
+		fprintf (stderr, "%s\n", error);
+		exit(1);
+	}
+	struct fi_info *info = (*dup_info_ptr)(NULL);
 
 	dlclose(handle);
 
@@ -36,12 +47,23 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initInfo
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initEmpty
 	(JNIEnv *env, jobject jthis)
 {
+	struct fi_info *(*dup_info_ptr)(const struct fi_info *info);
+	char *error;
+
 	void *handle = dlopen("libfabric.1.dylib", RTLD_LAZY);
-	struct fi_info (*fi_allocinfo) = dlsym(handle, "fi_getinfo");
+	if ( handle == NULL ){
+		fprintf(stdout,"dlopen failure: %s\n", dlerror());
+		exit(1);
+	}
+	*(void **) (&dup_info_ptr) = dlsym(handle, "fi_dupinfo");
+	if ((error = dlerror()) != NULL) {
+		fprintf (stderr, "%s\n", error);
+		exit(1);
+	}
 
+
+	info_list[info_list_tail] = (*dup_info_ptr)(NULL);
 	dlclose(handle);
-
-	info_list[info_list_tail] = fi_allocinfo;
 	info_list_tail++;
 	return (jlong)info_list[info_list_tail - 1];
 }

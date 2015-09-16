@@ -58,6 +58,7 @@ ${O_FILES}: ${C_SOURCES}
 clean:
 	rm -f *.class *.o
 	rm -f org_*.h
+	rm -f libjfab_native.dylib
 
 #test:
 #	javac -g -Xlint:deprecation -classpath ${CLASSPATH} Test.java
