@@ -2,8 +2,11 @@
 #define _LIB_FABRIC_H_
 
 #include <stdlib.h>
+#include <string.h>
+#include <dlfcn.h>
+#include "fabric.h"
 #include "org_ofi_libjfabric_LibFabric.h"
-#include "fi_list.h"
+
 
 extern struct fi_domain_attr *domain_attr_list[];
 extern int domain_attr_list_tail;

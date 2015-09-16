@@ -78,6 +78,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
+                	<argLine>-Djava.library.path=/Users/ngraham/Documents/workspace/LibJFabric/src/main/native/org/ofi/libjfabric_native</argLine>
                 	<parallel>methods</parallel>
 					<threadCount>10</threadCount>
                     <skipTests>${skipTests}</skipTests>

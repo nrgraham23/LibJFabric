@@ -7,7 +7,12 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initInfo
 		jlong transmitAttrHandle, jlong receiveAttrHandle, jlong endpointAttrHandle, jlong domainAttrHandle,
 		jlong fabricAttrHandle)
 {
-	struct fi_info *info = (struct fi_info*)calloc(1, sizeof(struct fi_info));
+	//void *handle = dlopen("libfabric.1.dylib", RTLD_LAZY);
+	//struct fi_info (*fi_allocinfo) = dlsym(handle, "fi_getinfo");
+
+	struct fi_info *info = (struct fi_info*)calloc(1, sizeof(struct fi_info)); //fi_allocinfo;
+
+	//dlclose(handle);
 
 	info->next = (struct fi_info*)calloc(1, sizeof(struct fi_info));
 	info->caps = caps;
@@ -31,7 +36,12 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initInfo
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initEmpty
 	(JNIEnv *env, jobject jthis)
 {
-	info_list[info_list_tail] = (struct fi_info*)calloc(1, sizeof(struct fi_info));
+	//void *handle = dlopen("libfabric.1.dylib", RTLD_LAZY);
+	//struct fi_info (*fi_allocinfo) = dlsym(handle, "fi_getinfo");
+
+	//dlclose(handle);
+
+	info_list[info_list_tail] = (struct fi_info*)calloc(1, sizeof(struct fi_info)); //fi_allocinfo;
 	info_list_tail++;
 	return (jlong)info_list[info_list_tail - 1];
 }

@@ -5,6 +5,8 @@
 CFLAGS=-g -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin -I/Users/ngraham/libfabric-cray/include/rdma \
 	-I/Users/ngraham/libfabric-cray/include
 
+LIBFAB_LIB_LOCATION=-L/Users/ngraham/libfabric_install/lib
+
 LDFLAGS= #-ldl
 
 C_SOURCES = 				\
@@ -39,7 +41,7 @@ O_FILES =					\
 	domain_attr.o			\
 	ep_attr.o				\
 	fabric_attr.o			\
-	receive_attr.c			\
+	receive_attr.o			\
 	tx_attr.o				\
 	specified_domain_attr.o	\
 	specified_fabric_attr.o	\
@@ -47,15 +49,14 @@ O_FILES =					\
 
 all: libjfab_native.dylib
 
-libjfab_native.dylib: av_type.o
-	gcc ${CFLAGS} -dynamiclib ${O_FILES} -o libjfab_native.dylib  ${LDFLAGS}
+libjfab_native.dylib: ${O_FILES}
+	gcc ${CFLAGS} -dynamiclib -install_name /Users/ngraham/libfabric_install/lib/libfabric.dylib ${O_FILES} -o libjfab_native.dylib ${LDFLAGS} 
 
 ${O_FILES}: ${C_SOURCES}
 	gcc -c ${CFLAGS} ${C_SOURCES}
 
 clean:
 	rm -f *.class *.o
-	rm -f libhello.so
 	rm -f org_*.h
 
 #test:
