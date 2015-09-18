@@ -1,6 +1,5 @@
 #include "libfabric.h"
 #include "org_ofi_libjfabric_LibFabric.h"
-#include <dlfcn.h>
 
 #define LISTSIZE 1000
 
@@ -71,6 +70,9 @@ void deleteEnumMethods(JNIEnv *env) {
 void convertJNIString(JNIEnv *env, char **charPointer, jstring javaString) {
 	if(*charPointer != NULL) {
 		free(*charPointer);
+	}
+	if(javaString == NULL) {
+		return;
 	}
 	*charPointer = (char*)malloc((int)(*env)->GetStringLength(env, javaString));
 	const char *jniName = (*env)->GetStringUTFChars(env, javaString, NULL);

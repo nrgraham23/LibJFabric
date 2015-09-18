@@ -1,5 +1,5 @@
-#include "org_ofi_libjfabric_attributes_DomainAttr.h"
 #include "fabric.h"
+#include "org_ofi_libjfabric_attributes_DomainAttr.h"
 #include "libfabric.h"
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_initDomainAttr

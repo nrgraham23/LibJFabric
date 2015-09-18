@@ -18,7 +18,14 @@ public class Info {
 	}
 	private native long initEmpty();
 	
+	public Info(long handle) {
+		this.handle = handle;
+	}
+	
 	//gets
+	public long getHandle() {
+		return this.handle;
+	}
 	public long getCaps() {
 		return getCaps(this.handle);
 	}

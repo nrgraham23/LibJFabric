@@ -15,9 +15,16 @@ public class Fabric {
 		return this.handle;
 	}
 	
-	public static Info[] getInfo(int version, String node, String service, long flags, Info hints) {
-		return getInfoJNI(version, node, service, flags, hints);
+	public static Info[] getInfo(double version, String node, String service, long flags, Info hints) {
+		long infoHandleArray[] = getInfoJNI(version, node, service, flags, hints.getHandle());
+		Info infoArray[] = new Info[infoHandleArray.length];
+		
+		for(int i = 0; i < infoHandleArray.length; i++) {
+			infoArray[i] = new Info(infoHandleArray[i]);
+		}
+		
+		return infoArray;
 	}
 	
-	private static native Info[] getInfoJNI(int version, String node, String service, long flags, Info hints);
+	private static native long[] getInfoJNI(double version, String node, String service, long flags, long hints);
 }

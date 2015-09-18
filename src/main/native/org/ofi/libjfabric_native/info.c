@@ -1,5 +1,5 @@
-#include "org_ofi_libjfabric_Info.h"
 #include "fabric.h"
+#include "org_ofi_libjfabric_Info.h"
 #include "libfabric.h"
 
 void *dlhandle;
