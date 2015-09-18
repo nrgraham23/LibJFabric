@@ -7,7 +7,7 @@ void *dlhandle;
 JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_Fabric_getInfoJNI(JNIEnv *env, jclass jthis,
 		jdouble version, jstring node, jstring service, jlong flags, jlong hintsHandle) {
 	int getInfoRet, infoNum = 0;
-	char *nodeName, *error, *serviceName;
+	char *nodeName = NULL, *error, *serviceName = NULL;
 	struct fi_info *resultInfo, *curInfo;
 	jlongArray infoArray;
 
