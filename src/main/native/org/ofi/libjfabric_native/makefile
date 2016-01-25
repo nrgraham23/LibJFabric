@@ -5,7 +5,7 @@
 CFLAGS=-g -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -I/home/nathan/libfabric-cray/include/rdma \
 	-I/home/nathan/libfabric-cray/include
 
-LIBFAB_LIB_LOCATION=-L/home/nathan/libfab_install/lib
+LIBFAB_LIB_LOCATION=/home/nathan/libfab_install/lib
 
 LDFLAGS=-ldl
 
@@ -50,7 +50,7 @@ O_FILES =					\
 all: libjfab_native.so
 
 libjfab_native.so: ${O_FILES}
-	gcc -shared ${O_FILES} ${LIBFAB_LIB_LOCATION} -lfabric -o libjfab_native.so
+	gcc -L${LIBFAB_LIB_LOCATION} -shared -o libjfab_native.so ${O_FILES} -lfabric 
 
 ${O_FILES}: ${C_SOURCES}
 	gcc -c -Wall ${CFLAGS} -fpic ${C_SOURCES}
