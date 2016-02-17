@@ -23,7 +23,7 @@ public class TestProtocol {
 		assertEquals(Protocol.PSMX.getVal(), 4);
 		assertEquals(Protocol.UDP.getVal(), 5);
 		assertEquals(Protocol.SOCK_TCP.getVal(), 6);
-		assertEquals(Protocol.GNI.getVal(), 7);
+		assertEquals(Protocol.GNI.getVal(), 10);
 	}
 
 }

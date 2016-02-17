@@ -106,8 +106,8 @@ public class TestDomainAttr {
 
 	@Test
 	public void testSetName() {
-		emptyDomainAttr.setName("new Name");
-		assertEquals(emptyDomainAttr.getName(), "new Name");
+		emptyDomainAttr.setName("newName");
+		assertEquals(emptyDomainAttr.getName(), "newName");
 	}
 
 	@Test

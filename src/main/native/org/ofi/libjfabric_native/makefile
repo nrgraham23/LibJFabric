@@ -2,12 +2,12 @@
 # Maven sets JAVA_HOME aka java.home to ${JAVA_HOME}/jre.  Need to add a funky include for this.
 #
 
-CFLAGS=-g -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin -I/Users/ngraham/libfabric-cray/include/rdma \
-	-I/Users/ngraham/libfabric-cray/include
+CFLAGS=-g -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -I/home/nathan/libfabric-cray/include/rdma \
+	-I/home/nathan/libfabric-cray/include
 
-LIBFAB_LIB_LOCATION=-L/Users/ngraham/libfabric_install/lib
+LIBFAB_LIB_LOCATION=/home/nathan/libfab_install/lib
 
-LDFLAGS= #-ldl
+LDFLAGS=-ldl
 
 C_SOURCES = 				\
 	av_type.c				\
@@ -47,18 +47,18 @@ O_FILES =					\
 	specified_fabric_attr.o	\
 	info.o
 
-all: libjfab_native.dylib
+all: libjfab_native.so
 
-libjfab_native.dylib: ${O_FILES}
-	gcc ${CFLAGS} -dynamiclib -install_name /Users/ngraham/libfabric_install/lib/libfabric.dylib ${O_FILES} -o libjfab_native.dylib ${LDFLAGS} ${LIBFAB_LIB_LOCATION} -lfabric
+libjfab_native.so: ${O_FILES}
+	gcc -L${LIBFAB_LIB_LOCATION} -shared -o libjfab_native.so ${O_FILES} -lfabric 
 
 ${O_FILES}: ${C_SOURCES}
-	gcc -c ${CFLAGS} ${C_SOURCES}
+	gcc -c -Wall ${CFLAGS} -fpic ${C_SOURCES}
 
 clean:
 	rm -f *.class *.o
 	rm -f org_*.h
-	rm -f libjfab_native.dylib
+	rm -f libjfab_native.so
 
 #test:
 #	javac -g -Xlint:deprecation -classpath ${CLASSPATH} Test.java
