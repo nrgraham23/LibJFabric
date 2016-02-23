@@ -14,3 +14,5 @@ org_*.h
 *.log
 target/*
 *.dSYM/
+*~
+.metadata

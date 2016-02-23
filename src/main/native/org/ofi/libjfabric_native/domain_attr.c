@@ -1,4 +1,3 @@
-#include "fabric.h"
 #include "org_ofi_libjfabric_attributes_DomainAttr.h"
 #include "libfabric.h"
 

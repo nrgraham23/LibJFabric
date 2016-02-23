@@ -1,5 +1,4 @@
 #include "org_ofi_libjfabric_attributes_SpecifiedFabricAttr.h"
-#include "fabric.h"
 #include "libfabric.h"
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_SpecifiedFabricAttr_initWithFabric

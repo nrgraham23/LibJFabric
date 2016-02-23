@@ -2,8 +2,8 @@
 # Maven sets JAVA_HOME aka java.home to ${JAVA_HOME}/jre.  Need to add a funky include for this.
 #
 
-CFLAGS=-g -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -I/home/nathan/libfabric-cray/include/rdma \
-	-I/home/nathan/libfabric-cray/include
+CFLAGS=-g -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux \
+	   -I/home/nathan/libfab_install/include
 
 LIBFAB_LIB_LOCATION=/home/nathan/libfab_install/lib
 
