@@ -29,8 +29,7 @@ JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_Fabric_getInfoJNI(JNIEnv 
 
 	if (getInfoRet != 0) {
 		//printf("fi_getinfo %s\n", fi_strerror(-ret));
-		//goto out;
-		//exit(1);
+		exit(1);
 	}
 
 	infoNum = getLinkedListLength(&resultInfo);

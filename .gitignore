@@ -16,3 +16,4 @@ target/*
 *.dSYM/
 *~
 .metadata
+ManualTests.java
