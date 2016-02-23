@@ -1,5 +1,5 @@
 #include "org_ofi_libjfabric_enums_Progress.h"
-#include "fabric.h"
+#include "libfabric.h"
 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Progress_getUNSPEC(JNIEnv *env, jclass jthis) {
 	return FI_PROGRESS_UNSPEC;

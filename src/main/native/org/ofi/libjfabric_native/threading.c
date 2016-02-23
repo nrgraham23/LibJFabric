@@ -1,5 +1,5 @@
 #include "org_ofi_libjfabric_enums_Threading.h"
-#include "fabric.h"
+#include "libfabric.h"
 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Threading_getUNSPEC(JNIEnv *env, jclass jthis) {
 	return FI_THREAD_UNSPEC;
