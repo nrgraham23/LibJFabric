@@ -8,6 +8,9 @@ public enum Protocol {
 	PSMX(getPSMX()),
 	UDP(getUDP()),
 	SOCK_TCP(getSOCKTCP()),
+	MXM(getMXM()),
+	IWARP_RDM(getIWARPRDM()),
+	IB_RDM(getIBRDM()),
 	GNI(getGNI());
 	
 	private int val;
@@ -43,6 +46,15 @@ public enum Protocol {
 		if(val == Protocol.SOCK_TCP.getVal()) {
 			return Protocol.SOCK_TCP;
 		}
+		if(val == Protocol.MXM.getVal()) {
+			return Protocol.MXM;
+		}
+		if(val == Protocol.IWARP_RDM.getVal()) {
+			return Protocol.IWARP_RDM;
+		}
+		if(val == Protocol.IB_RDM.getVal()) {
+			return Protocol.IB_RDM;
+		}
 		if(val == Protocol.GNI.getVal()) {
 			return Protocol.GNI;
 		}
@@ -56,5 +68,8 @@ public enum Protocol {
 	private static native int getPSMX();
 	private static native int getUDP();
 	private static native int getSOCKTCP();
+	private static native int getMXM();
+	private static native int getIWARPRDM();
+	private static native int getIBRDM();
 	private static native int getGNI();
 }
