@@ -29,6 +29,18 @@ JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getSOCKTCP(JNIEnv 
 	return FI_PROTO_SOCK_TCP;
 }
 
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getMXM(JNIEnv *env, jclass jthis) {
+	return FI_PROTO_MXM;
+}
+
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getIWARPRDM(JNIEnv *env, jclass jthis) {
+	return FI_PROTO_IWARP_RDM;
+}
+
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getIBRDM(JNIEnv *env, jclass jthis) {
+	return FI_PROTO_IB_RDM;
+}
+
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getGNI(JNIEnv *env, jclass jthis) {
 	return FI_PROTO_GNI;
 }

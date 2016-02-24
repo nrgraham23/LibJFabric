@@ -65,6 +65,30 @@ JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getSOCKTCP
 
 /*
  * Class:     org_ofi_libjfabric_enums_Protocol
+ * Method:    getMXM
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getMXM
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_ofi_libjfabric_enums_Protocol
+ * Method:    getIWARPRDM
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getIWARPRDM
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_ofi_libjfabric_enums_Protocol
+ * Method:    getIBRDM
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getIBRDM
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_ofi_libjfabric_enums_Protocol
  * Method:    getGNI
  * Signature: ()I
  */
