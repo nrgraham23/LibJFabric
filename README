@@ -1,1 +1,5 @@
 Java bindings for the libfabric project.
+
+To work on this project with eclipse, clone the git repository into
+your working directory, and then create a new project in eclipse
+called LibJFabric.
