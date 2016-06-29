@@ -15,7 +15,7 @@
         <skipTests>false</skipTests>
         <project.native.directory>${basedir}/src/main/native</project.native.directory>
         <!--Installation directory for libfabric-->
-        <libfabric_install>/home/nathan/libfab_install</libfabric_install>
+        <libfabric_install>/Users/ngraham/libfab_install</libfabric_install>
     </properties>
 
     <dependencies>
