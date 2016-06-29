@@ -20,7 +20,7 @@ void * dlhandle;
 libfabric_enum_globals_t lib_enums;
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclass jthis) {
-	dlhandle = dlopen("libfabric.so", RTLD_LAZY);
+	dlhandle = dlopen("/Users/ngraham/libfab_install/lib/libfabric.dylib", RTLD_LAZY);
 	if ( dlhandle == NULL ){
 		fprintf(stdout,"dlopen failure: %s\n",dlerror());
 		exit(1);
