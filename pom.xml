@@ -6,7 +6,6 @@
     <name>libfabric_java_bindings</name>
     <description>Java bindings for libfabric</description>
     <packaging>jar</packaging>
-	
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--
@@ -15,7 +14,6 @@
         <skipTests>false</skipTests>
         <project.native.directory>${basedir}/src/main/native</project.native.directory>
         <!--Installation directory for libfabric-->
-        <libfabric_install>/Users/ngraham/libfab_install</libfabric_install>
     </properties>
 
     <dependencies>
@@ -93,7 +91,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
-                    <argLine>-Djava.library.path=${project.native.directory}/org/ofi/libjfabric_native/:${libfabric_install}/lib</argLine>
+                    <argLine>-Djava.library.path=${project.native.directory}/org/ofi/libjfabric_native/lib</argLine>
                     <parallel>methods</parallel>
                     <threadCount>10</threadCount>
                     <skipTests>${skipTests}</skipTests>
@@ -125,12 +123,6 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-            <!--
-                <lustre.prefix></lustre.prefix>
-                <lustre.lib></lustre.lib>
-                <lustre.include></lustre.include>
-                <require.lustre>true</require.lustre>
-            -->
             </properties>
             <build>
                 <plugins>
@@ -153,17 +145,16 @@
                                         <property name="test_classpath" refid="maven.test.classpath"/>
                                         <property name="plugin_classpath" refid="maven.plugin.classpath"/>
                                         <property name="test_classpath" value="."/>
-                                        
+                                        -->
                                         <echo message="compile classpath: ${compile_classpath}"/>
                                         <echo message="runtime classpath: ${runtime_classpath}"/>
                                         <echo message="test classpath:    ${test_classpath}"/>
                                         <echo message="plugin classpath:  ${plugin_classpath}"/>
-                                        -->
-                                        <!-- normally Hadoop/Apache use CMake -->
+                                        <exec executable="cmake" dir="${project.native.directory}/org/ofi/libjfabric_native" failonerror="true">
+                                        <arg line="-DGENERATED_JAVAH=${project.native.directory}/org/ofi/libjfabric_native -DCMAKE_INSTALL_PREFIX=${project.native.directory}/org/ofi/libjfabric_native"/>
+                                        </exec>
                                         <exec executable="make" dir="${project.native.directory}/org/ofi/libjfabric_native" failonerror="true">
-                                            <arg line="-f makefile all"/>
-                                            <!--<env key="CLASSPATH" value="${test_classpath}:${compile_classpath}"/>-->
-                                            <env key="JAVA_HOME" value="${JAVA_HOME}"/>
+                                        <arg line="install VERBOSE=1"/>
                                         </exec>
                                     </target>
                                 </configuration>
