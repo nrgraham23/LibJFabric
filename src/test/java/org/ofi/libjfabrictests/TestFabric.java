@@ -1,7 +1,5 @@
 package org.ofi.libjfabrictests;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.ofi.libjfabric.Fabric;
@@ -22,6 +20,8 @@ public class TestFabric {
 		hints.setMode(~0);
 		
 		Info resultInfo[] = Fabric.getInfo(VERSION, null, "", 0, hints);
+		
+		assert resultInfo != null;
 	}
 
 }
