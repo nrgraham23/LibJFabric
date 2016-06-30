@@ -55,6 +55,23 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initEmpty
 	return (jlong)info_list[info_list_tail - 1];
 }
 
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Info_freeJNI
+	(JNIEnv *env, jobject jthis, jlong handle)
+{
+	if(handle != 0) {
+		((struct fi_info*)handle)->next = NULL;
+		((struct fi_info*)handle)->src_addr = NULL;
+		((struct fi_info*)handle)->dest_addr = NULL;
+		((struct fi_info*)handle)->tx_attr = NULL;
+		((struct fi_info*)handle)->rx_attr = NULL;
+		((struct fi_info*)handle)->ep_attr = NULL;
+		((struct fi_info*)handle)->domain_attr = NULL;
+		((struct fi_info*)handle)->fabric_attr = NULL;
+
+		free(((struct fi_info*)handle));
+	}
+}
+
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_getCaps
 	(JNIEnv *env, jobject jthis, jlong handle)
 {

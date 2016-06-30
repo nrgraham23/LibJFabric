@@ -18,6 +18,11 @@ public class TestInfo {
 	}
 
 	@Test
+	public void testFree() {
+		fullInfo.free();
+		emptyInfo.free();
+	}
+	@Test
 	public void testGetCaps() {
 		assertEquals(fullInfo.getCaps(), 2);
 	}

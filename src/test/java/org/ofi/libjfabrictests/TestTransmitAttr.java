@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.ofi.libjfabric.LibFabric;
 import org.ofi.libjfabric.attributes.TransmitAttr;
 
 public class TestTransmitAttr {
@@ -11,6 +12,7 @@ public class TestTransmitAttr {
 	
 	@Before
 	public void setUp() throws Exception {
+		LibFabric.load();
 		fullTA = new TransmitAttr(3, 4, 5, 6, 7, 8, 9, 10, 11);
 		emptyTA = new TransmitAttr();
 	}

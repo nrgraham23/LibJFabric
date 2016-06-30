@@ -83,12 +83,14 @@ void convertJNIString(JNIEnv *env, char **charPointer, jstring javaString) {
 void deleteDomainAttrList() {
 	int i = 0;
 
-	while(domain_attr_list[i] != NULL && i < LISTSIZE) {
-		domain_attr_list[i]->domain = NULL;
-		if(domain_attr_list[i]->name != NULL) {
-			free(domain_attr_list[i]->name);
+	while(i < domain_attr_list_tail) {
+		if(domain_attr_list[i] != NULL) {
+			domain_attr_list[i]->domain = NULL;
+			if(domain_attr_list[i]->name != NULL) {
+				free(domain_attr_list[i]->name);
+			}
+			free(domain_attr_list[i]);
 		}
-		free(domain_attr_list[i]);
 		i++;
 	}
 }
@@ -96,15 +98,17 @@ void deleteDomainAttrList() {
 void deleteFabricAttrList() {
 	int i = 0;
 
-	while(fabric_attr_list[i] != NULL && i < LISTSIZE) {
-		fabric_attr_list[i]->fabric = NULL;
-		if(fabric_attr_list[i]->name != NULL) {
-			free(fabric_attr_list[i]->name);
+	while(i < fabric_attr_list_tail) {
+		if(fabric_attr_list[i] != NULL) {
+			fabric_attr_list[i]->fabric = NULL;
+			if(fabric_attr_list[i]->name != NULL) {
+				free(fabric_attr_list[i]->name);
+			}
+			if(fabric_attr_list[i]->name != NULL) {
+				free(fabric_attr_list[i]->prov_name);
+			}
+			free(fabric_attr_list[i]);
 		}
-		if(fabric_attr_list[i]->name != NULL) {
-			free(fabric_attr_list[i]->prov_name);
-		}
-		free(fabric_attr_list[i]);
 		i++;
 	}
 }
@@ -112,17 +116,19 @@ void deleteFabricAttrList() {
 void deleteInfoList() {
 	int i = 0;
 
-	while(info_list[i] != NULL && i < LISTSIZE) {
-		info_list[i]->next = NULL;
-		info_list[i]->src_addr = NULL;
-		info_list[i]->dest_addr = NULL;
-		info_list[i]->tx_attr = NULL;
-		info_list[i]->rx_attr = NULL;
-		info_list[i]->ep_attr = NULL;
-		info_list[i]->domain_attr = NULL;
-		info_list[i]->fabric_attr = NULL;
+	while(i < info_list_tail) {
+		if(info_list[i] != NULL) {
+			info_list[i]->next = NULL;
+			info_list[i]->src_addr = NULL;
+			info_list[i]->dest_addr = NULL;
+			info_list[i]->tx_attr = NULL;
+			info_list[i]->rx_attr = NULL;
+			info_list[i]->ep_attr = NULL;
+			info_list[i]->domain_attr = NULL;
+			info_list[i]->fabric_attr = NULL;
 
-		free(info_list[i]);
+			free(info_list[i]);
+		}
 		i++;
 	}
 }

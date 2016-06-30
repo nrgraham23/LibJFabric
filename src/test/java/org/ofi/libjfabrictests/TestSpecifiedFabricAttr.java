@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.ofi.libjfabric.Fabric;
+import org.ofi.libjfabric.LibFabric;
 import org.ofi.libjfabric.attributes.SpecifiedFabricAttr;
 
 public class TestSpecifiedFabricAttr {
@@ -12,6 +13,7 @@ public class TestSpecifiedFabricAttr {
 	
 	@Before
 	public void setUp() throws Exception {
+		LibFabric.load();
 		fullSFA = new SpecifiedFabricAttr(new Fabric(100025), "testName", "testProvName", 5);
 		fabricSFA = new SpecifiedFabricAttr(new Fabric(100024));
 	}

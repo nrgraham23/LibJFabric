@@ -22,6 +22,12 @@ public class Info {
 		this.handle = handle;
 	}
 	
+	public void free() {
+		freeJNI(this.handle);
+		this.handle = 0;
+	}
+	private native void freeJNI(long handle);
+	
 	//gets
 	public long getHandle() {
 		return this.handle;

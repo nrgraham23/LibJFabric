@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.ofi.libjfabric.LibFabric;
 import org.ofi.libjfabric.attributes.EndPointAttr;
 import org.ofi.libjfabric.enums.EPType;
 
@@ -12,6 +13,7 @@ public class TestEndPointAttr {
 	
 	@Before
 	public void setUp() throws Exception {
+		LibFabric.load();
 		fullEP = new EndPointAttr(EPType.DGRAM, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
 		emptyEP = new EndPointAttr();
 	}
