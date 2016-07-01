@@ -7,7 +7,7 @@ import org.ofi.libjfabric.Info;
 import org.ofi.libjfabric.LibFabric;
 import org.ofi.libjfabric.Version;
 
-public class TestFabric {
+public class TestLibFabric {
 	
 	@Before
 	public void setUp() throws Exception {
@@ -16,16 +16,13 @@ public class TestFabric {
 
 	@Test
 	public void testGetInfo() {
-		Info hints = new Info();
-		hints.setMode(~0);
 		Version version = new Version(1, 3);
 		
-		Info resultInfo[] = LibFabric.getInfo(version, null, "", 0, hints);
+		Info resultInfo[] = LibFabric.getInfo(version, null, null, 0, null);
 		
 		assert resultInfo != null;
 		
 		for(int i = 0; i < resultInfo.length; i++) {
-			System.out.println("info object: " + i);
 			System.out.println("provider: " + resultInfo[i].getFabricAttr().getProviderName());
 			System.out.println("	fabric: " + resultInfo[i].getFabricAttr().getName());
 			System.out.println("	domain: " + resultInfo[i].getDomainAttr().getName());
