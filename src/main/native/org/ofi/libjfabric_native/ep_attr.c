@@ -37,13 +37,14 @@ JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_EndPointAttr_getEpT
 	(JNIEnv *env, jobject jthis, jlong handle)
 {
 	int epType = ((struct fi_ep_attr*)handle)->type;
-	return (*env)->CallObjectMethod(env, lib_enums.EPTypeClass, lib_enums.GetEPType, epType);
+	return (*env)->CallObjectMethod(env, lib_globals.EPTypeClass, lib_globals.GetEPType, epType);
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_EndPointAttr_getProtocol
+JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_EndPointAttr_getProtocol
 	(JNIEnv *env, jobject jthis, jlong handle)
 {
-	return ((struct fi_ep_attr*)handle)->protocol;
+	int protocol = ((struct fi_ep_attr*)handle)->protocol;
+	return (*env)->CallObjectMethod(env, lib_globals.ProtocolClass, lib_globals.GetProtocol, protocol);
 }
 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_EndPointAttr_getProtoVersion

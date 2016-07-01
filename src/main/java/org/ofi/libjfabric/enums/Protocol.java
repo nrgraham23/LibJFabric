@@ -11,7 +11,8 @@ public enum Protocol {
 	MXM(getMXM()),
 	IWARP_RDM(getIWARPRDM()),
 	IB_RDM(getIBRDM()),
-	GNI(getGNI());
+	GNI(getGNI()),
+	RXM(getRXM());
 	
 	private int val;
 	
@@ -58,6 +59,9 @@ public enum Protocol {
 		if(val == Protocol.GNI.getVal()) {
 			return Protocol.GNI;
 		}
+		if(val == Protocol.RXM.getVal()) {
+			return Protocol.RXM;
+		}
 		throw new IllegalArgumentException("Invalid integer value for method getProtocol!");
 	}
 	
@@ -72,4 +76,5 @@ public enum Protocol {
 	private static native int getIWARPRDM();
 	private static native int getIBRDM();
 	private static native int getGNI();
+	private static native int getRXM();
 }

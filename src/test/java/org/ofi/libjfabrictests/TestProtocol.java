@@ -27,6 +27,7 @@ public class TestProtocol {
 		assertEquals(Protocol.IWARP_RDM.getVal(), 8);
 		assertEquals(Protocol.IB_RDM.getVal(), 9);
 		assertEquals(Protocol.GNI.getVal(), 10);
+		assertEquals(Protocol.RXM.getVal(), 11);
 	}
 
 }

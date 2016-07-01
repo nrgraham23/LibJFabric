@@ -1,10 +1,11 @@
 package org.ofi.libjfabric.attributes;
 
 import org.ofi.libjfabric.Fabric;
+import org.ofi.libjfabric.Version;
 
 public class SpecifiedFabricAttr extends FabricAttr {
 	
-	public SpecifiedFabricAttr(Fabric fabric, String name, String providerName, int providerVersion) {
+	public SpecifiedFabricAttr(Fabric fabric, String name, String providerName, Version providerVersion) {
 		super(name, providerName, providerVersion);
 		setFabric(fabric.getHandle(), this.handle);
 	}

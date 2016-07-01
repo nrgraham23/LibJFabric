@@ -51,42 +51,42 @@ JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getThrea
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	int threading = ((struct fi_domain_attr*)handle)->threading;
-	return (*env)->CallObjectMethod(env, lib_enums.ThreadingClass, lib_enums.GetThreading, threading);
+	return (*env)->CallObjectMethod(env, lib_globals.ThreadingClass, lib_globals.GetThreading, threading);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getCntrlProgress
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	int cntrlProgress = ((struct fi_domain_attr*)handle)->control_progress;
-	return (*env)->CallObjectMethod(env, lib_enums.ProgressClass, lib_enums.GetProgress, cntrlProgress);
+	return (*env)->CallObjectMethod(env, lib_globals.ProgressClass, lib_globals.GetProgress, cntrlProgress);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getdataProgress
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	int dataProgress = ((struct fi_domain_attr*)handle)->data_progress;
-	return (*env)->CallObjectMethod(env, lib_enums.ProgressClass, lib_enums.GetProgress, dataProgress);
+	return (*env)->CallObjectMethod(env, lib_globals.ProgressClass, lib_globals.GetProgress, dataProgress);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getResourceMgmt
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	int resourceMgmt = ((struct fi_domain_attr*)handle)->resource_mgmt;
-	return (*env)->CallObjectMethod(env, lib_enums.ResourceMgmtClass, lib_enums.GetResourceMgmt, resourceMgmt);
+	return (*env)->CallObjectMethod(env, lib_globals.ResourceMgmtClass, lib_globals.GetResourceMgmt, resourceMgmt);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getAVType
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	int avType = ((struct fi_domain_attr*)handle)->av_type;
-	return (*env)->CallObjectMethod(env, lib_enums.AVTypeClass, lib_enums.GetAVType, avType);
+	return (*env)->CallObjectMethod(env, lib_globals.AVTypeClass, lib_globals.GetAVType, avType);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMRMode
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	int mrMode = ((struct fi_domain_attr*)handle)->mr_mode;
-	return (*env)->CallObjectMethod(env, lib_enums.MRModeClass, lib_enums.GetMRMode, mrMode);
+	return (*env)->CallObjectMethod(env, lib_globals.MRModeClass, lib_globals.GetMRMode, mrMode);
 }
 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMrKeySize

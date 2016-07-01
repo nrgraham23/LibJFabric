@@ -1,13 +1,14 @@
 package org.ofi.libjfabric.attributes;
 
 import org.ofi.libjfabric.enums.EPType;
+import org.ofi.libjfabric.enums.Protocol;
 
 public class EndPointAttr {
 	private long handle;
 
-	public EndPointAttr(EPType epType, int protocol, int protoVersion, int maxMsgSize, int msgPrefixSize,
+	public EndPointAttr(EPType epType, Protocol protocol, int protoVersion, int maxMsgSize, int msgPrefixSize,
 			int maxOrderRawSize, int maxOrderWarSize, int maxOrderWawSize, long memTagFormat, int txCtxCnt, int rxCtxCnt) {
-		this.handle = initEndPointAttr(epType.getVal(), protocol, protoVersion, maxMsgSize, msgPrefixSize,
+		this.handle = initEndPointAttr(epType.getVal(), protocol.getVal(), protoVersion, maxMsgSize, msgPrefixSize,
 				maxOrderRawSize, maxOrderWarSize, maxOrderWawSize, memTagFormat, txCtxCnt, rxCtxCnt);
 	}
 	private native long initEndPointAttr(int epType, int protocol, int protoVersion, int maxMsgSize, int msgPrefixSize,
@@ -32,10 +33,10 @@ public class EndPointAttr {
 	}
 	private native EPType getEpType(long handle);
 	
-	public int getProtocol() {
+	public Protocol getProtocol() {
 		return getProtocol(this.handle);
 	}
-	private native int getProtocol(long handle);
+	private native Protocol getProtocol(long handle);
 	
 	public int getProtoVersion() {
 		return getProtoVersion(this.handle);
@@ -88,8 +89,8 @@ public class EndPointAttr {
 	}
 	private native void setEpType(int epType, long handle);
 	
-	public void setProtocol(int protocol) {
-		setProtocol(protocol, this.handle);
+	public void setProtocol(Protocol protocol) {
+		setProtocol(protocol.getVal(), this.handle);
 	}
 	private native void setProtocol(int protocol, long handle);
 	

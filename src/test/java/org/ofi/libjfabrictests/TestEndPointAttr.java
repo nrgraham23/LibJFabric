@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.ofi.libjfabric.LibFabric;
 import org.ofi.libjfabric.attributes.EndPointAttr;
 import org.ofi.libjfabric.enums.EPType;
+import org.ofi.libjfabric.enums.Protocol;
 
 public class TestEndPointAttr {
 	EndPointAttr fullEP, emptyEP;
@@ -14,7 +15,7 @@ public class TestEndPointAttr {
 	@Before
 	public void setUp() throws Exception {
 		LibFabric.load();
-		fullEP = new EndPointAttr(EPType.DGRAM, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+		fullEP = new EndPointAttr(EPType.DGRAM, Protocol.IB_UD, 3, 4, 5, 6, 7, 8, 9, 10, 11);
 		emptyEP = new EndPointAttr();
 	}
 
@@ -25,7 +26,7 @@ public class TestEndPointAttr {
 
 	@Test
 	public void testGetProtocol() {
-		assertEquals(fullEP.getProtocol(), 2);
+		assertEquals(fullEP.getProtocol(), Protocol.IB_UD);
 	}
 
 	@Test
@@ -81,8 +82,8 @@ public class TestEndPointAttr {
 
 	@Test
 	public void testSetProtocol() {
-		emptyEP.setProtocol(3);
-		assertEquals(emptyEP.getProtocol(), 3);
+		emptyEP.setProtocol(Protocol.IWARP);
+		assertEquals(emptyEP.getProtocol(), Protocol.IWARP);
 	}
 
 	@Test

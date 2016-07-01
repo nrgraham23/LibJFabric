@@ -1,12 +1,14 @@
 package org.ofi.libjfabric.attributes;
 
+import org.ofi.libjfabric.Version;
+
 public class FabricAttr {
 	protected long handle;
 
-	public FabricAttr(String name, String providerName, int providerVersion) {
-		this.handle = initFabricAttr(name, providerName, providerVersion);
+	public FabricAttr(String name, String providerName, Version providerVersion) {
+		this.handle = initFabricAttr(name, providerName, providerVersion.getMajorVersion(), providerVersion.getMinorVersion());
 	}
-	private native long initFabricAttr(String name, String providerName, int providerVersion);
+	private native long initFabricAttr(String name, String providerName, int majorVersion, int minorVersion);
 	
 	public FabricAttr() {
 		this.handle = initEmpty();
@@ -30,12 +32,16 @@ public class FabricAttr {
 	public String getProviderName() {
 		return getProviderName(this.handle);
 	}
-	private native String getProviderName( long handle);
+	private native String getProviderName(long handle);
 	
-	public int getProviderVersion() {
-		return getProviderVersion(this.handle);
+	public Version getProviderVersion() {
+		int majorVersion = getMajorProviderVersion(this.handle);
+		int minorVersion = getMinorProviderVersion(this.handle);
+		
+		return new Version(majorVersion, minorVersion);
 	}
-	private native int getProviderVersion(long handle);
+	private native int getMajorProviderVersion(long handle);
+	private native int getMinorProviderVersion(long handle);
 
 	//sets
 	public void setName(String name) {
@@ -48,8 +54,8 @@ public class FabricAttr {
 	}
 	private native void setProviderName(String providerName, long handle);
 	
-	public void setProviderVersion(int providerVersion) {
-		setProviderVersion(providerVersion, this.handle);
+	public void setProviderVersion(Version providerVersion) {
+		setProviderVersion(providerVersion.getMajorVersion(), providerVersion.getMinorVersion(), this.handle);
 	}
-	private native void setProviderVersion(int providerVersion, long handle);
+	private native void setProviderVersion(int majorVersion, int minorVersion, long handle);
 }

@@ -3,6 +3,6 @@
 
 #include "rdma/fabric.h"
 
-int getLinkedListLength(struct fi_info **resultInfo);
+
 
 #endif

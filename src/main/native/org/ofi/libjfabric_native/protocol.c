@@ -44,3 +44,7 @@ JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getIBRDM(JNIEnv *e
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getGNI(JNIEnv *env, jclass jthis) {
 	return FI_PROTO_GNI;
 }
+
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_Protocol_getRXM(JNIEnv *env, jclass jthis) {
+	return FI_PROTO_RXM;
+}

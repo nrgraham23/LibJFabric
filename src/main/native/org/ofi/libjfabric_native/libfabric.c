@@ -17,7 +17,7 @@ int simple_attr_list_tail = 0;
 
 void * dlhandle;
 
-libfabric_enum_globals_t lib_enums;
+libfabric_globals_t lib_globals;
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclass jthis) {
 	dlhandle = dlopen("/Users/ngraham/libfab_install/lib/libfabric.dylib", RTLD_LAZY);
@@ -25,13 +25,13 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclas
 		fprintf(stdout,"dlopen failure: %s\n",dlerror());
 		exit(1);
 	}
-	initEnumMethods(env);
+	initGlobals(env);
 
 	nullListsOut(); //can be removed when we move to a different method of keeping track of C things
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv *env, jclass jthis) {
-	deleteEnumMethods(env);
+	deleteGlobals(env);
 
 	deleteDomainAttrList();
 	deleteFabricAttrList();
@@ -40,31 +40,34 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv
 	dlclose(dlhandle);
 }
 
-void initEnumMethods(JNIEnv *env) {
-	lib_enums.AVTypeClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/AVType");
-	lib_enums.EPTypeClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/EPType");
-	lib_enums.MRModeClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/MRMode");
-	lib_enums.ProgressClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/Progress");
-	lib_enums.ProtocolClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/Protocol");
-	lib_enums.ResourceMgmtClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/ResourceMgmt");
-	lib_enums.ThreadingClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/Threading");
-	lib_enums.GetAVType = (*env)->GetStaticMethodID(env,lib_enums.AVTypeClass,"getAVType","(I)Lorg/ofi/libjfabric/enums/AVType;");
-	lib_enums.GetEPType = (*env)->GetStaticMethodID(env,lib_enums.EPTypeClass,"getEPType","(I)Lorg/ofi/libjfabric/enums/EPType;");
-	lib_enums.GetMRMode = (*env)->GetStaticMethodID(env,lib_enums.MRModeClass,"getMRMode","(I)Lorg/ofi/libjfabric/enums/MRMode;");
-	lib_enums.GetProgress = (*env)->GetStaticMethodID(env,lib_enums.ProgressClass,"getProgress","(I)Lorg/ofi/libjfabric/enums/Progress;");
-	lib_enums.GetProtocol = (*env)->GetStaticMethodID(env,lib_enums.ProtocolClass,"getProtocol","(I)Lorg/ofi/libjfabric/enums/Protocol;");
-	lib_enums.GetResourceMgmt = (*env)->GetStaticMethodID(env,lib_enums.ResourceMgmtClass,"getResourceMgmt","(I)Lorg/ofi/libjfabric/enums/ResourceMgmt;");
-	lib_enums.GetThreading = (*env)->GetStaticMethodID(env,lib_enums.ThreadingClass,"getThreading","(I)Lorg/ofi/libjfabric/enums/Threading;");
+void initGlobals(JNIEnv *env) {
+	lib_globals.AVTypeClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/AVType");
+	lib_globals.EPTypeClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/EPType");
+	lib_globals.MRModeClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/MRMode");
+	lib_globals.ProgressClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/Progress");
+	lib_globals.ProtocolClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/Protocol");
+	lib_globals.ResourceMgmtClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/ResourceMgmt");
+	lib_globals.ThreadingClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/Threading");
+	lib_globals.VersionClass = (*env)->FindClass(env,"org/ofi/libjfabric/Version");
+	lib_globals.GetAVType = (*env)->GetStaticMethodID(env,lib_globals.AVTypeClass,"getAVType","(I)Lorg/ofi/libjfabric/enums/AVType;");
+	lib_globals.GetEPType = (*env)->GetStaticMethodID(env,lib_globals.EPTypeClass,"getEPType","(I)Lorg/ofi/libjfabric/enums/EPType;");
+	lib_globals.GetMRMode = (*env)->GetStaticMethodID(env,lib_globals.MRModeClass,"getMRMode","(I)Lorg/ofi/libjfabric/enums/MRMode;");
+	lib_globals.GetProgress = (*env)->GetStaticMethodID(env,lib_globals.ProgressClass,"getProgress","(I)Lorg/ofi/libjfabric/enums/Progress;");
+	lib_globals.GetProtocol = (*env)->GetStaticMethodID(env,lib_globals.ProtocolClass,"getProtocol","(I)Lorg/ofi/libjfabric/enums/Protocol;");
+	lib_globals.GetResourceMgmt = (*env)->GetStaticMethodID(env,lib_globals.ResourceMgmtClass,"getResourceMgmt","(I)Lorg/ofi/libjfabric/enums/ResourceMgmt;");
+	lib_globals.GetThreading = (*env)->GetStaticMethodID(env,lib_globals.ThreadingClass,"getThreading","(I)Lorg/ofi/libjfabric/enums/Threading;");
+	lib_globals.VersionConstructor = (*env)->GetMethodID(env, lib_globals.VersionClass, "<init>", "(II)V");
 }
 
-void deleteEnumMethods(JNIEnv *env) {
-	(*env)->DeleteGlobalRef(env, lib_enums.AVTypeClass);
-	(*env)->DeleteGlobalRef(env, lib_enums.EPTypeClass);
-	(*env)->DeleteGlobalRef(env, lib_enums.MRModeClass);
-	(*env)->DeleteGlobalRef(env, lib_enums.ProgressClass);
-	(*env)->DeleteGlobalRef(env, lib_enums.ProtocolClass);
-	(*env)->DeleteGlobalRef(env, lib_enums.ResourceMgmtClass);
-	(*env)->DeleteGlobalRef(env, lib_enums.ThreadingClass);
+void deleteGlobals(JNIEnv *env) {
+	(*env)->DeleteGlobalRef(env, lib_globals.AVTypeClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.EPTypeClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.MRModeClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.ProgressClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.ProtocolClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.ResourceMgmtClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.ThreadingClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.VersionClass);
 }
 
 void convertJNIString(JNIEnv *env, char **charPointer, jstring javaString) {
@@ -151,4 +154,71 @@ void nullListsOut() {
 		info_list[i] = NULL;
 		simple_attr_list[i] = NULL;
 	}
+}
+
+JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_LibFabric_getInfoJNI(JNIEnv *env, jclass jthis,
+		jint majorVersion, jint minorVersion, jstring node, jstring service, jlong flags, jlong hintsHandle) {
+	int getInfoRet, infoNum = 0;
+	char *nodeName = NULL, *error, *serviceName = NULL;
+	struct fi_info *resultInfo, *curInfo;
+	jlongArray infoArray;
+
+	uint32_t convertedVersion= FI_VERSION((uint32_t)majorVersion, (uint32_t)minorVersion);
+
+	int (*get_info_ptr)(uint32_t convertedVersion, const char *node, const char *service,
+			uint64_t flags, struct fi_info *hints, struct fi_info **info);
+
+	convertJNIString(env, &nodeName, node);
+	convertJNIString(env, &serviceName, service);
+
+
+
+	*(void **) (&get_info_ptr) = dlsym(dlhandle, "fi_getinfo");
+	if ((error = dlerror()) != NULL) {
+		fprintf (stderr, "%s\n", error);
+		exit(1);
+	}
+
+	getInfoRet = (*get_info_ptr)(convertedVersion, nodeName, serviceName, flags, (struct fi_info*)hintsHandle, &resultInfo);
+
+	if (getInfoRet != 0) {
+		//printf("fi_getinfo %s\n", fi_strerror(-ret));
+		exit(1);
+	}
+
+	infoNum = getLinkedListLength(&resultInfo);
+	if(infoNum == 0) {
+		return NULL;
+	}
+
+	infoArray = (*env)->NewLongArray(env, infoNum);
+
+	int i;
+	jlong filler[infoNum];
+	curInfo = resultInfo;
+	for(i = 0; i < infoNum; i++) {
+		filler[i] = (jlong)curInfo;
+
+		info_list[info_list_tail] = curInfo;
+		info_list_tail++;
+
+		curInfo = curInfo->next;
+	}
+	(*env)->SetLongArrayRegion(env, infoArray, 0, infoNum, filler);
+	free(nodeName);
+	free(serviceName);
+	return infoArray;
+}
+
+int getLinkedListLength(struct fi_info **infoLinkedList) {
+	int length = 0;
+
+	struct fi_info *cur = *infoLinkedList;
+
+	while(cur != NULL) {
+		length++;
+		cur = cur->next;
+	}
+
+	return length;
 }

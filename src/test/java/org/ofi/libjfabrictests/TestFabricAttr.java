@@ -5,16 +5,19 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.ofi.libjfabric.LibFabric;
+import org.ofi.libjfabric.Version;
 import org.ofi.libjfabric.attributes.FabricAttr;
 
 public class TestFabricAttr {
 	private FabricAttr fullFA, emptyFA;
+	private Version version;
 	
 	@Before
 	public void setUp() throws Exception {
 		LibFabric.load();
-		fullFA = new FabricAttr("testName", "testProvName", 5);
-		emptyFA = new FabricAttr();
+		this.version = new Version(1, 3);
+		this.fullFA = new FabricAttr("testName", "testProvName", version);
+		this.emptyFA = new FabricAttr();
 	}
 
 	@Test
@@ -29,7 +32,7 @@ public class TestFabricAttr {
 
 	@Test
 	public void testGetProviderVersion() {
-		assertEquals(fullFA.getProviderVersion(), 5);
+		assertEquals(fullFA.getProviderVersion(), version);
 	}
 
 	@Test
@@ -46,8 +49,8 @@ public class TestFabricAttr {
 
 	@Test
 	public void testSetProviderVersion() {
-		emptyFA.setProviderVersion(6);
-		assertEquals(emptyFA.getProviderVersion(), 6);
+		emptyFA.setProviderVersion(version);
+		assertEquals(emptyFA.getProviderVersion(), version);
 	}
 
 }

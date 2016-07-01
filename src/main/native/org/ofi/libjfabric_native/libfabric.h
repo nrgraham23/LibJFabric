@@ -31,6 +31,7 @@ typedef struct {
 	jclass ProtocolClass;
 	jclass ResourceMgmtClass;
 	jclass ThreadingClass;
+	jclass VersionClass;
 	jmethodID GetAVType;
 	jmethodID GetEPType;
 	jmethodID GetMRMode;
@@ -38,17 +39,19 @@ typedef struct {
 	jmethodID GetProtocol;
 	jmethodID GetResourceMgmt;
 	jmethodID GetThreading;
-} libfabric_enum_globals_t;
+	jmethodID VersionConstructor;
+} libfabric_globals_t;
 
-extern libfabric_enum_globals_t lib_enums;
+extern libfabric_globals_t lib_globals;
 
-void initEnumMethods(JNIEnv *env);
-void deleteEnumMethods(JNIEnv *env);
+void initGlobals(JNIEnv *env);
+void deleteGlobals(JNIEnv *env);
 void convertJNIString(JNIEnv *env, char **charPointer, jstring javaString);
 void deleteDomainAttrList();
 void deleteFabricAttrList();
 void deleteInfoList();
 void deleteSimpleAttrList();
 void nullListsOut();
+int getLinkedListLength(struct fi_info **resultInfo);
 
 #endif
