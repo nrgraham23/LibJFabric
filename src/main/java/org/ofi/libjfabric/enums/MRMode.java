@@ -1,9 +1,9 @@
 package org.ofi.libjfabric.enums;
 
 public enum MRMode {
-	UNSPEC(getUNSPEC()),
-	BASIC(getBASIC()),
-	SCALABLE(getSCALABLE());
+	FI_MR_MODE_UNSPEC(getUNSPEC()),
+	FI_MR_MODE_BASIC(getBASIC()),
+	FI_MR_MODE_SCALABLE(getSCALABLE());
 	
 	private int val;
 	
@@ -17,14 +17,14 @@ public enum MRMode {
 	
 	//private because it should only be used from the JNI code
 	private static MRMode getMRMode(int val) {
-		if(val == MRMode.UNSPEC.getVal()) {
-			return MRMode.UNSPEC;
+		if(val == MRMode.FI_MR_MODE_UNSPEC.getVal()) {
+			return MRMode.FI_MR_MODE_UNSPEC;
 		}
-		if(val == MRMode.BASIC.getVal()) {
-			return MRMode.BASIC;
+		if(val == MRMode.FI_MR_MODE_BASIC.getVal()) {
+			return MRMode.FI_MR_MODE_BASIC;
 		}
-		if(val == MRMode.SCALABLE.getVal()) {
-			return MRMode.SCALABLE;
+		if(val == MRMode.FI_MR_MODE_SCALABLE.getVal()) {
+			return MRMode.FI_MR_MODE_SCALABLE;
 		}
 		throw new IllegalArgumentException("Invalid integer value for method getMRMode!");
 	}

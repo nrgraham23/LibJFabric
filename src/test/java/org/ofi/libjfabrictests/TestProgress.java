@@ -16,9 +16,9 @@ public class TestProgress {
 
 	@Test
 	public void test() {
-		assertEquals(Progress.UNSPEC.getVal(), 0);
-		assertEquals(Progress.AUTO.getVal(), 1);
-		assertEquals(Progress.MANUAL.getVal(), 2);
+		assertEquals(Progress.FI_PROGRESS_UNSPEC.getVal(), 0);
+		assertEquals(Progress.FI_PROGRESS_AUTO.getVal(), 1);
+		assertEquals(Progress.FI_PROGRESS_MANUAL.getVal(), 2);
 	}
 
 }

@@ -19,8 +19,8 @@ public class TestSpecifiedDomainAttr {
 	@Before
 	public void setUp() throws Exception {
 		LibFabric.load();
-		fullSDA = new SpecifiedDomainAttr(new Domain(100024), "testDomain", Threading.SAFE, Progress.AUTO, Progress.AUTO, ResourceMgmt.ENABLED, 
-				AVType.MAP, MRMode.BASIC, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51);
+		fullSDA = new SpecifiedDomainAttr(new Domain(100024), "testDomain", Threading.FI_THREAD_SAFE, Progress.FI_PROGRESS_AUTO, Progress.FI_PROGRESS_AUTO, ResourceMgmt.FI_RM_ENABLED, 
+				AVType.FI_AV_MAP, MRMode.FI_MR_MODE_BASIC, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51);
 		domainSDA = new SpecifiedDomainAttr(new Domain(100023));
 	}
 

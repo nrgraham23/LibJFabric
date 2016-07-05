@@ -16,8 +16,8 @@ public class TestResourceMgmt {
 
 	@Test
 	public void test() {
-		assertEquals(ResourceMgmt.UNSPEC.getVal(), 0);
-		assertEquals(ResourceMgmt.DISABLED.getVal(), 1);
-		assertEquals(ResourceMgmt.ENABLED.getVal(), 2);
+		assertEquals(ResourceMgmt.FI_RM_UNSPEC.getVal(), 0);
+		assertEquals(ResourceMgmt.FI_RM_DISABLED.getVal(), 1);
+		assertEquals(ResourceMgmt.FI_RM_ENABLED.getVal(), 2);
 	}
 }

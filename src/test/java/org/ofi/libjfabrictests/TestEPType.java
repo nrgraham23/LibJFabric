@@ -16,10 +16,10 @@ public class TestEPType {
 	
 	@Test
 	public void test() {
-		assertEquals(EPType.UNSPEC.getVal(), 0);
-		assertEquals(EPType.MSG.getVal(), 1);
-		assertEquals(EPType.DGRAM.getVal(), 2);
-		assertEquals(EPType.RDM.getVal(), 3);
+		assertEquals(EPType.FI_EP_UNSPEC.getVal(), 0);
+		assertEquals(EPType.FI_EP_MSG.getVal(), 1);
+		assertEquals(EPType.FI_EP_DGRAM.getVal(), 2);
+		assertEquals(EPType.FI_EP_RDM.getVal(), 3);
 	}
 
 }

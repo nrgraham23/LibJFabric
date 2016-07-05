@@ -16,18 +16,18 @@ public class TestProtocol {
 	
 	@Test
 	public void test() {
-		assertEquals(Protocol.UNSPEC.getVal(), 0);
-		assertEquals(Protocol.RDMA_CM_IB_RC.getVal(), 1);
-		assertEquals(Protocol.IWARP.getVal(), 2);
-		assertEquals(Protocol.IB_UD.getVal(), 3);
-		assertEquals(Protocol.PSMX.getVal(), 4);
-		assertEquals(Protocol.UDP.getVal(), 5);
-		assertEquals(Protocol.SOCK_TCP.getVal(), 6);
-		assertEquals(Protocol.MXM.getVal(), 7);
-		assertEquals(Protocol.IWARP_RDM.getVal(), 8);
-		assertEquals(Protocol.IB_RDM.getVal(), 9);
-		assertEquals(Protocol.GNI.getVal(), 10);
-		assertEquals(Protocol.RXM.getVal(), 11);
+		assertEquals(Protocol.FI_PROTO_UNSPEC.getVal(), 0);
+		assertEquals(Protocol.FI_PROTO_RDMA_CM_IB_RC.getVal(), 1);
+		assertEquals(Protocol.FI_PROTO_IWARP.getVal(), 2);
+		assertEquals(Protocol.FI_PROTO_IB_UD.getVal(), 3);
+		assertEquals(Protocol.FI_PROTO_PSMX.getVal(), 4);
+		assertEquals(Protocol.FI_PROTO_UDP.getVal(), 5);
+		assertEquals(Protocol.FI_PROTO_SOCK_TCP.getVal(), 6);
+		assertEquals(Protocol.FI_PROTO_MXM.getVal(), 7);
+		assertEquals(Protocol.FI_PROTO_IWARP_RDM.getVal(), 8);
+		assertEquals(Protocol.FI_PROTO_IB_RDM.getVal(), 9);
+		assertEquals(Protocol.FI_PROTO_GNI.getVal(), 10);
+		assertEquals(Protocol.FI_PROTO_RXM.getVal(), 11);
 	}
 
 }
