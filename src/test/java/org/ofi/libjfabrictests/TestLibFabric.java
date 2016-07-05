@@ -2,7 +2,6 @@ package org.ofi.libjfabrictests;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.ofi.libjfabric.Fabric;
 import org.ofi.libjfabric.Info;
 import org.ofi.libjfabric.LibFabric;
 import org.ofi.libjfabric.Version;
