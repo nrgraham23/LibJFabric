@@ -1,9 +1,9 @@
 package org.ofi.libjfabric.enums;
 
 public enum Progress {
-	UNSPEC(getUNSPEC()),
-	AUTO(getAUTO()),
-	MANUAL(getMANUAL());
+	FI_PROGRESS_UNSPEC(getUNSPEC()),
+	FI_PROGRESS_AUTO(getAUTO()),
+	FI_PROGRESS_MANUAL(getMANUAL());
 	
 	private int val;
 	
@@ -17,14 +17,14 @@ public enum Progress {
 	
 	//private because it should only be used from the JNI code
 	private static Progress getProgress(int val) {
-		if(val == Progress.UNSPEC.getVal()) {
-			return Progress.UNSPEC;
+		if(val == Progress.FI_PROGRESS_UNSPEC.getVal()) {
+			return Progress.FI_PROGRESS_UNSPEC;
 		}
-		if(val == Progress.AUTO.getVal()) {
-			return Progress.AUTO;
+		if(val == Progress.FI_PROGRESS_AUTO.getVal()) {
+			return Progress.FI_PROGRESS_AUTO;
 		}
-		if(val == Progress.MANUAL.getVal()) {
-			return Progress.MANUAL;
+		if(val == Progress.FI_PROGRESS_MANUAL.getVal()) {
+			return Progress.FI_PROGRESS_MANUAL;
 		}
 		throw new IllegalArgumentException("Invalid integer value for method getProgress!");
 	}

@@ -16,12 +16,12 @@ public class TestThreading {
 	
 	@Test
 	public void test() {
-		assertEquals(Threading.UNSPEC.getVal(), 0);
-		assertEquals(Threading.SAFE.getVal(), 1);
-		assertEquals(Threading.FID.getVal(), 2);
-		assertEquals(Threading.DOMAIN.getVal(), 3);
-		assertEquals(Threading.COMPLETION.getVal(), 4);
-		assertEquals(Threading.ENDPOINT.getVal(), 5);
+		assertEquals(Threading.FI_THREAD_UNSPEC.getVal(), 0);
+		assertEquals(Threading.FI_THREAD_SAFE.getVal(), 1);
+		assertEquals(Threading.FI_THREAD_FID.getVal(), 2);
+		assertEquals(Threading.FI_THREAD_DOMAIN.getVal(), 3);
+		assertEquals(Threading.FI_THREAD_COMPLETION.getVal(), 4);
+		assertEquals(Threading.FI_THREAD_ENDPOINT.getVal(), 5);
 	}
 
 }

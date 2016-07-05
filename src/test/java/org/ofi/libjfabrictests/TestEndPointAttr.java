@@ -15,18 +15,18 @@ public class TestEndPointAttr {
 	@Before
 	public void setUp() throws Exception {
 		LibFabric.load();
-		fullEP = new EndPointAttr(EPType.DGRAM, Protocol.IB_UD, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+		fullEP = new EndPointAttr(EPType.FI_EP_DGRAM, Protocol.FI_PROTO_IB_UD, 3, 4, 5, 6, 7, 8, 9, 10, 11);
 		emptyEP = new EndPointAttr();
 	}
 
 	@Test
 	public void testGetEpType() {
-		assertEquals(fullEP.getEpType(), EPType.DGRAM);
+		assertEquals(fullEP.getEpType(), EPType.FI_EP_DGRAM);
 	}
 
 	@Test
 	public void testGetProtocol() {
-		assertEquals(fullEP.getProtocol(), Protocol.IB_UD);
+		assertEquals(fullEP.getProtocol(), Protocol.FI_PROTO_IB_UD);
 	}
 
 	@Test
@@ -76,14 +76,14 @@ public class TestEndPointAttr {
 
 	@Test
 	public void testSetEpType() {
-		emptyEP.setEpType(EPType.MSG);
-		assertEquals(emptyEP.getEpType(), EPType.MSG);
+		emptyEP.setEpType(EPType.FI_EP_MSG);
+		assertEquals(emptyEP.getEpType(), EPType.FI_EP_MSG);
 	}
 
 	@Test
 	public void testSetProtocol() {
-		emptyEP.setProtocol(Protocol.IWARP);
-		assertEquals(emptyEP.getProtocol(), Protocol.IWARP);
+		emptyEP.setProtocol(Protocol.FI_PROTO_IWARP);
+		assertEquals(emptyEP.getProtocol(), Protocol.FI_PROTO_IWARP);
 	}
 
 	@Test

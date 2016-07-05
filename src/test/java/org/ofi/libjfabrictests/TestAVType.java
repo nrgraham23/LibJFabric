@@ -16,9 +16,9 @@ public class TestAVType {
 	
 	@Test
 	public void test() {
-		assertEquals(AVType.UNSPEC.getVal(), 0);
-		assertEquals(AVType.MAP.getVal(), 1);
-		assertEquals(AVType.TABLE.getVal(), 2);
+		assertEquals(AVType.FI_AV_UNSPEC.getVal(), 0);
+		assertEquals(AVType.FI_AV_MAP.getVal(), 1);
+		assertEquals(AVType.FI_AV_TABLE.getVal(), 2);
 	}
 
 }

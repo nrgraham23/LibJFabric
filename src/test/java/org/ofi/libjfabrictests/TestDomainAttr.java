@@ -14,8 +14,8 @@ public class TestDomainAttr {
 	@Before
 	public void setUp() throws Exception {
 		LibFabric.load();
-		domainAttr = new DomainAttr("testDomain", Threading.SAFE, Progress.AUTO, Progress.AUTO, ResourceMgmt.ENABLED, 
-				AVType.MAP, MRMode.BASIC, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51);
+		domainAttr = new DomainAttr("testDomain", Threading.FI_THREAD_SAFE, Progress.FI_PROGRESS_AUTO, Progress.FI_PROGRESS_AUTO, ResourceMgmt.FI_RM_ENABLED, 
+				AVType.FI_AV_MAP, MRMode.FI_MR_MODE_BASIC, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51);
 		emptyDomainAttr = new DomainAttr();
 	}
 
@@ -26,32 +26,32 @@ public class TestDomainAttr {
 
 	@Test
 	public void testGetThreading() {
-		assertEquals(domainAttr.getThreading(), Threading.SAFE);
+		assertEquals(domainAttr.getThreading(), Threading.FI_THREAD_SAFE);
 	}
 
 	@Test
 	public void testGetCntrlProgress() {
-		assertEquals(domainAttr.getCntrlProgress(), Progress.AUTO);
+		assertEquals(domainAttr.getCntrlProgress(), Progress.FI_PROGRESS_AUTO);
 	}
 
 	@Test
 	public void testGetDataProgress() {
-		assertEquals(domainAttr.getDataProgress(), Progress.AUTO);
+		assertEquals(domainAttr.getDataProgress(), Progress.FI_PROGRESS_AUTO);
 	}
 
 	@Test
 	public void testGetResourceMgmt() {
-		assertEquals(domainAttr.getResourceMgmt(), ResourceMgmt.ENABLED);
+		assertEquals(domainAttr.getResourceMgmt(), ResourceMgmt.FI_RM_ENABLED);
 	}
 
 	@Test
 	public void testGetAvType() {
-		assertEquals(domainAttr.getAvType(), AVType.MAP);
+		assertEquals(domainAttr.getAvType(), AVType.FI_AV_MAP);
 	}
 
 	@Test
 	public void testGetMRMode() {
-		assertEquals(domainAttr.getMRMode(), MRMode.BASIC);
+		assertEquals(domainAttr.getMRMode(), MRMode.FI_MR_MODE_BASIC);
 	}
 
 	@Test
@@ -112,38 +112,38 @@ public class TestDomainAttr {
 
 	@Test
 	public void testSetThreading() {
-		emptyDomainAttr.setThreading(Threading.COMPLETION);
-		assertEquals(emptyDomainAttr.getThreading(), Threading.COMPLETION);
+		emptyDomainAttr.setThreading(Threading.FI_THREAD_COMPLETION);
+		assertEquals(emptyDomainAttr.getThreading(), Threading.FI_THREAD_COMPLETION);
 	}
 
 	@Test
 	public void testSetCntrlProgress() {
-		emptyDomainAttr.setCntrlProgress(Progress.MANUAL);
-		assertEquals(emptyDomainAttr.getCntrlProgress(), Progress.MANUAL);
+		emptyDomainAttr.setCntrlProgress(Progress.FI_PROGRESS_MANUAL);
+		assertEquals(emptyDomainAttr.getCntrlProgress(), Progress.FI_PROGRESS_MANUAL);
 	}
 
 	@Test
 	public void testSetDataProgress() {
-		emptyDomainAttr.setDataProgress(Progress.MANUAL);
-		assertEquals(emptyDomainAttr.getDataProgress(), Progress.MANUAL);
+		emptyDomainAttr.setDataProgress(Progress.FI_PROGRESS_MANUAL);
+		assertEquals(emptyDomainAttr.getDataProgress(), Progress.FI_PROGRESS_MANUAL);
 	}
 
 	@Test
 	public void testSetResourceMgmt() {
-		emptyDomainAttr.setResourceMgmt(ResourceMgmt.DISABLED);
-		assertEquals(emptyDomainAttr.getResourceMgmt(), ResourceMgmt.DISABLED);
+		emptyDomainAttr.setResourceMgmt(ResourceMgmt.FI_RM_DISABLED);
+		assertEquals(emptyDomainAttr.getResourceMgmt(), ResourceMgmt.FI_RM_DISABLED);
 	}
 
 	@Test
 	public void testSetAVType() {
-		emptyDomainAttr.setAVType(AVType.TABLE);
-		assertEquals(emptyDomainAttr.getAvType(), AVType.TABLE);
+		emptyDomainAttr.setAVType(AVType.FI_AV_TABLE);
+		assertEquals(emptyDomainAttr.getAvType(), AVType.FI_AV_TABLE);
 	}
 
 	@Test
 	public void testSetMRMode() {
-		emptyDomainAttr.setMRMode(MRMode.SCALABLE);
-		assertEquals(emptyDomainAttr.getMRMode(), MRMode.SCALABLE);
+		emptyDomainAttr.setMRMode(MRMode.FI_MR_MODE_SCALABLE);
+		assertEquals(emptyDomainAttr.getMRMode(), MRMode.FI_MR_MODE_SCALABLE);
 	}
 
 	@Test

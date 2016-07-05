@@ -16,9 +16,9 @@ public class TestMRMode {
 	
 	@Test
 	public void test() {
-		assertEquals(MRMode.UNSPEC.getVal(), 0);
-		assertEquals(MRMode.BASIC.getVal(), 1);
-		assertEquals(MRMode.SCALABLE.getVal(), 2);
+		assertEquals(MRMode.FI_MR_MODE_UNSPEC.getVal(), 0);
+		assertEquals(MRMode.FI_MR_MODE_BASIC.getVal(), 1);
+		assertEquals(MRMode.FI_MR_MODE_SCALABLE.getVal(), 2);
 	}
 
 }

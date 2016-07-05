@@ -1,10 +1,10 @@
 package org.ofi.libjfabric.enums;
 
 public enum EPType {
-	UNSPEC(getUNSPEC()),
-	MSG(getMSG()),
-	DGRAM(getDGRAM()),
-	RDM(getRDM());
+	FI_EP_UNSPEC(getUNSPEC()),
+	FI_EP_MSG(getMSG()),
+	FI_EP_DGRAM(getDGRAM()),
+	FI_EP_RDM(getRDM());
 	
 	private int val;
 	
@@ -18,17 +18,17 @@ public enum EPType {
 	
 	//private because it should only be used from the JNI code
 	private static EPType getEPType(int val) {
-		if(val == EPType.UNSPEC.getVal()) {
-			return EPType.UNSPEC;
+		if(val == EPType.FI_EP_UNSPEC.getVal()) {
+			return EPType.FI_EP_UNSPEC;
 		}
-		if(val == EPType.MSG.getVal()) {
-			return EPType.MSG;
+		if(val == EPType.FI_EP_MSG.getVal()) {
+			return EPType.FI_EP_MSG;
 		}
-		if(val == EPType.DGRAM.getVal()) {
-			return EPType.DGRAM;
+		if(val == EPType.FI_EP_DGRAM.getVal()) {
+			return EPType.FI_EP_DGRAM;
 		}
-		if(val == EPType.RDM.getVal()) {
-			return EPType.RDM;
+		if(val == EPType.FI_EP_RDM.getVal()) {
+			return EPType.FI_EP_RDM;
 		}
 		throw new IllegalArgumentException("Invalid integer value for method getEPType!");
 	}

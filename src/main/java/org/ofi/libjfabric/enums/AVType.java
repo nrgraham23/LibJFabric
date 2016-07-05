@@ -1,9 +1,9 @@
 package org.ofi.libjfabric.enums;
 
 public enum AVType {
-	UNSPEC(getUNSPEC()),
-	MAP(getMAP()),
-	TABLE(getTABLE());
+	FI_AV_UNSPEC(getUNSPEC()),
+	FI_AV_MAP(getMAP()),
+	FI_AV_TABLE(getTABLE());
 	
 	private int val;
 	
@@ -17,14 +17,14 @@ public enum AVType {
 	
 	//private because it should only be used from the JNI code
 	private static AVType getAVType(int val) {
-		if(val == AVType.UNSPEC.getVal()) {
-			return AVType.UNSPEC;
+		if(val == AVType.FI_AV_UNSPEC.getVal()) {
+			return AVType.FI_AV_UNSPEC;
 		}
-		if(val == AVType.MAP.getVal()) {
-			return AVType.MAP;
+		if(val == AVType.FI_AV_MAP.getVal()) {
+			return AVType.FI_AV_MAP;
 		}
-		if(val == AVType.TABLE.getVal()) {
-			return AVType.TABLE;
+		if(val == AVType.FI_AV_TABLE.getVal()) {
+			return AVType.FI_AV_TABLE;
 		}
 		throw new IllegalArgumentException("Invalid integer value for method getAVType!");
 	}
