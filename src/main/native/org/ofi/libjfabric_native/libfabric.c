@@ -15,6 +15,21 @@ int info_list_tail = 0;
 void *simple_attr_list[LISTSIZE];
 int simple_attr_list_tail = 0;
 
+struct fid_fabric *fabric_list[LISTSIZE];
+int fabric_list_tail = 0;
+
+struct fid_domain *domain_list[LISTSIZE];
+int domain_list_tail = 0;
+
+struct fid_pep *passive_ep_list[LISTSIZE];
+int passive_ep_list_tail = 0;
+
+struct fid_eq *event_queue_list[LISTSIZE];
+int event_queue_list_tail = 0;
+
+struct fid_wait *wait_list[LISTSIZE];
+int wait_list_tail = 0;
+
 void * dlhandle;
 
 libfabric_globals_t lib_globals;
@@ -37,6 +52,10 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv
 	deleteFabricAttrList();
 	deleteInfoList();
 	deleteSimpleAttrList();
+	deleteFabricList();
+	deleteDomainList();
+	deletePassiveEPList();
+	deleteEventQueueList();
 	dlclose(dlhandle);
 }
 
@@ -48,6 +67,7 @@ void initGlobals(JNIEnv *env) {
 	lib_globals.ProtocolClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/Protocol");
 	lib_globals.ResourceMgmtClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/ResourceMgmt");
 	lib_globals.ThreadingClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/Threading");
+	lib_globals.WaitObjClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/WaitObj");
 	lib_globals.VersionClass = (*env)->FindClass(env,"org/ofi/libjfabric/Version");
 	lib_globals.GetAVType = (*env)->GetStaticMethodID(env,lib_globals.AVTypeClass,"getAVType","(I)Lorg/ofi/libjfabric/enums/AVType;");
 	lib_globals.GetEPType = (*env)->GetStaticMethodID(env,lib_globals.EPTypeClass,"getEPType","(I)Lorg/ofi/libjfabric/enums/EPType;");
@@ -56,6 +76,7 @@ void initGlobals(JNIEnv *env) {
 	lib_globals.GetProtocol = (*env)->GetStaticMethodID(env,lib_globals.ProtocolClass,"getProtocol","(I)Lorg/ofi/libjfabric/enums/Protocol;");
 	lib_globals.GetResourceMgmt = (*env)->GetStaticMethodID(env,lib_globals.ResourceMgmtClass,"getResourceMgmt","(I)Lorg/ofi/libjfabric/enums/ResourceMgmt;");
 	lib_globals.GetThreading = (*env)->GetStaticMethodID(env,lib_globals.ThreadingClass,"getThreading","(I)Lorg/ofi/libjfabric/enums/Threading;");
+	lib_globals.GetWaitObj = (*env)->GetStaticMethodID(env,lib_globals.WaitObjClass,"getWaitObj","(I)Lorg/ofi/libjfabric/enums/WaitObj;");
 	lib_globals.VersionConstructor = (*env)->GetMethodID(env, lib_globals.VersionClass, "<init>", "(II)V");
 }
 
@@ -67,6 +88,7 @@ void deleteGlobals(JNIEnv *env) {
 	(*env)->DeleteGlobalRef(env, lib_globals.ProtocolClass);
 	(*env)->DeleteGlobalRef(env, lib_globals.ResourceMgmtClass);
 	(*env)->DeleteGlobalRef(env, lib_globals.ThreadingClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.WaitObjClass);
 	(*env)->DeleteGlobalRef(env, lib_globals.VersionClass);
 }
 
@@ -139,8 +161,52 @@ void deleteInfoList() {
 void deleteSimpleAttrList() {
 	int i = 0;
 
-	while(simple_attr_list[i] != NULL && i < LISTSIZE) {
+	while(simple_attr_list[i] != NULL && i < simple_attr_list_tail) {
 		free(simple_attr_list[i]);
+		i++;
+	}
+}
+
+void deleteFabricList() { //TODO: see if there are sub things to free for these
+	int i = 0;
+
+	while(i < fabric_list_tail) {
+		if(fabric_list[i] != NULL) {
+			free(fabric_list[i]);
+		}
+		i++;
+	}
+}
+
+void deleteDomainList() {
+	int i = 0;
+
+	while(i < domain_list_tail) {
+		if(domain_list[i] != NULL) {
+			free(domain_list[i]);
+		}
+		i++;
+	}
+}
+
+void deletePassiveEPList() {
+	int i = 0;
+
+	while(i < passive_ep_list_tail) {
+		if(passive_ep_list[i] != NULL) {
+			free(passive_ep_list[i]);
+		}
+		i++;
+	}
+}
+
+void deleteEventQueueList() {
+	int i = 0;
+
+	while(i < event_queue_list_tail) {
+		if(event_queue_list[i] != NULL) {
+			free(event_queue_list[i]);
+		}
 		i++;
 	}
 }
