@@ -1,5 +1,5 @@
 package org.ofi.libjfabric;
 
-public class CompletionQueue {
+public class CompletionQueue extends FIDescriptor {
 
 }

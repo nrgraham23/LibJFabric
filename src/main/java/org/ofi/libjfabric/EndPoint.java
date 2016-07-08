@@ -1,13 +1,8 @@
 package org.ofi.libjfabric;
 
-public class EndPoint {
-	private long handle;
+public class EndPoint extends FIDescriptor {
 	
 	public EndPoint(long handle) {
 		this.handle = handle;
-	}
-	
-	public long getHandle() {
-		return this.handle;
 	}
 }

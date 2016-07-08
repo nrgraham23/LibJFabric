@@ -5,7 +5,7 @@ public class LibFabric {
 	public static void loadVerbose() {
 		try {
 			System.loadLibrary("jfab_native");
-			System.loadLibrary("fabric");
+			//System.loadLibrary("fabric");
 			init();
 			registerNativeCleanup();
 		} catch (UnsatisfiedLinkError e) {
@@ -16,7 +16,7 @@ public class LibFabric {
 	public static boolean load() {
 		try {
 			System.loadLibrary("jfab_native");
-			System.loadLibrary("fabric");
+			//System.loadLibrary("fabric");
 			init();
 			registerNativeCleanup();
 			return true;
