@@ -30,6 +30,9 @@ int event_queue_list_tail = 0;
 struct fid_wait *wait_list[LISTSIZE];
 int wait_list_tail = 0;
 
+struct libjfab_context *context_list[LISTSIZE];
+int context_list_tail = 0;
+
 void * dlhandle;
 
 libfabric_globals_t lib_globals;
@@ -56,6 +59,7 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv
 	deleteDomainList();
 	deletePassiveEPList();
 	deleteEventQueueList();
+	deleteContextList();
 	dlclose(dlhandle);
 }
 
@@ -206,6 +210,18 @@ void deleteEventQueueList() {
 	while(i < event_queue_list_tail) {
 		if(event_queue_list[i] != NULL) {
 			free(event_queue_list[i]);
+		}
+		i++;
+	}
+}
+
+void deleteContextList() {
+	int i = 0;
+
+	while(i < context_list_tail) {
+		if(context_list[i] != NULL) {
+			free(context_list[i]->context);
+			free(context_list[i]);
 		}
 		i++;
 	}

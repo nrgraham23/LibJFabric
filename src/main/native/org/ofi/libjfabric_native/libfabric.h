@@ -40,6 +40,9 @@ extern int event_queue_list_tail;
 extern struct fid_wait *wait_list[];
 extern int wait_list_tail;
 
+extern struct libjfab_context *context_list[];
+extern int context_list_tail;
+
 extern void *dlhandle;
 
 typedef struct {
@@ -65,6 +68,13 @@ typedef struct {
 
 extern libfabric_globals_t lib_globals;
 
+typedef struct libjfab_context {
+	struct fi_context *context;
+	long userContext;
+} libjfab_context_t;
+
+extern libjfab_context_t libjfab_context;
+
 void initGlobals(JNIEnv *env);
 void deleteGlobals(JNIEnv *env);
 void convertJNIString(JNIEnv *env, char **charPointer, jstring javaString);
@@ -76,6 +86,7 @@ void deleteFabricList();
 void deleteDomainList();
 void deletePassiveEPList();
 void deleteEventQueueList();
+void deleteContextList();
 void nullListsOut();
 int getLinkedListLength(struct fi_info **resultInfo);
 
