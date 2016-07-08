@@ -4,8 +4,7 @@ import org.ofi.libjfabric.attributes.EventQueueAttr;
 import org.ofi.libjfabric.attributes.FabricAttr;
 import org.ofi.libjfabric.attributes.WaitAttr;
 
-public class Fabric {
-	private long handle;
+public class Fabric extends FIDescriptor {
 	FabricAttr fabricAttr;
 	Context context;
 	
@@ -18,10 +17,6 @@ public class Fabric {
 	
 	public Fabric(long handle) {
 		this.handle = handle;
-	}
-	
-	public long getHandle() {
-		return this.handle;
 	}
 	
 	public Domain createDomain(Info info, Context context) {

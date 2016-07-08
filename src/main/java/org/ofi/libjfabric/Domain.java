@@ -1,18 +1,8 @@
 package org.ofi.libjfabric;
 
-public class Domain {
-	private long handle;
-	
-	public Domain() {
-		
-	}
+public class Domain extends FIDescriptor {
 	
 	public  Domain(long handle) {
 		this.handle = handle;
-	}
-	
-	//gets
-	public long getHandle() {
-		return this.handle;
 	}
 }

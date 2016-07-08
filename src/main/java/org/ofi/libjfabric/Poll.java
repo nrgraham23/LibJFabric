@@ -1,5 +1,5 @@
 package org.ofi.libjfabric;
 
-public class Poll {
+public class Poll extends FIDescriptor {
 
 }

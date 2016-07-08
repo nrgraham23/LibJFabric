@@ -30,7 +30,8 @@ C_SOURCES = 					\
 	specified_fabric_attr.c			\
 	info.c					\
 	wait_obj.c				\
-	context.c
+	context.c				\
+	fi_descriptor.c
 
 O_FILES =					\
 	av_type.o				\
@@ -51,7 +52,8 @@ O_FILES =					\
 	specified_fabric_attr.o			\
 	info.o					\
 	wait_obj.o				\
-	context.o
+	context.o				\
+	fi_descriptor.o
 
 all: libjfab_native.dylib
 
