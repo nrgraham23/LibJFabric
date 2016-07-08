@@ -1,5 +1,9 @@
 Java bindings for the libfabric project.
 
+This project is still very much in development.  It is NOT ready
+to be used as it is incomplete and there are likely bugs and
+memory leaks.
+
 To work on this project with eclipse, clone the git repository into
 your working directory, and then create a new project in eclipse
 called LibJFabric.
