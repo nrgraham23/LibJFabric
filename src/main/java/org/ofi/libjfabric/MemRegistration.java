@@ -32,6 +32,9 @@
 
 package org.ofi.libjfabric;
 
-public class MemoryRegistration extends FIDescriptor {
+public class MemRegistration extends FIDescriptor {
 
+	public MemRegistration(long handle) {
+		super(handle);
+	}
 }

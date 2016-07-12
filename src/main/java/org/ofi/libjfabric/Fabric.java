@@ -48,7 +48,7 @@ public class Fabric extends FIDescriptor {
 	private native long initFabric(long fabricAttrHandle, long contextHandle);
 	
 	public Fabric(long handle) {
-		this.handle = handle;
+		super(handle);
 	}
 	
 	public Domain createDomain(Info info, Context context) {
