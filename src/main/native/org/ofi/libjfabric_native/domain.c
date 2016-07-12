@@ -30,11 +30,23 @@
  * SOFTWARE.
  */
 
-package org.ofi.libjfabric;
+#include "org_ofi_libjfabric_Fabric.h"
+#include "libfabric.h"
 
-public class EndPoint extends FIDescriptor {
-	
-	public EndPoint(long handle) {
-		super(handle);
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_endPointOpen
+(JNIEnv *env, jobject jthis, jlong domHandle, jlong infoHandle, jlong contextHandle)
+{
+	struct fid_ep *endPoint = (struct fid_ep *)calloc(1, sizeof(struct fid_ep));
+
+	ep_list[ep_list_tail] = endPoint;
+	ep_list_tail++;
+
+	int res = ((struct fid_domain *)domHandle)->ops->endpoint((struct fid_domain *)domHandle,
+			(struct fi_info *)infoHandle, &endPoint, (void *)contextHandle);
+
+	if(res) {
+		printf("Error opening endPoint: %d\n", res);
+		exit(1);
 	}
+	return (jlong)endPoint;
 }

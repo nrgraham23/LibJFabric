@@ -65,6 +65,9 @@ int wait_list_tail = 0;
 struct libjfab_context *context_list[LISTSIZE];
 int context_list_tail = 0;
 
+struct fid_ep *ep_list[LISTSIZE];
+int ep_list_tail = 0;
+
 libfabric_globals_t lib_globals;
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclass jthis) {
@@ -75,7 +78,7 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclas
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv *env, jclass jthis) {
 	deleteGlobals(env);
 
-	deleteDomainAttrList();
+	deleteDomainAttrList(); //this may be too naive an approach after looking more at libfabric
 	deleteFabricAttrList();
 	deleteInfoList();
 	deleteSimpleAttrList();
@@ -84,6 +87,7 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv
 	deletePassiveEPList();
 	deleteEventQueueList();
 	deleteContextList();
+	deleteEPList();
 }
 
 void initGlobals(JNIEnv *env) {
@@ -245,6 +249,17 @@ void deleteContextList() {
 		if(context_list[i] != NULL) {
 			free(context_list[i]->context);
 			free(context_list[i]);
+		}
+		i++;
+	}
+}
+
+void deleteEPList() {
+	int i = 0;
+
+	while(i < ep_list_tail) {
+		if(ep_list[i] != NULL) {
+			free(ep_list[i]);
 		}
 		i++;
 	}

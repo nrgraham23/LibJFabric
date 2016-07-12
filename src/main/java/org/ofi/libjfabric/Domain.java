@@ -32,9 +32,36 @@
 
 package org.ofi.libjfabric;
 
+import org.ofi.libjfabric.attributes.AVAttr;
+import org.ofi.libjfabric.attributes.CQAttr;
+import org.ofi.libjfabric.attributes.CntrAttr;
+
 public class Domain extends FIDescriptor {
 	
 	public  Domain(long handle) {
-		this.handle = handle;
+		super(handle);
 	}
+	
+	public AddressVector avOpen(AVAttr avAttr, Context context) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public CompletionQueue cqOpen(CQAttr cqAttr, Context context) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public EndPoint endPointOpen(Info info, Context context) {
+		return new EndPoint(endPointOpen(this.handle, info.getHandle(), context.getHandle()));
+	}
+	private native long endPointOpen(long domHandle, long infoHandle, long contextHandle);
+	
+	public ScalableEP scalableEPOpen(Info info, Context context) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public Counter cntrOpen(CntrAttr cntrAttr, Context context) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	//public Poll pollOpen(PollAttr pollAttr, ) Will have to discuss how to implement this.
 }
