@@ -62,6 +62,7 @@
                                 <javahClassName>org.ofi.libjfabric.enums.EPType</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.enums.Protocol</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.enums.WaitObj</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.Domain</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Fabric</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Info</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.LibFabric</javahClassName>

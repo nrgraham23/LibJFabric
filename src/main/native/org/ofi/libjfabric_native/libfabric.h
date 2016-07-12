@@ -43,8 +43,6 @@
 #include "rdma/fi_errno.h"
 #include "org_ofi_libjfabric_LibFabric.h"
 
-#include "org_ofi_libjfabric_LibFabric.h"
-
 /*NOTE: The intent is to eventually replace these lists with linked lists!*/
 extern struct fi_domain_attr *domain_attr_list[];
 extern int domain_attr_list_tail;
@@ -75,6 +73,9 @@ extern int wait_list_tail;
 
 extern struct libjfab_context *context_list[];
 extern int context_list_tail;
+
+extern struct fid_ep *ep_list[];
+extern int ep_list_tail;
 
 typedef struct {
 	jclass AVTypeClass;
@@ -118,6 +119,7 @@ void deleteDomainList();
 void deletePassiveEPList();
 void deleteEventQueueList();
 void deleteContextList();
+void deleteEPList();
 void nullListsOut();
 int getLinkedListLength(struct fi_info **resultInfo);
 
