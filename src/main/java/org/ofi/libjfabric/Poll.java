@@ -34,4 +34,7 @@ package org.ofi.libjfabric;
 
 public class Poll extends FIDescriptor {
 
+	public Poll(long handle) {
+		super(handle);
+	}
 }
