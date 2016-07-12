@@ -33,22 +33,14 @@
 #include "org_ofi_libjfabric_Info.h"
 #include "libfabric.h"
 
-void *dlhandle;
-
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initInfo
 	(JNIEnv *env, jobject jthis, jlong caps, jlong mode, jint addrFormat, jint srcAddrLen, jint destAddrLen,
 		jlong transmitAttrHandle, jlong receiveAttrHandle, jlong endpointAttrHandle, jlong domainAttrHandle,
 		jlong fabricAttrHandle)
 {
-	struct fi_info *(*dup_info_ptr)(const struct fi_info *info);
 	char *error;
 
-	*(void **) (&dup_info_ptr) = dlsym(dlhandle, "fi_dupinfo");
-	if ((error = dlerror()) != NULL) {
-		fprintf (stderr, "%s\n", error);
-		exit(1);
-	}
-	struct fi_info *info = (*dup_info_ptr)(NULL);
+	struct fi_info *info = fi_dupinfo(NULL);
 
 	info->next = NULL;
 	info->caps = caps;
@@ -72,17 +64,9 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initInfo
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initEmpty
 	(JNIEnv *env, jobject jthis)
 {
-	struct fi_info *(*dup_info_ptr)(const struct fi_info *info);
 	char *error;
 
-	*(void **) (&dup_info_ptr) = dlsym(dlhandle, "fi_dupinfo");
-	if ((error = dlerror()) != NULL) {
-		fprintf (stderr, "%s\n", error);
-		exit(1);
-	}
-
-
-	info_list[info_list_tail] = (*dup_info_ptr)(NULL);
+	info_list[info_list_tail] = fi_dupinfo(NULL);
 	info_list_tail++;
 	return (jlong)info_list[info_list_tail - 1];
 }

@@ -65,18 +65,10 @@ int wait_list_tail = 0;
 struct libjfab_context *context_list[LISTSIZE];
 int context_list_tail = 0;
 
-void * dlhandle;
-
 libfabric_globals_t lib_globals;
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclass jthis) {
-	dlhandle = dlopen("/Users/ngraham/libfab_install/lib/libfabric.dylib", RTLD_LAZY);
-	if ( dlhandle == NULL ){
-		fprintf(stdout,"dlopen failure: %s\n",dlerror());
-		exit(1);
-	}
 	initGlobals(env);
-
 	nullListsOut(); //can be removed when we move to a different method of keeping track of C things
 }
 
@@ -92,7 +84,6 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv
 	deletePassiveEPList();
 	deleteEventQueueList();
 	deleteContextList();
-	dlclose(dlhandle);
 }
 
 void initGlobals(JNIEnv *env) {
@@ -279,21 +270,10 @@ JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_LibFabric_getInfoJNI(JNIE
 
 	uint32_t convertedVersion= FI_VERSION((uint32_t)majorVersion, (uint32_t)minorVersion);
 
-	int (*get_info_ptr)(uint32_t convertedVersion, const char *node, const char *service,
-			uint64_t flags, struct fi_info *hints, struct fi_info **info);
-
 	convertJNIString(env, &nodeName, node);
 	convertJNIString(env, &serviceName, service);
 
-
-
-	*(void **) (&get_info_ptr) = dlsym(dlhandle, "fi_getinfo");
-	if ((error = dlerror()) != NULL) {
-		fprintf (stderr, "%s\n", error);
-		exit(1);
-	}
-
-	getInfoRet = (*get_info_ptr)(convertedVersion, nodeName, serviceName, flags, (struct fi_info*)hintsHandle, &resultInfo);
+	getInfoRet = fi_getinfo(convertedVersion, nodeName, serviceName, flags, (struct fi_info*)hintsHandle, &resultInfo);
 
 	if (getInfoRet != 0) {
 		//printf("fi_getinfo %s\n", fi_strerror(-ret));

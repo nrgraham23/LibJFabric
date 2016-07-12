@@ -41,6 +41,7 @@
 #include "rdma/fi_domain.h"
 #include "rdma/fi_endpoint.h"
 #include "rdma/fi_errno.h"
+#include "org_ofi_libjfabric_LibFabric.h"
 
 #include "org_ofi_libjfabric_LibFabric.h"
 
@@ -74,8 +75,6 @@ extern int wait_list_tail;
 
 extern struct libjfab_context *context_list[];
 extern int context_list_tail;
-
-extern void *dlhandle;
 
 typedef struct {
 	jclass AVTypeClass;
