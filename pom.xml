@@ -76,7 +76,7 @@
                                 <javahClassName>org.ofi.libjfabric.attributes.TransmitAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.EventQueueAttr</javahClassName>
                             </javahClassNames>
-                            <javahOutputDirectory>${project.build.directory}/native/javah</javahOutputDirectory>
+                            <javahOutputDirectory>${project.native.directory}/org/ofi/libjfabric_native</javahOutputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -91,7 +91,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
-                    <argLine>-Djava.library.path=${project.build.directory}/native</argLine>
+                    <argLine>-Djava.library.path=${project.native.directory}/org/ofi/libjfabric_native/lib</argLine>
                     <parallel>methods</parallel>
                     <threadCount>10</threadCount>
                     <skipTests>${skipTests}</skipTests>
@@ -143,10 +143,10 @@
                                         <echo message="runtime classpath: ${runtime_classpath}"/>
                                         <echo message="test classpath:    ${test_classpath}"/>
                                         <echo message="plugin classpath:  ${plugin_classpath}"/>
-                                        <exec executable="cmake" dir="${project.build.directory}/native" failonerror="true">
-                                        <arg line="${project.native.directory}/org/ofi/libjfabric_native -DGENERATED_JAVAH=${project.build.directory}/native/javah -DCMAKE_INSTALL_PREFIX=${project.native.directory}/native"/>
+                                        <exec executable="cmake" dir="${project.native.directory}/org/ofi/libjfabric_native" failonerror="true">
+                                        <arg line="-DGENERATED_JAVAH=${project.native.directory}/org/ofi/libjfabric_native -DCMAKE_INSTALL_PREFIX=${project.native.directory}/org/ofi/libjfabric_native"/>
                                         </exec>
-                                        <exec executable="make" dir="${project.build.directory}/native" failonerror="true">
+                                        <exec executable="make" dir="${project.native.directory}/org/ofi/libjfabric_native" failonerror="true">
                                         <arg line="install VERBOSE=1"/>
                                         </exec>
                                     </target>
