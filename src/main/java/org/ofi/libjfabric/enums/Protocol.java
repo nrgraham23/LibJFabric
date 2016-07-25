@@ -44,7 +44,8 @@ public enum Protocol {
 	FI_PROTO_IWARP_RDM(getIWARPRDM()),
 	FI_PROTO_IB_RDM(getIBRDM()),
 	FI_PROTO_GNI(getGNI()),
-	FI_PROTO_RXM(getRXM());
+	FI_PROTO_RXM(getRXM()),
+	FI_PROTO_RXD(getRXD());
 	
 	private int val;
 	
@@ -94,7 +95,10 @@ public enum Protocol {
 		if(val == Protocol.FI_PROTO_RXM.getVal()) {
 			return Protocol.FI_PROTO_RXM;
 		}
-		throw new IllegalArgumentException("Invalid integer value for method getProtocol!");
+		if(val == Protocol.FI_PROTO_RXD.getVal()) {
+			return Protocol.FI_PROTO_RXD;
+		}
+		throw new IllegalArgumentException("Invalid integer value for method getProtocol: " + val);
 	}
 	
 	private static native int getUNSPEC();
@@ -109,4 +113,5 @@ public enum Protocol {
 	private static native int getIBRDM();
 	private static native int getGNI();
 	private static native int getRXM();
+	private static native int getRXD();
 }
