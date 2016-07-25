@@ -36,7 +36,7 @@ import java.nio.*;
 
 public class LibFabric {
 	private static final ByteOrder nativeOrder = ByteOrder.nativeOrder();
-	
+
 	public static void loadVerbose() {
 		try {
 			System.loadLibrary("jfab_native");
@@ -46,7 +46,7 @@ public class LibFabric {
 			throw new RuntimeException("Could not load the libfabric native library");
 		}
 	}
-	
+
 	public static boolean load() {
 		try {
 			System.loadLibrary("jfab_native");
@@ -57,9 +57,9 @@ public class LibFabric {
 			throw new RuntimeException("Could not load the libfabric native library");
 		}
 	}
-	
+
 	private static native void init();
-	
+
 	/* This method adds a shutdown hook to the JVM.
 	 * The thread defined below will run as the JVM is
 	 * shutting down.  It cleans up any memory that was
@@ -74,16 +74,16 @@ public class LibFabric {
 			}
 		});
 	}
-	
+
 	private static void nativeCleanup() {
 		deleteCachedVars();
 	}
-	
+
 	private static native void deleteCachedVars();
 
 	public static Info[] getInfo(Version version, String node, String service, long flags, Info hints) {
 		long infoHandleArray[] = null;
-		
+
 		if(hints != null) {
 			infoHandleArray = getInfoJNI(version.getMajorVersion(), version.getMinorVersion(), node, service, flags, hints.getHandle());
 		} else {
@@ -92,25 +92,24 @@ public class LibFabric {
 		if(infoHandleArray == null) {
 			return null; //should probably handle this better
 		}
-		
+
 		Info infoArray[] = new Info[infoHandleArray.length];
-		
+
 		for(int i = 0; i < infoHandleArray.length; i++) {
 			infoArray[i] = new Info(infoHandleArray[i]);
 		}
-		
+
 		return infoArray;
 	}
-	
+
 	private static native long[] getInfoJNI(int majorVersion, int minorVersion, String node, String service, long flags, long hints);
-	
+
 	/**
 	 * Allocates a new direct byte buffer.
 	 * @param capacity The new buffer's capacity, in bytes
 	 * @return The new byte buffer
 	 */
-	public static ByteBuffer newByteBuffer(int capacity)
-	{
+	public static ByteBuffer newByteBuffer(int capacity) {
 		ByteBuffer buf = ByteBuffer.allocateDirect(capacity);
 		buf.order(nativeOrder);
 		return buf;
@@ -121,8 +120,7 @@ public class LibFabric {
 	 * @param capacity The new buffer's capacity, in chars
 	 * @return The new char buffer
 	 */
-	public static CharBuffer newCharBuffer(int capacity)
-	{
+	public static CharBuffer newCharBuffer(int capacity) {
 		assert capacity <= Integer.MAX_VALUE / 2;
 		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 2);
 		buf.order(nativeOrder);
@@ -134,8 +132,7 @@ public class LibFabric {
 	 * @param capacity The new buffer's capacity, in shorts
 	 * @return The new short buffer
 	 */
-	public static ShortBuffer newShortBuffer(int capacity)
-	{
+	public static ShortBuffer newShortBuffer(int capacity) {
 		assert capacity <= Integer.MAX_VALUE / 2;
 		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 2);
 		buf.order(nativeOrder);
@@ -147,8 +144,7 @@ public class LibFabric {
 	 * @param capacity The new buffer's capacity, in ints
 	 * @return The new int buffer
 	 */
-	public static IntBuffer newIntBuffer(int capacity)
-	{
+	public static IntBuffer newIntBuffer(int capacity) {
 		assert capacity <= Integer.MAX_VALUE / 4;
 		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 4);
 		buf.order(nativeOrder);
@@ -160,8 +156,7 @@ public class LibFabric {
 	 * @param capacity The new buffer's capacity, in longs
 	 * @return The new long buffer
 	 */
-	public static LongBuffer newLongBuffer(int capacity)
-	{
+	public static LongBuffer newLongBuffer(int capacity) {
 		assert capacity <= Integer.MAX_VALUE / 8;
 		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 8);
 		buf.order(nativeOrder);
@@ -173,8 +168,7 @@ public class LibFabric {
 	 * @param capacity The new buffer's capacity, in floats
 	 * @return The new float buffer
 	 */
-	public static FloatBuffer newFloatBuffer(int capacity)
-	{
+	public static FloatBuffer newFloatBuffer(int capacity) {
 		assert capacity <= Integer.MAX_VALUE / 4;
 		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 4);
 		buf.order(nativeOrder);
@@ -186,11 +180,19 @@ public class LibFabric {
 	 * @param capacity The new buffer's capacity, in doubles
 	 * @return The new double buffer
 	 */
-	public static DoubleBuffer newDoubleBuffer(int capacity)
-	{
+	public static DoubleBuffer newDoubleBuffer(int capacity) {
 		assert capacity <= Integer.MAX_VALUE / 8;
 		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 8);
 		buf.order(nativeOrder);
 		return buf.asDoubleBuffer();
+	}
+
+	/**
+	 * Asserts that a buffer is direct.
+	 * @param buf buffer
+	 */
+	protected static void assertDirectBuffer(Buffer buf) {
+		if(!buf.isDirect())
+			throw new IllegalArgumentException("The buffer must be direct.");
 	}
 }
