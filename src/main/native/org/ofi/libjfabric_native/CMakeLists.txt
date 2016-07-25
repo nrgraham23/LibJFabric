@@ -122,6 +122,7 @@ set(SOURCE_FILES
   threading.c
   tx_attr.c
   wait_obj.c
+  endpoint.c
 )
 
 set(INTERFACE_FILES

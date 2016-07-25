@@ -331,3 +331,9 @@ int getLinkedListLength(struct fi_info **infoLinkedList) {
 
 	return length;
 }
+
+void* getDirectBufferAddress(JNIEnv *env, jobject buffer)
+{
+    /* Allow NULL buffers to send/recv 0 items as control messages. */
+    return buffer == NULL ? NULL : (*env)->GetDirectBufferAddress(env, buffer);
+}

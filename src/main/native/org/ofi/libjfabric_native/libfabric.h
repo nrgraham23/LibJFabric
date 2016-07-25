@@ -122,5 +122,6 @@ void deleteContextList();
 void deleteEPList();
 void nullListsOut();
 int getLinkedListLength(struct fi_info **resultInfo);
+void* getDirectBufferAddress(JNIEnv *env, jobject buffer);
 
 #endif

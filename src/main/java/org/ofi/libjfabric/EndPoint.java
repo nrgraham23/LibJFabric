@@ -32,9 +32,49 @@
 
 package org.ofi.libjfabric;
 
+import java.nio.Buffer;
+
 public class EndPoint extends FIDescriptor {
 	
 	public EndPoint(long handle) {
 		super(handle);
 	}
+	
+	public void recv(Buffer buffer, MemoryRegion desc, long srcAddress, Context context) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public void recv(Buffer buffer, MemoryRegion desc, long srcAddress) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public void recv(Buffer buffer, long srcAddress, Context context) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public void recv(Buffer buffer, long srcAddress) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public void recv(Buffer buffer) {
+		recv5(this.getHandle(), buffer, buffer.capacity());
+	}
+	private native void recv5(long handle, Buffer buffer, int length);
+	
+	public void send(Buffer buffer, MemoryRegion desc, long destAddress, Context context) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public void send(Buffer buffer, MemoryRegion desc, long destAddress) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public void send(Buffer buffer, long destAddress, Context context) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public void send(Buffer buffer, long destAddress) {
+		send4(this.getHandle(), buffer, buffer.capacity(), destAddress); //TODO: verify capacity method works for buffer length
+	}
+	private native void send4(long handle, Buffer buffer, int length, long destAddress);
 }
