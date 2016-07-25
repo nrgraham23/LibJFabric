@@ -32,7 +32,10 @@
 
 package org.ofi.libjfabric;
 
+import java.nio.*;
+
 public class LibFabric {
+	private static final ByteOrder nativeOrder = ByteOrder.nativeOrder();
 	
 	public static void loadVerbose() {
 		try {
@@ -100,4 +103,94 @@ public class LibFabric {
 	}
 	
 	private static native long[] getInfoJNI(int majorVersion, int minorVersion, String node, String service, long flags, long hints);
+	
+	/**
+	 * Allocates a new direct byte buffer.
+	 * @param capacity The new buffer's capacity, in bytes
+	 * @return The new byte buffer
+	 */
+	public static ByteBuffer newByteBuffer(int capacity)
+	{
+		ByteBuffer buf = ByteBuffer.allocateDirect(capacity);
+		buf.order(nativeOrder);
+		return buf;
+	}
+
+	/**
+	 * Allocates a new direct char buffer.
+	 * @param capacity The new buffer's capacity, in chars
+	 * @return The new char buffer
+	 */
+	public static CharBuffer newCharBuffer(int capacity)
+	{
+		assert capacity <= Integer.MAX_VALUE / 2;
+		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 2);
+		buf.order(nativeOrder);
+		return buf.asCharBuffer();
+	}
+
+	/**
+	 * Allocates a new direct short buffer.
+	 * @param capacity The new buffer's capacity, in shorts
+	 * @return The new short buffer
+	 */
+	public static ShortBuffer newShortBuffer(int capacity)
+	{
+		assert capacity <= Integer.MAX_VALUE / 2;
+		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 2);
+		buf.order(nativeOrder);
+		return buf.asShortBuffer();
+	}
+
+	/**
+	 * Allocates a new direct int buffer.
+	 * @param capacity The new buffer's capacity, in ints
+	 * @return The new int buffer
+	 */
+	public static IntBuffer newIntBuffer(int capacity)
+	{
+		assert capacity <= Integer.MAX_VALUE / 4;
+		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 4);
+		buf.order(nativeOrder);
+		return buf.asIntBuffer();
+	}
+
+	/**
+	 * Allocates a new direct long buffer.
+	 * @param capacity The new buffer's capacity, in longs
+	 * @return The new long buffer
+	 */
+	public static LongBuffer newLongBuffer(int capacity)
+	{
+		assert capacity <= Integer.MAX_VALUE / 8;
+		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 8);
+		buf.order(nativeOrder);
+		return buf.asLongBuffer();
+	}
+
+	/**
+	 * Allocates a new direct float buffer.
+	 * @param capacity The new buffer's capacity, in floats
+	 * @return The new float buffer
+	 */
+	public static FloatBuffer newFloatBuffer(int capacity)
+	{
+		assert capacity <= Integer.MAX_VALUE / 4;
+		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 4);
+		buf.order(nativeOrder);
+		return buf.asFloatBuffer();
+	}
+
+	/**
+	 * Allocates a new direct double buffer.
+	 * @param capacity The new buffer's capacity, in doubles
+	 * @return The new double buffer
+	 */
+	public static DoubleBuffer newDoubleBuffer(int capacity)
+	{
+		assert capacity <= Integer.MAX_VALUE / 8;
+		ByteBuffer buf = ByteBuffer.allocateDirect(capacity * 8);
+		buf.order(nativeOrder);
+		return buf.asDoubleBuffer();
+	}
 }
