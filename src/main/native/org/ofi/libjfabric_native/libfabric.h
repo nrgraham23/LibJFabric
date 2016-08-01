@@ -41,6 +41,7 @@
 #include "rdma/fi_domain.h"
 #include "rdma/fi_endpoint.h"
 #include "rdma/fi_errno.h"
+#include "rdma/fi_eq.h"
 #include "org_ofi_libjfabric_LibFabric.h"
 
 /*NOTE: The intent is to eventually replace these lists with linked lists!*/
@@ -77,6 +78,9 @@ extern int context_list_tail;
 extern struct fid_ep *ep_list[];
 extern int ep_list_tail;
 
+extern struct fi_cq_attr *cq_attr_list[];
+extern int cq_attr_list_tail;
+
 typedef struct {
 	jclass AVTypeClass;
 	jclass EPTypeClass;
@@ -87,6 +91,8 @@ typedef struct {
 	jclass ThreadingClass;
 	jclass VersionClass;
 	jclass WaitObjClass;
+	jclass CQFormatClass;
+	jclass CQWaitCondClass;
 	jmethodID GetAVType;
 	jmethodID GetEPType;
 	jmethodID GetMRMode;
@@ -96,6 +102,8 @@ typedef struct {
 	jmethodID GetThreading;
 	jmethodID GetWaitObj;
 	jmethodID VersionConstructor;
+	jmethodID GetCQFormat;
+	jmethodID GetCQWaitCond;
 } libfabric_globals_t;
 
 extern libfabric_globals_t lib_globals;
@@ -120,6 +128,7 @@ void deletePassiveEPList();
 void deleteEventQueueList();
 void deleteContextList();
 void deleteEPList();
+void deleteCQAttrList();
 void nullListsOut();
 int getLinkedListLength(struct fi_info **resultInfo);
 void* getDirectBufferAddress(JNIEnv *env, jobject buffer);

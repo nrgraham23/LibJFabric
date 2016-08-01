@@ -123,6 +123,9 @@ set(SOURCE_FILES
   tx_attr.c
   wait_obj.c
   endpoint.c
+  cq_format.c
+  cq_wait_cond.c
+  cq_attr.c
 )
 
 set(INTERFACE_FILES
