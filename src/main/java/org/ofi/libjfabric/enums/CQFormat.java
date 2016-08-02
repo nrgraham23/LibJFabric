@@ -34,10 +34,10 @@ package org.ofi.libjfabric.enums;
 
 public enum CQFormat {
 	FI_CQ_FORMAT_UNSPEC(getUNSPEC()),
-	FI_CQ_FORMAT_CONTEXT(getContext()),
+	FI_CQ_FORMAT_CONTEXT(getCONTEXT()),
 	FI_CQ_FORMAT_MSG(getMSG()),
-	FI_CQ_FORMAT_DATA(getData()),
-	FI_CQ_FORMAT_TAGGED(getTagged());
+	FI_CQ_FORMAT_DATA(getDATA()),
+	FI_CQ_FORMAT_TAGGED(getTAGGED());
 	
 	private int val;
 	
@@ -70,8 +70,8 @@ public enum CQFormat {
 	}
 	
 	private static native int getUNSPEC();
-	private static native int getContext();
+	private static native int getCONTEXT();
 	private static native int getMSG();
-	private static native int getData();
-	private static native int getTagged();
+	private static native int getDATA();
+	private static native int getTAGGED();
 }

@@ -103,16 +103,7 @@ void initGlobals(JNIEnv *env) {
 	lib_globals.ResourceMgmtClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/ResourceMgmt");
 	lib_globals.ThreadingClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/Threading");
 	lib_globals.WaitObjClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/WaitObj");
-	if((*env)->ExceptionCheck(env)) {
-					printf("EXCEPTION IN 1 CLASS LOOKUP\n");
-					(*env)->ExceptionDescribe(env);
-					return;
-				}
 	lib_globals.CQFormatClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/CQFormat");
-		if((*env)->ExceptionCheck(env)) {
-				printf("EXCEPTION IN 2 CLASS LOOKUP\n");
-				(*env)->ExceptionDescribe(env);
-			}
 	lib_globals.CQWaitCondClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/CQWaitCond");
 	lib_globals.VersionClass = (*env)->FindClass(env,"org/ofi/libjfabric/Version");
 	lib_globals.GetAVType = (*env)->GetStaticMethodID(env,lib_globals.AVTypeClass,"getAVType","(I)Lorg/ofi/libjfabric/enums/AVType;");
@@ -124,11 +115,7 @@ void initGlobals(JNIEnv *env) {
 	lib_globals.GetThreading = (*env)->GetStaticMethodID(env,lib_globals.ThreadingClass,"getThreading","(I)Lorg/ofi/libjfabric/enums/Threading;");
 	lib_globals.GetWaitObj = (*env)->GetStaticMethodID(env,lib_globals.WaitObjClass,"getWaitObj","(I)Lorg/ofi/libjfabric/enums/WaitObj;");
 	lib_globals.VersionConstructor = (*env)->GetMethodID(env, lib_globals.VersionClass, "<init>", "(II)V");
-
-	printf("INITTING GLOBALS 1!!\n");
 	lib_globals.GetCQFormat = (*env)->GetStaticMethodID(env,lib_globals.CQFormatClass,"getCQFormat","(I)Lorg/ofi/libjfabric/enums/CQFormat;");
-
-	printf("INITTING GLOBALS 2!!\n");
 	lib_globals.GetCQWaitCond = (*env)->GetStaticMethodID(env,lib_globals.CQWaitCondClass,"getCQWaitCond","(I)Lorg/ofi/libjfabric/enums/CQWaitCond;");
 }
 
