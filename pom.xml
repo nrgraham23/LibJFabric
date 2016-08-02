@@ -61,6 +61,8 @@
                                 <javahClassName>org.ofi.libjfabric.enums.EPType</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.enums.Protocol</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.enums.WaitObj</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.enums.CQFormat</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.enums.CQWaitCond</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Domain</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Fabric</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Info</javahClassName>
@@ -76,6 +78,7 @@
                                 <javahClassName>org.ofi.libjfabric.attributes.SpecifiedFabricAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.TransmitAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.EventQueueAttr</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.attributes.CQAttr</javahClassName>
                             </javahClassNames>
                             <javahOutputDirectory>${project.native.directory}/org/ofi/libjfabric_native</javahOutputDirectory>
                         </configuration>
