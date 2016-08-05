@@ -66,7 +66,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initEmpty
 {
 	char *error;
 
-	info_list[info_list_tail] = fi_dupinfo(NULL);
+	info_list[info_list_tail] = fi_allocinfo();
 	info_list_tail++;
 	return (jlong)info_list[info_list_tail - 1];
 }
