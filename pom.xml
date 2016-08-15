@@ -67,6 +67,7 @@
                                 <javahClassName>org.ofi.libjfabric.Fabric</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Info</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.LibFabric</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.Constant</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Context</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.FIDescriptor</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.EndPoint</javahClassName>

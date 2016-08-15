@@ -77,4 +77,12 @@ public class EndPoint extends FIDescriptor {
 		send4(this.getHandle(), buffer, buffer.capacity(), destAddress); //TODO: verify capacity method works for buffer length
 	}
 	private native void send4(long handle, Buffer buffer, int length, long destAddress);
+	
+	public void setName(String name) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public String getName() {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
 }
