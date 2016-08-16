@@ -34,16 +34,15 @@
 #include "constant.h"
 #include "libfabric.h"
 
-void setStaticLongField(JNIEnv *env, jclass c, char *field, jlong value)
+void setLongField(JNIEnv *env, jclass c, jobject jthis, char *field, jlong value)
 {
-	jfieldID id = (*env)->GetStaticFieldID(env, c, field, "J");
-	(*env)->SetStaticLongField(env, c, id, value);
+	jfieldID id = (*env)->GetFieldID(env, c, field, "J");
+	(*env)->SetLongField(env, c, id, value);
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Constant_setConstant
 	(JNIEnv *env, jobject jthis)
 {
-	jclass c = (*env)->GetObjectClass(env, obj);
-	
-	setStaticLongField(env, c, obj, "FI_LOCAL_MR", FI_LOCAL_MR);
+	jclass c = (*env)->GetObjectClass(env, jthis);
+	setLongField(env, c, jthis, "FI_LOCAL_MR", FI_LOCAL_MR);
 }

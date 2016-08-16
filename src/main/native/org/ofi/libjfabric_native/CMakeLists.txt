@@ -126,6 +126,7 @@ set(SOURCE_FILES
   cq_format.c
   cq_wait_cond.c
   cq_attr.c
+  constant.c
 )
 
 set(INTERFACE_FILES
