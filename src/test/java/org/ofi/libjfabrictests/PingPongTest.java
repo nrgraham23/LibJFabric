@@ -31,6 +31,13 @@
 
 package org.ofi.libjfabrictests;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.Buffer;
 
 import org.ofi.libjfabric.*;
@@ -38,11 +45,11 @@ import org.ofi.libjfabric.attributes.*;
 import org.ofi.libjfabric.enums.*;
 
 public class PingPongTest {
-	final Version version = new Version(1,3);
-	final int PP_OPT_ACTIVE = 1 << 0;
-	final int PP_OPT_ITER = 1 << 1;
-	final int PP_OPT_SIZE = 1 << 2;
-	final int PP_OPT_VERIFY_DATA = 1 << 3;
+	private final Version version = new Version(1,3);
+	private final int PP_OPT_ACTIVE = 1 << 0;
+	private final int PP_OPT_ITER = 1 << 1;
+	private final int PP_OPT_SIZE = 1 << 2;
+	private final int PP_OPT_VERIFY_DATA = 1 << 3;
 
 	private class PPOpts {
 		String src_port;
@@ -55,7 +62,15 @@ public class PingPongTest {
 		int options;
 		int argc;
 		String[] args;
+		boolean isServer = false;
 	};
+	
+	//container class to handle a case of 3 return values
+	private class AddrOptsObj {
+		String node;
+		String service;
+		long flags;
+	}
 
 	final int PP_SIZE_MAX_POWER_TWO = 22;
 	final long PP_MAX_DATA_MSG = (1 << (PP_SIZE_MAX_POWER_TWO + 1)) + (1 << PP_SIZE_MAX_POWER_TWO);
@@ -69,12 +84,12 @@ public class PingPongTest {
 	final int PP_ENABLE_ALL = ~0;
 	final int PP_DEFAULT_SIZE = (1 << 0);
 
-	final String PP_MSG_CHECK_PORT_OK = "port ok";
-	final int PP_MSG_LEN_PORT = 5;
-	final String PP_MSG_CHECK_CNT_OK = "cnt ok";
-	final int PP_MSG_LEN_CNT = 10;
-	final String PP_MSG_SYNC_Q = "q";
-	final String PP_MSG_SYNC_A = "a";
+	final static String PP_MSG_CHECK_PORT_OK = "port ok";
+	final static int PP_MSG_LEN_PORT = 5;
+	final static String PP_MSG_CHECK_CNT_OK = "cnt ok";
+	final static int PP_MSG_LEN_CNT = 10;
+	final static String PP_MSG_SYNC_Q = "q";
+	final static String PP_MSG_SYNC_A = "a";
 
 	private void PP_PRINTERR(String call, int retv) {
 		System.err.printf("%s(): ret=%d \n", call,
@@ -86,17 +101,16 @@ public class PingPongTest {
 		//can add something to handle variable arguments if its worth while
 	}
 
-	int PP_ACTIVATE_DEBUG = 0;
+	static boolean PP_ACTIVATE_DEBUG = false;
 
-	private void PP_DEBUG(String fmt, Object... items) {
-		if (PP_ACTIVATE_DEBUG != 0) {
+	private static void PP_DEBUG(String fmt, Object... items) {
+		if (PP_ACTIVATE_DEBUG) {
 			System.err.printf("[" + fmt + "]");
 		}
 		//can add something to handle variable arguments if its worth while
 	}
 
 	private void PP_CLOSE_FID(FIDescriptor fd) {
-		int ret;
 		if (fd != null) {	
 			fd.close();
 			fd = null;
@@ -132,7 +146,7 @@ public class PingPongTest {
 		//size_t buf_size, tx_size, rx_size;
 		int rx_fd, tx_fd;
 		int data_default_port;
-		char[] data_port = new char[8];
+		byte[] data_port = new byte[8]; //why does he have this as a char[] instead of an int?
 
 		String test_name;
 		int timeout;
@@ -145,10 +159,9 @@ public class PingPongTest {
 		long cnt_ack_msg;
 
 		int ctrl_port;
-		int ctrl_listenfd;
-		int ctrl_connfd;
-		//struct sockaddr_in ctrl_addr; some kind of socket thing
-		char[] ctrl_buf = new char[PP_CTRL_BUF_LEN + 1];
+		Socket ctrl_listenfd;
+		Socket ctrl_connfd;
+		byte[] ctrl_buf = new byte[PP_CTRL_BUF_LEN + 1];
 	};
 
 	final static char[] integ_alphabet = new char[] {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i',
@@ -205,12 +218,8 @@ public class PingPongTest {
 		PPOpts opts = ct.opts;
 		if ((opts.src_addr == null) || (opts.src_addr.length() == 0))
 			opts.src_addr = "None";
-		if ((opts.src_port == null) || (opts.src_port.length() == 0))
-			opts.src_port = "None";
 		if ((opts.dst_addr == null) || (opts.dst_addr.length() == 0))
 			opts.dst_addr = "None";
-		if ((opts.dst_port == null) || (opts.dst_addr.length() == 0))
-			opts.dst_port = "None";
 
 		if (opts.sizes_enabled == PP_ENABLE_ALL)
 			size_msg = "All sizes";
@@ -237,151 +246,98 @@ public class PingPongTest {
 	/*******************************************************************************************/
 	/*                                   Control Messaging                                     */
 	/*******************************************************************************************/
-/*
-	private int pp_ctrl_init(ct_pingpong  ct)
-	{
-		int err, ret;
-		struct timeval tv;
 
-		tv.tv_sec = 5;
-		tv.tv_usec = 0;
-
+	private static void ppCtrlInit(CTPingPong  ct) {
 		PP_DEBUG("Initializing control messages ...\n");
 
-		if (ct->opts.dst_addr) {
-			ct->ctrl_connfd = socket(AF_INET, SOCK_STREAM, 0);
-			if (ct->ctrl_connfd == -1) {
-				err = -errno;
-				PP_PRINTERR("socket", err);
-				return err;
-			}
+		if (!ct.opts.isServer) { //client
+			PP_DEBUG("CLIENT: connecting to <%s>\n", ct.opts.dst_addr);
+			try {
+				ct.ctrl_connfd = new Socket(ct.opts.dst_addr, Integer.parseInt(ct.opts.dst_port)); //creates and connects the socket
+				ct.ctrl_connfd.setReceiveBufferSize(PP_MSG_LEN_PORT);
+			} catch (UnknownHostException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			} 
 
-			memset(&ct->ctrl_addr, '\0', sizeof(ct->ctrl_addr));
-			ct->ctrl_addr.sin_family = AF_INET;
-			ret = inet_pton(AF_INET, ct->opts.dst_addr, &(ct->ctrl_addr.sin_addr));
-			if (ret == 0) {
-				err = -errno;
-				PP_PRINTERR("inet_pton", err);
-				return err;
-			}
-			ct->ctrl_addr.sin_port = htons(ct->ctrl_port);
-
-			PP_DEBUG("CLIENT: connecting to <%s>\n", ct->opts.dst_addr);
-			ret = connect(ct->ctrl_connfd, (struct sockaddr *)&ct->ctrl_addr, sizeof(ct->ctrl_addr));
-			if (ret == -1) {
-				err = -errno;
-				PP_PRINTERR("connect", err);
-				return err;
-			}
 			PP_DEBUG("CLIENT: connected\n");
-		} else {
-			ct->ctrl_listenfd = socket(AF_INET, SOCK_STREAM, 0);
-			if (ct->ctrl_listenfd == -1) {
-				err = -errno;
-				PP_PRINTERR("socket", err);
+		} else { //server
+			ServerSocket serverSock = null;
+			try {
+				serverSock = new ServerSocket(Integer.parseInt(ct.opts.src_port));
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
 			}
-			ret = setsockopt(ct->ctrl_listenfd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int));
-			if (ret == -1) {
-				err = -errno;
-				PP_PRINTERR("setsockopt(SO_REUSEADDR)", err);
-				return err;
-			}
-
-			memset(&ct->ctrl_addr, '\0', sizeof(ct->ctrl_addr));
-			ct->ctrl_addr.sin_family = AF_INET;
-			ct->ctrl_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-			ct->ctrl_addr.sin_port = htons(ct->ctrl_port);
-
-			ret = bind(ct->ctrl_listenfd, (struct sockaddr*)&ct->ctrl_addr, sizeof(ct->ctrl_addr));
-			if (ret == -1) {
-				err = -errno;
-				PP_PRINTERR("bind", err);
-				return err;
-			}
-
-			ret = listen(ct->ctrl_listenfd, 1);
-			if (ret == -1) {
-				err = -errno;
-				PP_PRINTERR("listen", err);
-				return err;
-			}
-
+			
+			//serverSock.bind(new InetSocketAddress(ct.opts.src_addr, ct.opts.src_port)); //should be able to not use this
 			PP_DEBUG("SERVER: waiting for connection ...\n");
-			ct->ctrl_connfd = accept(ct->ctrl_listenfd, (struct sockaddr*)null, null);
-			if (ct->ctrl_connfd == -1) {
-				err = -errno;
-				PP_PRINTERR("accept", err);
-				return err;
+			try {
+				ct.ctrl_listenfd = serverSock.accept();
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
 			}
+			
 			PP_DEBUG("SERVER: connection acquired\n");
 		}
-
-		ret = setsockopt(ct->ctrl_connfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
-		if (ret == -1) {
-			err = -errno;
-			PP_PRINTERR("setsockopt(SO_RCVTIMEO)", err);
-			return err;
+		try {
+			ct.ctrl_connfd.setSoTimeout(5000);
+		} catch (SocketException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
 		}
 
 		PP_DEBUG("Control messages initialized\n");
-
-		return 0;
 	}
 
-	int pp_ctrl_send(struct ct_pingpong *ct, char *buf, size_t size)
-	{
-		int ret, err;
-
-		ret = send(ct->ctrl_connfd, buf, size, 0);
-		if (ret < 0) {
-			err = -errno;
-			PP_PRINTERR("ctrl/send", err);
-			return err;
+	private static void pp_ctrl_send(CTPingPong ct, byte[] buf) {
+		try {
+			ct.ctrl_connfd.getOutputStream().write(buf);
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
 		}
-		if (ret == 0) {
-			err = -ECONNABORTED;
-			PP_ERR("ctrl/read : no data or remote connection closed");
-			return err;
-		}
-		PP_DEBUG("----> sent (%d/%ld) : \"", ret, size);
+		
+		PP_DEBUG("----> sent (%d) : \"", buf.length);
 		if (PP_ACTIVATE_DEBUG) {
 			int i;
-			for (i = 0; i < size; i++) {
-				fprintf(stderr, "%c.", buf[i]);
+			for (i = 0; i < buf.length; i++) {
+				System.err.printf("%c.", buf[i]);
 			}
-			fprintf(stderr,"\"\n");
+			System.err.printf("\"\n");
 		}
-
-		return ret;
 	}
 
-	int pp_ctrl_recv(struct ct_pingpong *ct, char *buf, size_t size)
+	private static void pp_ctrl_recv(CTPingPong ct, byte[] buf)
 	{
-		int ret, err;
-
-		ret = recv(ct->ctrl_connfd, buf, size, 0);
-		if (ret < 0) {
-			err = -errno;
-			PP_PRINTERR("ctrl/read", err);
-			return err;
+		try {
+			ct.ctrl_connfd.getInputStream().read(buf);
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
 		}
-		if (ret == 0) {
-			err = -ECONNABORTED;
-			PP_ERR("ctrl/read : no data or remote connection closed");
-			return err;
-		}
-		PP_DEBUG("----> received (%d/%ld) : \"", ret, size);
+		//ret = recv(ct->ctrl_connfd, buf, size, 0);
+		
+		PP_DEBUG("----> received (%d/%ld) : \"", PP_MSG_LEN_PORT);
 		if (PP_ACTIVATE_DEBUG) {
 			int i;
-			for (i = 0; i < size; i++) {
-				fprintf(stderr, "%c.", buf[i]);
+			for (i = 0; i < PP_MSG_LEN_PORT; i++) {
+				System.err.printf("%b.", buf[i]);
 			}
-			fprintf(stderr, "\"\n");
+			System.err.printf("\"\n");
 		}
-
-		return ret;
 	}
-
+/*
 	int pp_ctrl_finish(struct ct_pingpong *ct)
 	{
 		if (ct->ctrl_connfd != -1)
@@ -391,58 +347,65 @@ public class PingPongTest {
 
 		return 0;
 	}
-
-	int pp_ctrl_txrx_data_port(struct ct_pingpong *ct)
-	{
-		int ret;
+*/
+	private static void pp_ctrl_txrx_data_port(CTPingPong ct) {
 
 		PP_DEBUG("Exchanging data port ...\n");
 
-		if (ct->opts.dst_addr) {
-			memset(&ct->ctrl_buf, '\0', PP_MSG_LEN_PORT + 1);
-
+		if (!ct.opts.isServer) { //client
 			PP_DEBUG("CLIENT: receiving port ...\n");
-			ret = pp_ctrl_recv(ct, ct->ctrl_buf, PP_MSG_LEN_PORT);
-			if (ret < 0)
-				return ret;
-			ct->data_default_port = (int) parse_ulong(ct->ctrl_buf, (1 << 16) - 1);
-			if (ct->data_default_port < 0)
-				return ret;
-			PP_DEBUG("CLIENT: received port = <%d> (len=%lu)\n", ct->data_default_port, strlen(ct->ctrl_buf));
+			pp_ctrl_recv(ct, ct.ctrl_buf);
 
-			snprintf(ct->ctrl_buf, sizeof(PP_MSG_CHECK_PORT_OK) , "%s", PP_MSG_CHECK_PORT_OK);
-			ret = pp_ctrl_send(ct, ct->ctrl_buf, sizeof(PP_MSG_CHECK_PORT_OK));
-			if (ret < 0)
-				return ret;
+			ct.data_default_port = Integer.parseInt(ct.ctrl_buf.toString());
+			PP_DEBUG("CLIENT: received port = <%d> (len=%lu)\n", ct.data_default_port, ct.ctrl_buf.length);
+
+			try {
+				ct.ctrl_buf = PP_MSG_CHECK_PORT_OK.getBytes("UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.err.println("Platform does not support a neccessary charset (UTF-8).  Program will exit now!");
+				System.exit(-1);
+			}
+			pp_ctrl_send(ct, ct.ctrl_buf);
+			
 			PP_DEBUG("CLIENT: acked port to server\n");
-		} else {
-			snprintf(ct->ctrl_buf, PP_MSG_LEN_PORT + 1, "%d", ct->data_default_port);
+		} else { //server
+			try {
+				ct.ctrl_buf = (Integer.toString(ct.data_default_port)).getBytes("UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.err.println("Platform does not support a neccessary charset (UTF-8).  Program will exit now!");
+				System.exit(-1);
+			}
 
-			PP_DEBUG("SERVER: sending port = <%s> (len=%lu) ...\n", ct->ctrl_buf, strlen(ct->ctrl_buf));
-			ret = pp_ctrl_send(ct, ct->ctrl_buf, PP_MSG_LEN_PORT);
-			if (ret < 0)
-				return ret;
+			PP_DEBUG("SERVER: sending port = <%s> (len=%lu) ...\n", ct.ctrl_buf.toString(), ct.ctrl_buf.length);
+			
+			pp_ctrl_send(ct, ct.ctrl_buf);
+			
 			PP_DEBUG("SERVER: sent port\n");
 
-			memset(&ct->ctrl_buf, '\0', sizeof(PP_MSG_CHECK_PORT_OK));
-			ret = pp_ctrl_recv(ct, ct->ctrl_buf, sizeof(PP_MSG_CHECK_PORT_OK));
-			if (ret < 0)
-				return ret;
+			pp_ctrl_recv(ct, ct.ctrl_buf);
 
-			if (strcmp(ct->ctrl_buf, PP_MSG_CHECK_PORT_OK)) {
-				PP_DEBUG("SERVER: error while client acking the port : <%s> (len=%lu)\n", ct->ctrl_buf, strlen(ct->ctrl_buf));
-				return -EBADMSG;
+			if (ct.ctrl_buf.toString().equals(PP_MSG_CHECK_PORT_OK)) {
+				PP_DEBUG("SERVER: error while client acking the port : <%s> (len=%lu)\n", ct.ctrl_buf, ct.ctrl_buf.length);
+				//return -EBADMSG; may need to system.exit here
 			}
 			PP_DEBUG("SERVER: port acked by client\n");
 		}
-
-		snprintf(ct->data_port, sizeof(ct->data_port), "%d", ct->data_default_port);
+		try {
+			ct.data_port = (Integer.toString(ct.data_default_port)).getBytes("UTF-8"); 
+		} catch (UnsupportedEncodingException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+			System.err.println("Platform does not support a neccessary charset (UTF-8).  Program will exit now!");
+			System.exit(-1);
+		}
 
 		PP_DEBUG("Data port exchanged\n");
-
-		return 0;
 	}
-
+/*
 	int pp_ctrl_sync(struct ct_pingpong *ct)
 	{
 		int ret;
@@ -670,70 +633,48 @@ public class PingPongTest {
 
 	/*******************************************************************************************/
 	/*                                    Addresses handling                                   */
-	/*******************************************************************************************
+	/*******************************************************************************************/
 
-	static int pp_getsrcaddr(char *node, char *service, struct fi_info *hints)
-	{
-		struct fi_info *info;
-		int ret = 0;
-
-		ret = fi_getinfo(PP_FIVERSION, node, service, FI_SOURCE, null, &info);
-		if (ret) {
-			PP_PRINTERR("fi_getinfo", ret);
-			return ret;
-		}
+	private void pp_getsrcaddr(String node, String service, Info hints) {
+		Info[] info = LibFabric.getInfo(this.version, node, service, LibFabric.FI_SOURCE, null);
+/*
+		fi_getinfo(this.version, node, service, FI_SOURCE, null, &info);
 
 		hints->src_addrlen = info->src_addrlen;
 		hints->src_addr = calloc(1, hints->src_addrlen);
-		if (!hints->src_addr) {
-			ret = -errno;
-			PP_PRINTERR("calloc", ret);
-			goto err;
-		}
 
 		memcpy(hints->src_addr, info->src_addr, hints->src_addrlen);
-		if (!hints->src_addr) {
-			ret = -errno;
-			PP_PRINTERR("memcpy", ret);
-			goto err;
-		}
 
 	err:
 		fi_freeinfo(info);
-		return ret;
+		return ret;*/
 	}
 
-	int pp_read_addr_opts(struct ct_pingpong *ct, char **node, char **service, struct fi_info *hints,
-			uint64_t *flags, struct PPOpts *opts)
-	{
-		int ret;
-
-		if (opts->dst_addr) {
-			if (opts->src_addr) {
-				ret = pp_getsrcaddr(opts->src_addr, opts->src_port, hints);
-				if (ret) {
-					PP_ERR("Trying to get the source address for the client");
-					return ret;
-				}
+	private AddrOptsObj pp_read_addr_opts(CTPingPong ct, Info hints, long flags, PPOpts opts) {
+		AddrOptsObj nodeService = this.new AddrOptsObj();
+		
+		if (!opts.dst_addr.equals("")) { //this may be a place he is checking if its the server or client
+			if (!opts.src_addr.equals("")) {
+				pp_getsrcaddr(opts.src_addr, opts.src_port, hints);
 			}
 
-			if (!opts->dst_port)
-				opts->dst_port = ct->data_port;
+			if (opts.dst_port.equals(""))
+				opts.dst_port = new String(ct.data_port);
 
-			*node = opts->dst_addr;
-			*service = opts->dst_port;
+			nodeService.node = opts.dst_addr;
+			nodeService.service = opts.dst_port;
 		} else {
-			if (!opts->src_port)
-				opts->src_port = ct->data_port;
+			if (opts.src_port.equals(""))
+				opts.src_port = (new String(ct.data_port));
 
-			*node = opts->src_addr;
-			*service = opts->src_port;
-			*flags = FI_SOURCE;
+			nodeService.node = opts.src_addr;
+			nodeService.service = opts.src_port;
+			flags = LibFabric.FI_SOURCE;
 		}
 
-		return 0;
+		return nodeService;
 	}
-
+/*
 
 	/*******************************************************************************************/
 	/*                                       Test sizes                                        */
@@ -1249,28 +1190,21 @@ public class PingPongTest {
 
 		return 0;
 	}
-
-	int pp_getinfo(struct ct_pingpong *ct, struct fi_info *hints, struct fi_info **info)
+*/
+	private void pp_getinfo(CTPingPong ct, Info hints, Info info)
 	{
-		char *node, *service;
-		uint64_t flags = 0;
-		int ret;
+		String node, service;
+		long flags = 0;
 
-		ret = pp_read_addr_opts(ct, &node, &service, hints, &flags, &(ct->opts));
-		if (ret)
-			return ret;
+		pp_read_addr_opts(ct, hints, flags, ct.opts);
+		
+		if (hints.getEndPointAttr().getEpType() == null)
+			hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG); //he had datagram here
 
-		if (!hints->ep_attr->type)
-			hints->ep_attr->type = FI_EP_DGRAM;
-
-		ret = fi_getinfo(PP_FIVERSION, node, service, flags, hints, info);
-		if (ret) {
-			PP_PRINTERR("fi_getinfo", ret);
-			return ret;
-		}
-		return 0;
+		//LibFabric.getInfo(version, node, service, flags, hints) HERE
+		//fi_getinfo(PP_FIVERSION, node, service, flags, hints, info);
 	}
-
+/*
 	#define PP_EP_BIND(ep, fd, flags)					\
 		do {								\
 			int ret;						\
@@ -1324,52 +1258,26 @@ public class PingPongTest {
 
 		return 0;
 	}
-
-	int pp_start_server(struct ct_pingpong *ct)
-	{
-		int ret;
-
+*/
+	private static void pp_start_server(CTPingPong ct) {
+		
 		PP_DEBUG("Connected endpoint: starting server\n");
 
-		ret = pp_getinfo(ct, ct->hints, &(ct->fi_pep));
-		if (ret)
-			return ret;
+		//pp_getinfo(ct, ct.hints, ct.fi_pep);
 
-		ret = fi_fabric(ct->fi_pep->fabric_attr, &(ct->fabric), null);
-		if (ret) {
-			PP_PRINTERR("fi_fabric", ret);
-			return ret;
-		}
-
-		ret = fi_eq_open(ct->fabric, &(ct->eq_attr), &(ct->eq), null);
-		if (ret) {
-			PP_PRINTERR("fi_eq_open", ret);
-			return ret;
-		}
-
-		ret = fi_passive_ep(ct->fabric, ct->fi_pep, &(ct->pep), null);
-		if (ret) {
-			PP_PRINTERR("fi_passive_ep", ret);
-			return ret;
-		}
-
-		ret = fi_pep_bind(ct->pep, &(ct->eq->fid), 0);
-		if (ret) {
-			PP_PRINTERR("fi_pep_bind", ret);
-			return ret;
-		}
-
-		ret = fi_listen(ct->pep);
-		if (ret) {
-			PP_PRINTERR("fi_listen", ret);
-			return ret;
-		}
+		//fi_fabric(ct->fi_pep->fabric_attr, &(ct->fabric), null);
+		
+		//fi_eq_open(ct->fabric, &(ct->eq_attr), &(ct->eq), null);
+		
+		//fi_passive_ep(ct->fabric, ct->fi_pep, &(ct->pep), null);
+		
+		//fi_pep_bind(ct->pep, &(ct->eq->fid), 0);
+		
+		//fi_listen(ct->pep);
 
 		PP_DEBUG("Connected endpoint: server started\n");
-
-		return 0;
 	}
-
+/*
 	int pp_server_connect(struct ct_pingpong *ct)
 	{
 		struct fi_eq_cm_entry entry;
@@ -1538,8 +1446,7 @@ public class PingPongTest {
 		return 0;
 	}
 */
-	void pp_init_ct_pingpong(CTPingPong ct)
-	{
+	private void pp_init_ct_pingpong(CTPingPong ct)	{
 		//ct.remote_fi_addr = FI_ADDR_UNSPEC; TODO: remember this here.
 		ct.rx_fd = -1;
 		ct.tx_fd = -1;
@@ -1548,24 +1455,18 @@ public class PingPongTest {
 		ct.timeout = -1;
 
 		ct.eq_attr.setWaitObj(WaitObj.WAIT_UNSPEC);
-		/*ct.cq_attr = (struct fi_cq_attr) {
-			.wait_obj = FI_WAIT_NONE
-		};*/
+		ct.cq_attr = new CQAttr();
+		ct.cq_attr.setWaitObj(WaitObj.WAIT_NONE);
 
-		ct.ctrl_listenfd = -1;
-		ct.ctrl_connfd = -1;
 		ct.data_default_port = 9228;
 		ct.ctrl_port = 47592;
-
-		//memset(ct.ctrl_buf, '\0', ct.ctrl_buf.length);
 	}
 
 	/*******************************************************************************************/
 	/*                                Deallocations and Final                                  */
 	/*******************************************************************************************
 
-	void pp_free_res(struct ct_pingpong *ct)
-	{
+	private void pp_free_res(CTPingPong ct)	{
 		PP_DEBUG("Freeing ressources of test suite ...\n");
 
 		if (ct->mr != &(ct->no_mr))
@@ -1649,117 +1550,69 @@ public class PingPongTest {
 
 	/*******************************************************************************************/
 	/*                                CLI: Usage and Options parsing                           */
-	/*******************************************************************************************
+	/*******************************************************************************************/
 
-	void pp_pingpong_usage(char *name, char *desc)
-	{
-		fprintf(stderr, "Usage:\n");
-		fprintf(stderr, "  %s [OPTIONS]\t\tstart server\n", name);
-		fprintf(stderr, "  %s [OPTIONS] <srv_addr>\tconnect to server\n", name);
-
-		if (desc)
-			fprintf(stderr, "\n%s\n", desc);
-
-		fprintf(stderr, "\nOptions:\n");
-
-		fprintf(stderr, " %-20s %s\n", "-b <src_port>", "non default source port number");
-		fprintf(stderr, " %-20s %s\n", "-p <dst_port>", "non default destination port number");
-		fprintf(stderr, " %-20s %s\n", "-s <address>", "server address");
-
-		fprintf(stderr, " %-20s %s\n", "-n <domain>", "domain name");
-		fprintf(stderr, " %-20s %s\n", "-f <provider>", "specific provider name eg sockets, verbs");
-		fprintf(stderr, " %-20s %s\n", "-e <ep_type>", "Endpoint type: msg|rdm|dgram (default:dgram)");
-
-		fprintf(stderr, " %-20s %s\n", "-I <number>", "number of iterations");
-		fprintf(stderr, " %-20s %s\n", "-S <size>", "specific transfer size or 'all'");
-
-		fprintf(stderr, " %-20s %s\n", "-v", "enables data_integrity checks");
-
-		fprintf(stderr, " %-20s %s\n", "-h", "display this help output");
-		fprintf(stderr, " %-20s %s\n", "-d", "enable debugging output");
+	private void pingPongUsage() {
+		System.err.println("Usage: java PingPongTest [OPTIONS] <address:portnum>");
+		System.err.println("\tOptions:");
+		System.err.println("\t\t-I <number> (specify number of iterations)");
+		System.err.println("\t\t-D (Debug mode)");
+		System.err.println("\t\t-S (server - use this in the first call)");
+		System.err.println("\t\t-L <length> (length of transfers or 'all')");
+		
+		System.exit(-1);
 	}
-
-	void pp_parse_opts(struct ct_pingpong *ct, int op, char *optarg)
-	{
-		switch (op) {
-
-		/* Domain *
-		case 'n':
-			if (!ct->hints->domain_attr) {
-				ct->hints->domain_attr = malloc(sizeof *(ct->hints->domain_attr));
-				if (!ct->hints->domain_attr) {
-					perror("malloc");
-					exit(EXIT_FAILURE);
+	
+	private void parseArgs(CTPingPong ct, String[] args) {
+		for(int i = 0; i < args.length - 1; i+=2) { //last arg will be address
+			char op = args[i].length() == 1 ? args[i].charAt(0) : args[i].charAt(1); //allows a minus
+			switch (op) {
+			case 'D':
+				PP_ACTIVATE_DEBUG = true;
+				i = i-1;
+				break;
+			case 'I':
+				ct.opts.options |= PP_OPT_ITER;
+				ct.opts.iterations = Integer.parseInt(args[i+1]);
+				if (ct.opts.iterations < 0)
+					ct.opts.iterations = 0;
+				break;
+			case 'S':
+				ct.opts.isServer = true;
+				i = i-1;
+				break;
+			case 'L':
+				if(args[i+1].equalsIgnoreCase("all")) {
+					ct.opts.sizes_enabled = ~0;
+				} else {
+					ct.opts.options |=PP_OPT_SIZE;
+					try {
+						ct.opts.transfer_size = Integer.parseInt(args[i+1]);
+					} catch(NumberFormatException e) {
+						System.err.println(e.getMessage());
+						pingPongUsage();
+					}
 				}
+				break;
+			default:
+				pingPongUsage();
 			}
-			ct->hints->domain_attr->name = strdup(optarg);
-			break;
-
-		/* Fabric *
-		case 'f':
-			if (!ct->hints->fabric_attr) {
-				ct->hints->fabric_attr = malloc(sizeof *(ct->hints->fabric_attr));
-				if (!ct->hints->fabric_attr) {
-					perror("malloc");
-					exit(EXIT_FAILURE);
-				}
-			}
-			ct->hints->fabric_attr->prov_name = strdup(optarg);
-			/* The provider name will be checked during the fabric initialization. *
-			break;
-
-		/* Endpoint *
-		case 'e':
-			if (!strncasecmp("msg", optarg, 3))
-				ct->hints->ep_attr->type = FI_EP_MSG;
-			else if (!strncasecmp("rdm", optarg, 3))
-				ct->hints->ep_attr->type = FI_EP_RDM;
-			else if (!strncasecmp("dgram", optarg, 5))
-				ct->hints->ep_attr->type = FI_EP_DGRAM;
-			else {
-				fprintf(stderr, "Unknown endpoint : %s\n", optarg);
-				exit(EXIT_FAILURE);
-			}
-			break;
-
-		/* Iterations *
-		case 'I':
-			ct->opts.options |= PP_OPT_ITER;
-			ct->opts.iterations = (int) parse_ulong(optarg, INT_MAX);
-			if (ct->opts.iterations < 0)
-				ct->opts.iterations = 0;
-			break;
-
-		/* Message Size *
-		case 'S':
-			if (!strncasecmp("all", optarg, 3)) {
-				ct->opts.sizes_enabled = PP_ENABLE_ALL;
-			} else {
-				ct->opts.options |= PP_OPT_SIZE;
-				ct->opts.transfer_size = (int) parse_ulong(optarg, INT_MAX);
-			}
-			break;
-
-		/* Verbose *
-		case 'v':
-			ct->opts.options |= PP_OPT_VERIFY_DATA;
-			break;
-
-		/* Address *
-		case 's':
-			ct->opts.src_addr = optarg;
-			break;
-		case 'b':
-			ct->opts.src_port = optarg;
-			break;
-		case 'p':
-			ct->opts.dst_port = optarg;
-			break;
-		default:
-			/* let getopt handle unknown opts*
-			break;
-
 		}
+		
+		try {
+			String[] splitAddr = args[args.length -1].split(":");
+			if(!ct.opts.isServer) {
+				ct.opts.dst_addr = splitAddr[0];
+				ct.opts.dst_port = splitAddr[1];
+			} else {
+				ct.opts.src_addr = splitAddr[0];
+				ct.opts.src_port = splitAddr[1];
+			}
+		} catch (IndexOutOfBoundsException | NumberFormatException e) {
+			System.err.println(e.getMessage());
+			pingPongUsage();
+		}
+		
 	}
 
 	/*******************************************************************************************/
@@ -1817,31 +1670,22 @@ public class PingPongTest {
 
 		PP_DEBUG("PingPong test successfuly handled\n");
 		return 0;
-	}
+	}*/
 
-	static int run_pingpong_msg(struct ct_pingpong *ct)
-	{
-		int i, ret, sizes_cnt;
-		int *sizes = null;
+	private static void run_pingpong_msg(CTPingPong ct) {
+		int i, sizes_cnt;
+		int sizes = 0;
 
-		PP_DEBUG("Selected endpoint : DGRAM\n");
-
-		ret = pp_ctrl_init(ct);
-		if (ret) {
-			return ret;
+		PP_DEBUG("Selected endpoint : MSG\n");
+		
+		ppCtrlInit(ct);
+		
+		pp_ctrl_txrx_data_port(ct);
+		
+		if (ct.opts.isServer) {
+			pp_start_server(ct);
 		}
-
-		ret = pp_ctrl_txrx_data_port(ct);
-		if (ret) {
-			return ret;
-		}
-
-		if (!ct->opts.dst_addr) {
-			ret = pp_start_server(ct);
-			if (ret)
-				return ret;
-		}
-
+		/*
 		ret = ct->opts.dst_addr ? pp_client_connect(ct) : pp_server_connect(ct);
 		if (ret) {
 			return ret;
@@ -1869,15 +1713,15 @@ public class PingPongTest {
 
 		ret = pp_finalize(ct);
 	out:
-		fi_shutdown(ct->ep, 0);
-		return ret;
+		fi_shutdown(ct->ep, 0);*/
 	}
-*/
-	public void main(String[] args)
-	{
-		int op;
-		String ret = "EXIT_SUCCESS";
 
+	//D - debug | L - length | S - server | I - iterations | address last argument 
+	public void main(String[] args) //allow itteration and message length arguments
+	{
+		char op;
+		String ret = "EXIT_SUCCESS";
+		
 		CTPingPong ct = new CTPingPong();
 
 		pp_init_ct_pingpong(ct);
@@ -1887,59 +1731,25 @@ public class PingPongTest {
 		ct.opts.transfer_size = 1024;
 		ct.opts.sizes_enabled = PP_DEFAULT_SIZE;
 		ct.opts.argc = args.length; 
-		ct.opts.args = args;
+		ct.opts.args = args; 
+  		ct.hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG); //only support msg
 
 		ct.hints = new Info();
+		
+		parseArgs(ct, args);
 
-		/*while ((op = getopt(argc, argv, "hd" "b:p:s:n:f:e:I:S:v")) != -1) {
-			switch (op) {
-			default:
-				pp_parse_opts(&ct, op, optarg);
-				break;
-			case 'd':
-				PP_ACTIVATE_DEBUG = 1;
-				break;
-			case '?':
-			case 'h':
-				pp_pingpong_usage(argv[0], "Ping pong client and server.");
-				return EXIT_FAILURE;
-			}
+		if (ct.hints.getEndPointAttr().getEpType() == null 
+				|| ct.hints.getEndPointAttr().getEpType() == EPType.FI_EP_UNSPEC) {
+			ct.hints.getEndPointAttr().setEpType(EPType.FI_EP_DGRAM);
 		}
 
-		if (optind < argc)
-			ct.opts.dst_addr = argv[optind];
+		pp_banner_options(ct);
 
-		if (!ct.hints->ep_attr->type || ct.hints->ep_attr->type == FI_EP_UNSPEC) {
-			ct.hints->ep_attr->type = FI_EP_DGRAM;
-		}
-
-		pp_banner_options(&ct);
-
-		switch(ct.hints->ep_attr->type) {
-		case FI_EP_DGRAM:
-			if (ct.opts.options & PP_OPT_SIZE)
-				ct.hints->ep_attr->max_msg_size = ct.opts.transfer_size;
-			ct.hints->caps = FI_MSG;
-			ct.hints->mode |= FI_LOCAL_MR;
-			ret = run_pingpong_dgram(&ct);
-			break;
-		case FI_EP_RDM:
-			ct.hints->caps = FI_MSG;
-			ct.hints->mode = FI_CONTEXT | FI_LOCAL_MR;
-			ret = run_pingpong_rdm(&ct);
-			break;
-		case FI_EP_MSG:
-			ct.hints->caps = FI_MSG;
-			ct.hints->mode = FI_LOCAL_MR;
-			ret = run_pingpong_msg(&ct);
-			break;
-		default:
-			fprintf(stderr, "Endpoint unsupported : %d\n", ct.hints->ep_attr->type);
-			ret = EXIT_FAILURE;
-		}
-
-		pp_free_res(&ct);
-		return -ret;*/
+		ct.hints.setCaps(1);//caps = FI_MSG; ask for input on these types of values.
+		ct.hints.setMode(LibFabric.FI_LOCAL_MR); //add this
+		run_pingpong_msg(ct);
+		
+		//pp_free_res(ct);
 	}
 
 	

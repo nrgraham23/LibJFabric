@@ -37,6 +37,7 @@ import java.nio.*;
 public class LibFabric {
 	private static final ByteOrder nativeOrder = ByteOrder.nativeOrder();
 	public static final long FI_LOCAL_MR;
+	public static final long FI_SOURCE;
 
 	static {
 		System.loadLibrary("jfab_native");
@@ -44,6 +45,7 @@ public class LibFabric {
 		Constant c = new Constant();
 		
 		FI_LOCAL_MR = c.FI_LOCAL_MR;
+		FI_SOURCE = c.FI_SOURCE;
 	}
 	
 	public static void loadVerbose() {
@@ -92,12 +94,27 @@ public class LibFabric {
 
 	public static Info[] getInfo(Version version, String node, String service, long flags, Info hints) {
 		long infoHandleArray[] = null;
-
-		if(hints != null) {
-			infoHandleArray = getInfoJNI(version.getMajorVersion(), version.getMinorVersion(), node, service, flags, hints.getHandle());
-		} else {
-			infoHandleArray = getInfoJNI(version.getMajorVersion(), version.getMinorVersion(), node, service, flags, 0);
+		
+		infoHandleArray = getInfoJNI(version.getMajorVersion(), version.getMinorVersion(), node, service, flags, hints.getHandle());
+		
+		if(infoHandleArray == null) {
+			return null; //should probably handle this better
 		}
+
+		Info infoArray[] = new Info[infoHandleArray.length];
+
+		for(int i = 0; i < infoHandleArray.length; i++) {
+			infoArray[i] = new Info(infoHandleArray[i]);
+		}
+
+		return infoArray;
+	}
+	
+	public static Info[] getInfo(Version version, String node, String service, long flags) {
+		long infoHandleArray[] = null;
+
+		infoHandleArray = getInfoJNI(version.getMajorVersion(), version.getMinorVersion(), node, service, flags, 0);
+
 		if(infoHandleArray == null) {
 			return null; //should probably handle this better
 		}

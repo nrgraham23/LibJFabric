@@ -49,7 +49,7 @@ public class TestLibFabric {
 	public void testGetInfo() {
 		Version version = new Version(1, 3);
 		
-		Info resultInfo[] = LibFabric.getInfo(version, null, null, 0, null);
+		Info resultInfo[] = LibFabric.getInfo(version, null, null, 0);
 		
 		assert resultInfo != null;
 		

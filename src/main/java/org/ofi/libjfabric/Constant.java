@@ -35,6 +35,7 @@ package org.ofi.libjfabric;
 //used to init constants based on their values in libfabric
 public class Constant {
 	protected long FI_LOCAL_MR;
+	protected long FI_SOURCE;
 	
 	protected Constant() {
 		setConstant();
