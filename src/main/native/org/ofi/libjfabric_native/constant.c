@@ -43,14 +43,8 @@ void setLongField(JNIEnv *env, jclass c, jobject jthis, char *field, jlong value
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Constant_setConstant
 	(JNIEnv *env, jobject jthis)
 {
-<<<<<<< Updated upstream
-	jclass c = (*env)->GetObjectClass(env, jthis);
-	setLongField(env, c, jthis, "FI_LOCAL_MR", FI_LOCAL_MR);
-}
-=======
 	jclass c = (*env)->GetObjectClass(env, obj);
 	
 	setStaticLongField(env, c, obj, "FI_LOCAL_MR", FI_LOCAL_MR);
 	setStaticLongField(env, c, obj, "FI_SOURCE", FI_SOURCE);
 }
->>>>>>> Stashed changes
