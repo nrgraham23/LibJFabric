@@ -47,6 +47,12 @@ public class Fabric extends FIDescriptor {
 	}
 	private native long initFabric(long fabricAttrHandle, long contextHandle);
 	
+	public Fabric(FabricAttr fabricAttr) {
+		this.fabricAttr = fabricAttr;
+		this.handle = initFabric2(fabricAttr.getHandle());
+	}
+	private native long initFabric2(long fabricAttrHandle);
+	
 	public Fabric(long handle) {
 		super(handle);
 	}

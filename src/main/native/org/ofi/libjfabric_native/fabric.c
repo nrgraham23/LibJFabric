@@ -50,6 +50,23 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_initFabric
 	return (jlong)fabric;
 }
 
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_initFabric2
+	(JNIEnv *env, jobject jthis, jlong fabricAttrHandle)
+{
+	struct fid_fabric *fabric = (struct fid_fabric *)calloc(1, sizeof(struct fid_fabric));
+
+	fabric_list[fabric_list_tail] = fabric;
+	fabric_list_tail++;
+
+	int res = fi_fabric((struct fi_fabric_attr *)fabricAttrHandle, &fabric, NULL);
+
+	if(res) {
+		printf("Error creating fabric: %d\n", res);
+		exit(1);
+	}
+	return (jlong)fabric;
+}
+
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createDomainJNI
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong infoHandle, jlong contextHandle)
 {
