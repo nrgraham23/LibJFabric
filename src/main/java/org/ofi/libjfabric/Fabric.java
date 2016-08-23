@@ -72,6 +72,11 @@ public class Fabric extends FIDescriptor {
 	}
 	private native long eventQueueOpen(long fabricHandle, long eventQueueAttrHandle, long contextHandle);
 	
+	public EventQueue eventQueueOpen(EventQueueAttr eventQueueAttr) {
+		return new EventQueue(eventQueueOpen2(this.handle, eventQueueAttr.getHandle()));
+	}
+	private native long eventQueueOpen2(long fabricHandle, long eventQueueAttrHandle);
+	
 	public Wait waitOpen(WaitAttr waitAttr) {
 		return new Wait(waitOpen(this.handle, waitAttr.getHandle()));
 	}
