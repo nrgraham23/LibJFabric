@@ -121,6 +121,24 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen
 	return (jlong)event_queue;
 }
 
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen2
+	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong eqAttrHandle)
+{
+	struct fid_eq *event_queue = (struct fid_eq *)calloc(1, sizeof(struct fid_eq));
+
+	event_queue_list[event_queue_list_tail] = event_queue;
+	event_queue_list_tail++;
+
+	int res = ((struct fid_fabric *)fabricHandle)->ops->eq_open((struct fid_fabric *)fabricHandle,
+			(struct fi_eq_attr *)eqAttrHandle, &event_queue, NULL);
+
+	if(res) {
+		printf("Error opening event queue: %d\n", res);
+		exit(1);
+	}
+	return (jlong)event_queue;
+}
+
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_waitOpen
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong waitAttrHandle)
 {
