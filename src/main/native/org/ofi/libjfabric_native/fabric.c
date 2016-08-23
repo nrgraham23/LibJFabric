@@ -103,6 +103,24 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP
 	return (jlong)passive_ep;
 }
 
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP2
+	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong infoHandle)
+{
+	struct fid_pep *passive_ep = (struct fid_pep *)calloc(1, sizeof(struct fid_pep));
+
+	passive_ep_list[passive_ep_list_tail] = passive_ep;
+	passive_ep_list_tail++;
+
+	int res = ((struct fid_fabric *)fabricHandle)->ops->passive_ep((struct fid_fabric *)fabricHandle,
+			(struct fi_info *)infoHandle, &passive_ep, NULL);
+
+	if(res) {
+		printf("Error creating passive endpoint: %d\n", res);
+		exit(1);
+	}
+	return (jlong)passive_ep;
+}
+
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong eqAttrHandle, jlong contextHandle)
 {

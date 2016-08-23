@@ -67,6 +67,11 @@ public class Fabric extends FIDescriptor {
 	}
 	private native long createPassiveEP(long fabricHandle, long infoHandle, long contextHandle);
 	
+	public PassiveEndPoint createPassiveEndPoint(Info info) {
+		return new PassiveEndPoint(createPassiveEP2(this.handle, info.getHandle()));
+	}
+	private native long createPassiveEP2(long fabricHandle, long infoHandle);
+	
 	public EventQueue eventQueueOpen(EventQueueAttr eventQueueAttr, Context context) {
 		return new EventQueue(eventQueueOpen(this.handle, eventQueueAttr.getHandle(), context.getHandle()));
 	}
