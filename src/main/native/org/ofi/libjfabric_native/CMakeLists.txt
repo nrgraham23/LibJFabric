@@ -127,6 +127,7 @@ set(SOURCE_FILES
   cq_wait_cond.c
   cq_attr.c
   constant.c
+  passive_ep.c
 )
 
 set(INTERFACE_FILES

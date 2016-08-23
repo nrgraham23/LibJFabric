@@ -71,6 +71,7 @@
                                 <javahClassName>org.ofi.libjfabric.Context</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.FIDescriptor</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.EndPoint</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.PassiveEndPoint</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.DomainAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.EndPointAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.FabricAttr</javahClassName>

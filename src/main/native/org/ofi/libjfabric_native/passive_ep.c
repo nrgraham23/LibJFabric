@@ -30,16 +30,18 @@
  * SOFTWARE.
  */
 
-package org.ofi.libjfabric;
+#include "libfabric.h"
+#include "org_ofi_libjfabric_PassiveEndPoint.h"
 
-public class PassiveEndPoint extends EndPoint {
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_PassiveEndPoint_listen
+	(JNIEnv *env, jobject jthis, jlong handle)
+{
+	int ret;
 	
-	public PassiveEndPoint(long handle) {
-		super(handle);
-	}
+	ret = ((struct fid_pep *)handle)->cm->listen((struct fid_pep *)handle);
 	
-	public void listen() {
-		listen(this.handle);
+	if(ret) {
+		printf("listen failed with code: %d\n", ret);
+		exit(ret);
 	}
-	private native void listen(long handle);
 }
