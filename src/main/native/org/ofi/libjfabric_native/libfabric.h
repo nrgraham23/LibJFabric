@@ -42,6 +42,7 @@
 #include "rdma/fi_endpoint.h"
 #include "rdma/fi_errno.h"
 #include "rdma/fi_eq.h"
+#include "rdma/fi_cm.h"
 #include "org_ofi_libjfabric_LibFabric.h"
 
 /*NOTE: The intent is to eventually replace these lists with linked lists!*/
