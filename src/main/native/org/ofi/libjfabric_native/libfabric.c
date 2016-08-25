@@ -106,6 +106,8 @@ void initGlobals(JNIEnv *env) {
 	lib_globals.CQFormatClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/CQFormat");
 	lib_globals.CQWaitCondClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/CQWaitCond");
 	lib_globals.VersionClass = (*env)->FindClass(env,"org/ofi/libjfabric/Version");
+	lib_globals.EQCMEntryClass = (*env)->FindClass(env,"org/ofi/libjfabric/EQCMEntry");
+	lib_globals.EQEventClass = (*env)->FindClass(env,"org/ofi/libjfabric/enums/EQEvent");
 	lib_globals.GetAVType = (*env)->GetStaticMethodID(env,lib_globals.AVTypeClass,"getAVType","(I)Lorg/ofi/libjfabric/enums/AVType;");
 	lib_globals.GetEPType = (*env)->GetStaticMethodID(env,lib_globals.EPTypeClass,"getEPType","(I)Lorg/ofi/libjfabric/enums/EPType;");
 	lib_globals.GetMRMode = (*env)->GetStaticMethodID(env,lib_globals.MRModeClass,"getMRMode","(I)Lorg/ofi/libjfabric/enums/MRMode;");
@@ -117,6 +119,8 @@ void initGlobals(JNIEnv *env) {
 	lib_globals.VersionConstructor = (*env)->GetMethodID(env, lib_globals.VersionClass, "<init>", "(II)V");
 	lib_globals.GetCQFormat = (*env)->GetStaticMethodID(env,lib_globals.CQFormatClass,"getCQFormat","(I)Lorg/ofi/libjfabric/enums/CQFormat;");
 	lib_globals.GetCQWaitCond = (*env)->GetStaticMethodID(env,lib_globals.CQWaitCondClass,"getCQWaitCond","(I)Lorg/ofi/libjfabric/enums/CQWaitCond;");
+	lib_globals.EQCMEntryConstructor = (*env)->GetMethodID(env, lib_globals.EQCMEntryClass, "<init>", "(Lorg/ofi/libjfabric/enums/EQEvent;JJ[B)V");
+	lib_globals.GetEQEvent = (*env)->GetStaticMethodID(env,lib_globals.EQEventClass,"getEQEvent","(I)Lorg/ofi/libjfabric/enums/EQEvent;");
 }
 
 void deleteGlobals(JNIEnv *env) {

@@ -128,6 +128,8 @@ set(SOURCE_FILES
   cq_attr.c
   constant.c
   passive_ep.c
+  event_queue.c
+  eq_event.c
 )
 
 set(INTERFACE_FILES
