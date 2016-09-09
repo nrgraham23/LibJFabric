@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Los Alamos Nat. Security, LLC. All rights reserved.
+ * Copyright (c) 2016 Los Alamos Nat. Security, LLC. All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -30,16 +30,29 @@
  * SOFTWARE.
  */
 
-package org.ofi.libjfabric;
+#include "org_ofi_libjfabric_enums_EQEvent.h"
+#include "libfabric.h"
 
-public class EventQueue extends FIDescriptor {
-	
-	public EventQueue(long handle) {
-		super(handle);
-	}
-	
-	public EventEntry sread(int timeOut, long flags) {
-		return sread(this.handle, timeOut, flags);
-	}
-	private native EventEntry sread(long handle, int timeOut, long flags);
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_EQEvent_getNOTIFY(JNIEnv *env, jclass jthis) {
+	return FI_NOTIFY;
+}
+
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_EQEvent_getCONNREQ(JNIEnv *env, jclass jthis) {
+	return FI_CONNREQ;
+}
+
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_EQEvent_getCONNECTED(JNIEnv *env, jclass jthis) {
+	return FI_CONNECTED;
+}
+
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_EQEvent_getSHUTDOWN(JNIEnv *env, jclass jthis) {
+	return FI_SHUTDOWN;
+}
+
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_EQEvent_getMRCOMPLETE(JNIEnv *env, jclass jthis) {
+	return FI_MR_COMPLETE;
+}
+
+JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_EQEvent_getAVCOMPLETE(JNIEnv *env, jclass jthis) {
+	return FI_AV_COMPLETE;
 }

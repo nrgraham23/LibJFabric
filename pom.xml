@@ -63,7 +63,9 @@
                                 <javahClassName>org.ofi.libjfabric.enums.WaitObj</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.enums.CQFormat</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.enums.CQWaitCond</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.enums.EQEvent</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Domain</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.EQCMEntry</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Fabric</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Info</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.LibFabric</javahClassName>
@@ -72,6 +74,7 @@
                                 <javahClassName>org.ofi.libjfabric.FIDescriptor</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.EndPoint</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.PassiveEndPoint</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.EventQueue</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.DomainAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.EndPointAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.FabricAttr</javahClassName>

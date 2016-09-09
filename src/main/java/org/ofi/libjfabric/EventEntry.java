@@ -32,14 +32,17 @@
 
 package org.ofi.libjfabric;
 
-public class EventQueue extends FIDescriptor {
+import org.ofi.libjfabric.enums.EQEvent;
+
+public abstract class EventEntry {
+	protected EQEvent event;
 	
-	public EventQueue(long handle) {
-		super(handle);
+	protected EventEntry(EQEvent event) {
+		this.event = event;
 	}
 	
-	public EventEntry sread(int timeOut, long flags) {
-		return sread(this.handle, timeOut, flags);
+	//gets
+	public EQEvent getEQEvent() {
+		return this.event;
 	}
-	private native EventEntry sread(long handle, int timeOut, long flags);
 }

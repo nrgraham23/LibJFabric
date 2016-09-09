@@ -74,7 +74,7 @@ public class EndPoint extends FIDescriptor {
 	}
 	
 	public void send(Buffer buffer, long destAddress) {
-		send4(this.getHandle(), buffer, buffer.capacity(), destAddress); //TODO: verify capacity method works for buffer length
+		send4(this.getHandle(), buffer, buffer.capacity(), destAddress);
 	}
 	private native void send4(long handle, Buffer buffer, int length, long destAddress);
 	

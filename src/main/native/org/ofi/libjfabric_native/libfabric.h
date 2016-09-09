@@ -94,6 +94,8 @@ typedef struct {
 	jclass WaitObjClass;
 	jclass CQFormatClass;
 	jclass CQWaitCondClass;
+	jclass EQCMEntryClass;
+	jclass EQEventClass;
 	jmethodID GetAVType;
 	jmethodID GetEPType;
 	jmethodID GetMRMode;
@@ -105,6 +107,8 @@ typedef struct {
 	jmethodID VersionConstructor;
 	jmethodID GetCQFormat;
 	jmethodID GetCQWaitCond;
+	jmethodID EQCMEntryConstructor;
+	jmethodID GetEQEvent;
 } libfabric_globals_t;
 
 extern libfabric_globals_t lib_globals;

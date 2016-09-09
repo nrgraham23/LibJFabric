@@ -30,16 +30,6 @@
  * SOFTWARE.
  */
 
-package org.ofi.libjfabric;
-
-public class EventQueue extends FIDescriptor {
-	
-	public EventQueue(long handle) {
-		super(handle);
-	}
-	
-	public EventEntry sread(int timeOut, long flags) {
-		return sread(this.handle, timeOut, flags);
-	}
-	private native EventEntry sread(long handle, int timeOut, long flags);
-}
+jobject createEQEntry(JNIEnv *env, uint8_t *buf, int event);
+jobject createEQCMEntry(JNIEnv *env, uint8_t *buf, int event, long length);
+jobject createEQErrEntry(JNIEnv *env, uint8_t *buf, int event);
