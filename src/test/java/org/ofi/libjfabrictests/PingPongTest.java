@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013-2015 Intel Corporation.  All rights reserved.
  * Copyright (c) 2014-2016, Cisco Systems, Inc. All rights reserved.
- * Copyright (c) 2015 Los Alamos Nat. Security, LLC. All rights reserved.
+ * Copyright (c) 2015-2016 Los Alamos Nat. Security, LLC. All rights reserved.
  * Copyright (c) 2016 Cray Inc.  All rights reserved.
  *
  * This software is available to you under the BSD license below:
