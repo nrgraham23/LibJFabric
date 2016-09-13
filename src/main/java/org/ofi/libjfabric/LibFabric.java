@@ -36,16 +36,20 @@ import java.nio.*;
 
 public class LibFabric {
 	private static final ByteOrder nativeOrder = ByteOrder.nativeOrder();
+	public static final long FI_CONTEXT;
 	public static final long FI_LOCAL_MR;
 	public static final long FI_SOURCE;
+	public static final long FI_MSG;
 
 	static {
 		System.loadLibrary("jfab_native");
 		
 		Constant c = new Constant();
 		
+		FI_CONTEXT = c.FI_CONTEXT;
 		FI_LOCAL_MR = c.FI_LOCAL_MR;
 		FI_SOURCE = c.FI_SOURCE;
+		FI_MSG = c.FI_MSG;
 	}
 	
 	public static void loadVerbose() {

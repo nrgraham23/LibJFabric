@@ -65,4 +65,13 @@ public abstract class FIDescriptor {
 	public long getHandle() {
 		return this.handle;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof FIDescriptor){
+			FIDescriptor fid = (FIDescriptor)obj;
+			return this.handle == fid.getHandle();
+		}
+		return false;
+	}
 }
