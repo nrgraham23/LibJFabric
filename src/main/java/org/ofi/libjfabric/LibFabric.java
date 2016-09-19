@@ -131,8 +131,27 @@ public class LibFabric {
 
 		return infoArray;
 	}
+	
+	public static Info[] getInfo(Version version, long flags, Info hints) {
+		long infoHandleArray[] = null;
+
+		infoHandleArray = getInfoJNI2(version.getMajorVersion(), version.getMinorVersion(), flags, 0);
+
+		if(infoHandleArray == null) {
+			return null; //should probably handle this better
+		}
+
+		Info infoArray[] = new Info[infoHandleArray.length];
+
+		for(int i = 0; i < infoHandleArray.length; i++) {
+			infoArray[i] = new Info(infoHandleArray[i]);
+		}
+
+		return infoArray;
+	}
 
 	private static native long[] getInfoJNI(int majorVersion, int minorVersion, String node, String service, long flags, long hints);
+	private static native long[] getInfoJNI2(int majorVersion, int minorVersion, long flags, long hints);
 
 	/**
 	 * Allocates a new direct byte buffer.

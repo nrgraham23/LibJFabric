@@ -34,7 +34,7 @@ package org.ofi.libjfabric;
 
 import java.nio.Buffer;
 
-public class EndPoint extends FIDescriptor {
+public class EndPoint extends EndPointSharedOps {
 	
 	public EndPoint(long handle) {
 		super(handle);

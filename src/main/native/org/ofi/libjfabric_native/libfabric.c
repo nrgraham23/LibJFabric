@@ -344,6 +344,44 @@ JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_LibFabric_getInfoJNI(JNIE
 	return infoArray;
 }
 
+JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_LibFabric_getInfoJNI2(JNIEnv *env, jclass jthis,
+		jint majorVersion, jint minorVersion, jlong flags, jlong hintsHandle) {
+	int getInfoRet, infoNum = 0;
+	char *error;
+	struct fi_info *resultInfo, *curInfo;
+	jlongArray infoArray;
+
+	uint32_t convertedVersion= FI_VERSION((uint32_t)majorVersion, (uint32_t)minorVersion);
+
+	getInfoRet = fi_getinfo(convertedVersion, NULL, NULL, flags, (struct fi_info*)hintsHandle, &resultInfo);
+
+	if (getInfoRet != 0) {
+		printf("fi_getinfo error!!!\n");
+		exit(1);
+	}
+
+	infoNum = getLinkedListLength(&resultInfo);
+	if(infoNum == 0) {
+		return NULL;
+	}
+
+	infoArray = (*env)->NewLongArray(env, infoNum);
+
+	int i;
+	jlong filler[infoNum];
+	curInfo = resultInfo;
+	for(i = 0; i < infoNum; i++) {
+		filler[i] = (jlong)curInfo;
+
+		info_list[info_list_tail] = curInfo;
+		info_list_tail++;
+
+		curInfo = curInfo->next;
+	}
+	(*env)->SetLongArrayRegion(env, infoArray, 0, infoNum, filler);
+	return infoArray;
+}
+
 int getLinkedListLength(struct fi_info **infoLinkedList) {
 	int length = 0;
 

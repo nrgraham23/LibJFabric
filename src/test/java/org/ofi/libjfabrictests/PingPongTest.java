@@ -39,6 +39,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.ofi.libjfabric.*;
 import org.ofi.libjfabric.attributes.*;
@@ -85,7 +87,7 @@ public class PingPongTest {
 
 	private void PP_PRINTERR(String call, int retv) {
 		System.err.printf("%s(): ret=%d \n", call,
-			(int) retv/*, fi_strerror((int) -retv)*/);
+				(int) retv/*, fi_strerror((int) -retv)*/);
 	}
 	private void PP_ERR(String fmt, Object ... items) {
 		System.err.printf("[" + fmt + "]: error\n");
@@ -145,9 +147,9 @@ public class PingPongTest {
 			'j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','L','M',
 			'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
-/*******************************************************************************
- *                                         Utils
- ******************************************************************************/
+	/*******************************************************************************
+	 *                                         Utils
+	 ******************************************************************************/
 
 	private int size_to_count(int size) {
 		if (size >= (1 << 20))
@@ -181,7 +183,7 @@ public class PingPongTest {
 		String size_msg = "";
 		String iter_msg;
 		PPOpts opts = ct.opts;
-		
+
 		if ((opts.dst_addr == null) || (opts.dst_addr.length() == 0))
 			opts.dst_addr = "None";
 
@@ -211,132 +213,117 @@ public class PingPongTest {
 					ct.hints.getDomainAttr().getName());
 	}
 
-/*******************************************************************************
- *                                         Control Messaging
- ******************************************************************************/
-	
-private static void ppCtrlInit(CTPingPong  ct) {
-	PP_DEBUG("Initializing control messages ...\n");
+	/*******************************************************************************
+	 *                                         Control Messaging
+	 ******************************************************************************/
 
-	if (!ct.opts.isServer) { //client
-		PP_DEBUG("CLIENT: connecting to <%s>\n", ct.opts.dst_addr);
+	private static void ppCtrlInit(CTPingPong  ct) {
+		PP_DEBUG("Initializing control messages ...\n");
+
+		if (!ct.opts.isServer) { //client
+			PP_DEBUG("CLIENT: connecting to <%s>\n", ct.opts.dst_addr);
+			try {
+				ct.ctrl_connfd = new Socket(ct.opts.dst_addr, Integer.parseInt(ct.opts.dst_port)); //creates and connects the socket
+				ct.ctrl_connfd.setReceiveBufferSize(PP_MSG_LEN_PORT);
+			} catch (UnknownHostException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			} 
+
+			PP_DEBUG("CLIENT: connected\n");
+		} else { //server
+			ServerSocket serverSock = null;
+			try {
+				serverSock = new ServerSocket(Integer.parseInt(ct.opts.src_port));
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			}
+
+			//serverSock.bind(new InetSocketAddress(ct.opts.src_addr, ct.opts.src_port)); //should be able to not use this
+			PP_DEBUG("SERVER: waiting for connection ...\n");
+			try {
+				ct.ctrl_listenfd = serverSock.accept();
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			}
+
+			PP_DEBUG("SERVER: connection acquired\n");
+		}
 		try {
-			ct.ctrl_connfd = new Socket(ct.opts.dst_addr, Integer.parseInt(ct.opts.dst_port)); //creates and connects the socket
-			ct.ctrl_connfd.setReceiveBufferSize(PP_MSG_LEN_PORT);
-		} catch (UnknownHostException e) {
+			ct.ctrl_connfd.setSoTimeout(5000);
+		} catch (SocketException e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 			System.exit(-1);
+		}
+
+		PP_DEBUG("Control messages initialized\n");
+	}
+
+	private static void pp_ctrl_send(CTPingPong ct, byte[] buf) {
+		try {
+			ct.ctrl_connfd.getOutputStream().write(buf);
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+		}
+
+		PP_DEBUG("----> sent (%d) : \"", buf.length);
+		if (PP_ACTIVATE_DEBUG) {
+			int i;
+			for (i = 0; i < buf.length; i++) {
+				System.err.printf("%c.", buf[i]);
+			}
+			System.err.printf("\"\n");
+		}
+	}
+
+	private static void pp_ctrl_recv(CTPingPong ct, byte[] buf) {
+		try {
+			ct.ctrl_connfd.getInputStream().read(buf);
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 			System.exit(-1);
-		} 
-
-		PP_DEBUG("CLIENT: connected\n");
-	} else { //server
-		ServerSocket serverSock = null;
-		try {
-			serverSock = new ServerSocket(Integer.parseInt(ct.opts.src_port));
-		} catch (IOException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-			System.exit(-1);
 		}
-		
-		//serverSock.bind(new InetSocketAddress(ct.opts.src_addr, ct.opts.src_port)); //should be able to not use this
-		PP_DEBUG("SERVER: waiting for connection ...\n");
-		try {
-			ct.ctrl_listenfd = serverSock.accept();
-		} catch (IOException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-		PP_DEBUG("SERVER: connection acquired\n");
-	}
-	try {
-		ct.ctrl_connfd.setSoTimeout(5000);
-	} catch (SocketException e) {
-		System.err.println(e.getMessage());
-		e.printStackTrace();
-		System.exit(-1);
-	}
+		//ret = recv(ct->ctrl_connfd, buf, size, 0);
 
-	PP_DEBUG("Control messages initialized\n");
-}
-
-private static void pp_ctrl_send(CTPingPong ct, byte[] buf) {
-	try {
-		ct.ctrl_connfd.getOutputStream().write(buf);
-	} catch (IOException e) {
-		System.err.println(e.getMessage());
-		e.printStackTrace();
-	}
-	
-	PP_DEBUG("----> sent (%d) : \"", buf.length);
-	if (PP_ACTIVATE_DEBUG) {
-		int i;
-		for (i = 0; i < buf.length; i++) {
-			System.err.printf("%c.", buf[i]);
+		PP_DEBUG("----> received (%d/%ld) : \"", PP_MSG_LEN_PORT);
+		if (PP_ACTIVATE_DEBUG) {
+			int i;
+			for (i = 0; i < PP_MSG_LEN_PORT; i++) {
+				System.err.printf("%b.", buf[i]);
+			}
+			System.err.printf("\"\n");
 		}
-		System.err.printf("\"\n");
 	}
-}
-
-private static void pp_ctrl_recv(CTPingPong ct, byte[] buf) {
-	try {
-		ct.ctrl_connfd.getInputStream().read(buf);
-	} catch (IOException e) {
-		System.err.println(e.getMessage());
-		e.printStackTrace();
-		System.exit(-1);
-	}
-	//ret = recv(ct->ctrl_connfd, buf, size, 0);
-	
-	PP_DEBUG("----> received (%d/%ld) : \"", PP_MSG_LEN_PORT);
-	if (PP_ACTIVATE_DEBUG) {
-		int i;
-		for (i = 0; i < PP_MSG_LEN_PORT; i++) {
-			System.err.printf("%b.", buf[i]);
-		}
-		System.err.printf("\"\n");
-	}
-}
-/*
-int pp_send_name(struct ct_pingpong *ct, struct fid *endpoint)
+/* TODO: was working here
+private void pp_send_name(CTPingPong ct, *endpoint)
 {
-	char local_name[64];
-	size_t addrlen;
-	uint32_t len;
-	int ret;
+	String local_name;
+	long addrlen;
+	int len;
 
 	PP_DEBUG("Fetching local address\n");
 
-	addrlen = sizeof(local_name);
-	ret = fi_getname(endpoint, local_name, &addrlen);
-	if (ret) {
-		PP_PRINTERR("fi_getname", ret);
-		return ret;
-	}
-
-	if (addrlen > sizeof(local_name)) {
-		PP_DEBUG("Address exceeds control buffer length\n");
-		return -EMSGSIZE;
-	}
-
+	fi_getname(endpoint, local_name, &addrlen);
+	
 	PP_DEBUG("Sending name length\n");
 	len = htonl(addrlen);
-	ret = pp_ctrl_send(ct, (char *) &len, sizeof(len));
-	if (ret < 0)
-		return ret;
+	pp_ctrl_send(ct, len);
 
 	PP_DEBUG("Sending name\n");
-	ret = pp_ctrl_send(ct, local_name, addrlen);
+	pp_ctrl_send(ct, local_name, addrlen);
 	PP_DEBUG("Sent name\n");
-
-	return ret;
 }
 
 int pp_recv_name(struct ct_pingpong *ct)
@@ -374,169 +361,107 @@ int pp_recv_name(struct ct_pingpong *ct)
 
 	return 0;
 }
-*/
-private void pp_ctrl_finish(CTPingPong ct) {
-	if (!ct.ctrl_connfd.isClosed()) {
-		try {
-			ct.ctrl_connfd.close();
-		} catch (IOException e) { 
-			System.err.println("Failed to close ctrl_connfd: " + e.getMessage());
+	 */
+	private void pp_ctrl_finish(CTPingPong ct) {
+		if (!ct.ctrl_connfd.isClosed()) {
+			try {
+				ct.ctrl_connfd.close();
+			} catch (IOException e) { 
+				System.err.println("Failed to close ctrl_connfd: " + e.getMessage());
+			}
 		}
 	}
-}
-/*
-int pp_ctrl_sync(struct ct_pingpong *ct)
-{
-	int ret;
 
-	PP_DEBUG("Syncing nodes\n");
+	private void pp_ctrl_sync(CTPingPong ct) {
+		PP_DEBUG("Syncing nodes\n");
 
-	if (ct->opts.dst_addr) {
-		snprintf(ct->ctrl_buf, sizeof(PP_MSG_SYNC_Q), "%s",
-			 PP_MSG_SYNC_Q);
+		if (ct.opts.isServer) {
+			PP_DEBUG("SERVER: syncing\n");
+			
+			pp_ctrl_recv(ct, ct.ctrl_buf);
+			
+			PP_DEBUG("SERVER: after recv\n");
+			
+			if (ct.ctrl_buf.toString().equals(PP_MSG_SYNC_Q)) {
+				ct.ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
+				PP_DEBUG("SERVER: sync error while acking Q: " + ct.ctrl_buf.toString() + " (len=" + ct.ctrl_buf.length + ")\n");
+			}
 
-		PP_DEBUG("CLIENT: syncing\n");
-		ret = pp_ctrl_send(ct, ct->ctrl_buf, sizeof(PP_MSG_SYNC_Q));
-		PP_DEBUG("CLIENT: after send / ret=%d\n", ret);
-		if (ret < 0)
-			return ret;
-		if (ret < sizeof(PP_MSG_SYNC_Q)) {
-			PP_ERR("CLIENT: bad length of sent data (len=%d/%zu)",
-			       ret, sizeof(PP_MSG_SYNC_Q));
-			return -EBADMSG;
-		}
-		PP_DEBUG("CLIENT: syncing now\n");
+			PP_DEBUG("SERVER: syncing now\n");
+			ct.ctrl_buf = PP_MSG_SYNC_A.getBytes();
+			
+			pp_ctrl_send(ct, ct.ctrl_buf);
+			PP_DEBUG("SERVER: after send\n");
+			
+			PP_DEBUG("SERVER: synced\n");
+		} else {
+			ct.ctrl_buf = PP_MSG_SYNC_Q.getBytes();
 
-		ret = pp_ctrl_recv(ct, ct->ctrl_buf, sizeof(PP_MSG_SYNC_A));
-		PP_DEBUG("CLIENT: after recv / ret=%d\n", ret);
-		if (ret < 0)
-			return ret;
-		if (strcmp(ct->ctrl_buf, PP_MSG_SYNC_A)) {
-			ct->ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
-			PP_DEBUG(
-				"CLIENT: sync error while acking A: <%s> (len=%lu)\n",
-				ct->ctrl_buf, strlen(ct->ctrl_buf));
-			return -EBADMSG;
-		}
-		PP_DEBUG("CLIENT: synced\n");
-	} else {
-		PP_DEBUG("SERVER: syncing\n");
-		ret = pp_ctrl_recv(ct, ct->ctrl_buf, sizeof(PP_MSG_SYNC_Q));
-		PP_DEBUG("SERVER: after recv / ret=%d\n", ret);
-		if (ret < 0)
-			return ret;
-		if (strcmp(ct->ctrl_buf, PP_MSG_SYNC_Q)) {
-			ct->ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
-			PP_DEBUG(
-				"SERVER: sync error while acking Q: <%s> (len=%lu)\n",
-				ct->ctrl_buf, strlen(ct->ctrl_buf));
-			return -EBADMSG;
+			PP_DEBUG("CLIENT: syncing\n");
+			pp_ctrl_send(ct, ct.ctrl_buf);
+			PP_DEBUG("CLIENT: after send\n");
+			
+			PP_DEBUG("CLIENT: syncing now\n");
+
+			pp_ctrl_recv(ct, ct.ctrl_buf);
+			PP_DEBUG("CLIENT: after recv\n");
+			
+			if (!ct.ctrl_buf.toString().equals(PP_MSG_SYNC_A)) {
+				ct.ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
+				PP_DEBUG(
+						"CLIENT: sync error while acking A: <%s> (len=%lu)\n",
+						ct.ctrl_buf, ct.ctrl_buf.length);
+			}
+			PP_DEBUG("CLIENT: synced\n");
 		}
 
-		PP_DEBUG("SERVER: syncing now\n");
-		snprintf(ct->ctrl_buf, sizeof(PP_MSG_SYNC_A), "%s",
-			 PP_MSG_SYNC_A);
-
-		ret = pp_ctrl_send(ct, ct->ctrl_buf, sizeof(PP_MSG_SYNC_A));
-		PP_DEBUG("SERVER: after send / ret=%d\n", ret);
-		if (ret < 0)
-			return ret;
-		if (ret < sizeof(PP_MSG_SYNC_A)) {
-			PP_ERR("SERVER: bad length of sent data (len=%d/%zu)",
-			       ret, sizeof(PP_MSG_SYNC_A));
-			return -EBADMSG;
-		}
-		PP_DEBUG("SERVER: synced\n");
+		PP_DEBUG("Nodes synced\n");
 	}
 
-	PP_DEBUG("Nodes synced\n");
+	private void pp_ctrl_txrx_msg_count(CTPingPong ct) {
+		PP_DEBUG("Exchanging ack count\n");
 
-	return 0;
-}
+		if (ct.opts.isServer) {
+			Arrays.fill(ct.ctrl_buf, (byte)'\0');
 
-int pp_ctrl_txrx_msg_count(struct ct_pingpong *ct)
-{
-	int ret;
+			PP_DEBUG("SERVER: receiving count\n");
+			pp_ctrl_recv(ct, ct.ctrl_buf);
+			
+			ct.cnt_ack_msg = Long.parseLong(ct.ctrl_buf.toString());
+			
+			PP_DEBUG("SERVER: received count = <%ld> (len=%lu)\n",
+					ct.cnt_ack_msg, ct.ctrl_buf.length);
 
-	PP_DEBUG("Exchanging ack count\n");
+			ct.ctrl_buf = PP_MSG_CHECK_CNT_OK.getBytes();
 
-	if (ct->opts.dst_addr) {
-		memset(&ct->ctrl_buf, '\0', PP_MSG_LEN_CNT + 1);
-		snprintf(ct->ctrl_buf, PP_MSG_LEN_CNT + 1, "%ld",
-			 ct->cnt_ack_msg);
+			pp_ctrl_send(ct, ct.ctrl_buf);
+			
+			PP_DEBUG("SERVER: acked count to client\n");
+		} else {
+			Arrays.fill(ct.ctrl_buf, (byte)'\0');
+			ct.ctrl_buf = ByteBuffer.allocate(Long.BYTES).putLong(ct.cnt_ack_msg).array(); //convert long to byte[]
 
-		PP_DEBUG("CLIENT: sending count = <%s> (len=%lu)\n",
-			 ct->ctrl_buf, strlen(ct->ctrl_buf));
-		ret = pp_ctrl_send(ct, ct->ctrl_buf, PP_MSG_LEN_CNT);
-		if (ret < 0)
-			return ret;
-		if (ret < PP_MSG_LEN_CNT) {
-			PP_ERR("CLIENT: bad length of sent data (len=%d/%d)",
-			       ret, PP_MSG_LEN_CNT);
-			return -EBADMSG;
+			PP_DEBUG("CLIENT: sending count = <%s> (len=%lu)\n",
+					ct.ctrl_buf, ct.ctrl_buf.length);
+			pp_ctrl_send(ct, ct.ctrl_buf);
+			
+			PP_DEBUG("CLIENT: sent count\n");
+
+			pp_ctrl_recv(ct, ct.ctrl_buf);
+
+			if (!ct.ctrl_buf.equals(PP_MSG_CHECK_CNT_OK)); {
+				PP_DEBUG("CLIENT: error while server acking the count: <%s> (len=%lu)\n",
+						ct.ctrl_buf, ct.ctrl_buf.length);
+			}
+			PP_DEBUG("CLIENT: count acked by server\n");
 		}
-		PP_DEBUG("CLIENT: sent count\n");
 
-		ret =
-		    pp_ctrl_recv(ct, ct->ctrl_buf, sizeof(PP_MSG_CHECK_CNT_OK));
-		if (ret < 0)
-			return ret;
-		if (ret < sizeof(PP_MSG_CHECK_CNT_OK)) {
-			PP_ERR(
-			    "CLIENT: bad length of received data (len=%d/%zu)",
-			    ret, sizeof(PP_MSG_CHECK_CNT_OK));
-			return -EBADMSG;
-		}
-
-		if (strcmp(ct->ctrl_buf, PP_MSG_CHECK_CNT_OK)) {
-			PP_DEBUG(
-				"CLIENT: error while server acking the count: <%s> (len=%lu)\n",
-				ct->ctrl_buf, strlen(ct->ctrl_buf));
-			return ret;
-		}
-		PP_DEBUG("CLIENT: count acked by server\n");
-	} else {
-		memset(&ct->ctrl_buf, '\0', PP_MSG_LEN_CNT + 1);
-
-		PP_DEBUG("SERVER: receiving count\n");
-		ret = pp_ctrl_recv(ct, ct->ctrl_buf, PP_MSG_LEN_CNT);
-		if (ret < 0)
-			return ret;
-		if (ret < PP_MSG_LEN_CNT) {
-			PP_ERR(
-			    "SERVER: bad length of received data (len=%d/%d)",
-			    ret, PP_MSG_LEN_CNT);
-			return -EBADMSG;
-		}
-		ct->cnt_ack_msg = parse_ulong(ct->ctrl_buf, -1);
-		if (ct->cnt_ack_msg < 0)
-			return ret;
-		PP_DEBUG("SERVER: received count = <%ld> (len=%lu)\n",
-			 ct->cnt_ack_msg, strlen(ct->ctrl_buf));
-
-		snprintf(ct->ctrl_buf, sizeof(PP_MSG_CHECK_CNT_OK), "%s",
-			 PP_MSG_CHECK_CNT_OK);
-		ret =
-		    pp_ctrl_send(ct, ct->ctrl_buf, sizeof(PP_MSG_CHECK_CNT_OK));
-		if (ret < 0)
-			return ret;
-		if (ret < sizeof(PP_MSG_CHECK_CNT_OK)) {
-			PP_ERR(
-			    "CLIENT: bad length of received data (len=%d/%zu)",
-			    ret, sizeof(PP_MSG_CHECK_CNT_OK));
-			return -EBADMSG;
-		}
-		PP_DEBUG("SERVER: acked count to client\n");
+		PP_DEBUG("Ack count exchanged\n");
 	}
 
-	PP_DEBUG("Ack count exchanged\n");
-
-	return 0;
-}
-
-/*******************************************************************************
- *                                         Options
- ******************************************************************************
+	/*******************************************************************************
+	 *                                         Options
+	 ******************************************************************************
 
 static inline void pp_start(struct ct_pingpong *ct)
 {
@@ -558,8 +483,8 @@ static inline int pp_check_opts(struct ct_pingpong *ct, uint64_t flags)
 }
 
 /*******************************************************************************
- *                                         Data Verification
- ******************************************************************************
+	 *                                         Data Verification
+	 ******************************************************************************
 
 void pp_fill_buf(void *buf, int size)
 {
@@ -615,8 +540,8 @@ int pp_check_buf(void *buf, int size)
 
 
 /*******************************************************************************
- *                                         Error handling
- ******************************************************************************
+	 *                                         Error handling
+	 ******************************************************************************
 
 void eq_readerr(struct fid_eq *eq)
 {
@@ -642,8 +567,8 @@ void pp_process_eq_err(ssize_t rd, struct fid_eq *eq, const char *fn)
 }
 
 /*******************************************************************************
- *                                         Test sizes
- ******************************************************************************
+	 *                                         Test sizes
+	 ******************************************************************************
 
 int generate_test_sizes(struct pp_opts *opts, size_t tx_size, int **sizes_)
 {
@@ -659,7 +584,7 @@ int generate_test_sizes(struct pp_opts *opts, size_t tx_size, int **sizes_)
 	sizes = calloc(64, sizeof(*sizes));
 	if (sizes == NULL)
 		return 0;
-	*sizes_ = sizes;
+	 *sizes_ = sizes;
 
 	if (opts->options & PP_OPT_SIZE) {
 		if (opts->transfer_size > tx_size)
@@ -701,8 +626,8 @@ int generate_test_sizes(struct pp_opts *opts, size_t tx_size, int **sizes_)
 }
 
 /*******************************************************************************
- *                                    Performance output
- ******************************************************************************
+	 *                                    Performance output
+	 ******************************************************************************
 
 /* str must be an allocated buffer of PP_STR_LEN bytes *
 char *size_str(char *str, uint64_t size)
@@ -811,8 +736,8 @@ void show_perf(char *name, int tsize, int sent, int acked,
 }
 
 /*******************************************************************************
- *                                      Data Messaging
- ******************************************************************************
+	 *                                      Data Messaging
+	 ******************************************************************************
 
 int pp_cq_readerr(struct fid_cq *cq)
 {
@@ -1008,8 +933,8 @@ ssize_t pp_rx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
 }
 
 /*******************************************************************************
- *                                Initialization and allocations
- ******************************************************************************
+	 *                                Initialization and allocations
+	 ******************************************************************************
 
 void init_test(struct ct_pingpong *ct, struct pp_opts *opts)
 {
@@ -1158,17 +1083,16 @@ int pp_alloc_active_res(struct ct_pingpong *ct, struct fi_info *fi)
 
 	return 0;
 }
-*/
-private void pp_getinfo(CTPingPong ct, Info hints, Info info) {
-	long flags = 0;
-	
-	if (hints.getEndPointAttr().getEpType() == null)
-		hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG); //he had datagram here
+	 */
+	private Info pp_getinfo(CTPingPong ct, Info hints) {
+		long flags = 0;
 
-	//info = LibFabric.getInfo(version, node, service, flags, hints)[0];
-	//fi_getinfo(PP_FIVERSION, node, service, flags, hints, info);
-}
-/*
+		if (hints.getEndPointAttr().getEpType() == null)
+			hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG); //he had datagram here
+
+		return LibFabric.getInfo(version, flags, hints)[0];
+	}
+	/*
 #define PP_EP_BIND(ep, fd, flags)                                              \
 	do {                                                                   \
 		int ret;                                                       \
@@ -1231,189 +1155,173 @@ int pp_av_insert(struct fid_av *av, void *addr, size_t count,
 
 	return 0;
 }
+	 */
+	private void pp_exchange_names_connected(CTPingPong ct) {
+		PP_DEBUG("Connection-based endpoint: setting up connection\n");
 
-int pp_exchange_names_connected(struct ct_pingpong *ct)
-{
-	int ret;
+		pp_ctrl_sync(ct);
 
-	PP_DEBUG("Connection-based endpoint: setting up connection\n");
+		if (ct.opts.isServer) {
+			//pp_send_name(ct, ct.pep); TODO: was working here
 
-	ret = pp_ctrl_sync(ct);
-	if (ret)
+		} else {
+			/*ret = pp_recv_name(ct);
+			ret = pp_getinfo(ct, ct->hints, &(ct->fi));*/
+		}
+	}
+	private void pp_start_server(CTPingPong ct) {
+
+		PP_DEBUG("Connected endpoint: starting server\n");
+
+		ct.fi_pep = pp_getinfo(ct, ct.hints);
+
+		ct.fabric = new Fabric(ct.fi_pep.getFabricAttr());
+
+		ct.eq = ct.fabric.eventQueueOpen(ct.eq_attr);
+
+		ct.pep = ct.fabric.createPassiveEndPoint(ct.fi_pep);
+
+		ct.eq.bind(ct.pep, 0);
+
+		ct.pep.listen();
+
+		PP_DEBUG("Connected endpoint: server started\n");
+	}
+/*
+	private void pp_server_connect(CTPingPong ct) {
+		EQCMEntry entry;
+		int event;
+		long rd;
+
+		PP_DEBUG("Connected endpoint: connecting server\n");
+
+		ret = pp_exchange_names_connected(ct);
+		if (ret)
+			goto err;
+
+		ret = pp_ctrl_sync(ct);
+		if (ret)
+			goto err;
+
+		/* Listen *
+		rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
+		if (rd != sizeof(entry)) {
+			pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
+			return (int)rd;
+		}
+
+		ct->fi = entry.info;
+		if (event != FI_CONNREQ) {
+			fprintf(stderr, "Unexpected CM event %d\n", event);
+			ret = -FI_EOTHER;
+			goto err;
+		}
+
+		ret = fi_domain(ct->fabric, ct->fi, &(ct->domain), NULL);
+		if (ret) {
+			PP_PRINTERR("fi_domain", ret);
+			goto err;
+		}
+
+		ret = pp_alloc_active_res(ct, ct->fi);
+		if (ret)
+			goto err;
+
+		ret = pp_init_ep(ct);
+		if (ret)
+			goto err;
+
+		PP_DEBUG("accepting\n");
+
+		ret = fi_accept(ct->ep, NULL, 0);
+		if (ret) {
+			PP_PRINTERR("fi_accept", ret);
+			goto err;
+		}
+
+		ret = pp_ctrl_sync(ct);
+		if (ret)
+			goto err;
+
+		/* Accept *
+		rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
+		if (rd != sizeof(entry)) {
+			pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
+			ret = (int)rd;
+			goto err;
+		}
+
+		if (event != FI_CONNECTED || entry.fid != &(ct->ep->fid)) {
+			fprintf(stderr, "Unexpected CM event %d fid %p (ep %p)\n",
+					event, entry.fid, ct->ep);
+			ret = -FI_EOTHER;
+			goto err;
+		}
+
+		PP_DEBUG("Connected endpoint: server connected\n");
+
+		return 0;
+		err:
+			fi_reject(ct->pep, ct->fi->handle, NULL, 0);
 		return ret;
+	}
 
-	if (ct->opts.dst_addr) {
-		ret = pp_recv_name(ct);
-		if (ret < 0)
-			return ret;
+	int pp_client_connect(struct ct_pingpong *ct)
+	{
+		struct fi_eq_cm_entry entry;
+		uint32_t event;
+		ssize_t rd;
+		int ret;
 
-		ret = pp_getinfo(ct, ct->hints, &(ct->fi));
+		ret = pp_exchange_names_connected(ct);
 		if (ret)
 			return ret;
-	} else {
-		ret = pp_send_name(ct, &ct->pep->fid);
-		if (ret < 0)
+
+		/* Check that the remote is still up *
+		ret = pp_ctrl_sync(ct);
+		if (ret)
 			return ret;
+
+		ret = pp_open_fabric_res(ct);
+		if (ret)
+			return ret;
+
+		ret = pp_alloc_active_res(ct, ct->fi);
+		if (ret)
+			return ret;
+
+		ret = pp_init_ep(ct);
+		if (ret)
+			return ret;
+
+		ret = fi_connect(ct->ep, ct->rem_name, NULL, 0);
+		if (ret) {
+			PP_PRINTERR("fi_connect", ret);
+			return ret;
+		}
+
+		ret = pp_ctrl_sync(ct);
+		if (ret)
+			return ret;
+
+		/* Connect *
+		rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
+		if (rd != sizeof(entry)) {
+			pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
+			ret = (int)rd;
+			return ret;
+		}
+
+		if (event != FI_CONNECTED || entry.fid != &(ct->ep->fid)) {
+			fprintf(stderr, "Unexpected CM event %d fid %p (ep %p)\n",
+					event, entry.fid, ct->ep);
+			ret = -FI_EOTHER;
+			return ret;
+		}
+
+		return 0;
 	}
-
-	return 0;
-}
-*/
-private static void pp_start_server(CTPingPong ct) {
-	
-	PP_DEBUG("Connected endpoint: starting server\n");
-
-	//pp_getinfo(ct, ct.hints, ct.fi_pep);
-
-	//fi_fabric(ct->fi_pep->fabric_attr, &(ct->fabric), null);
-	
-	//fi_eq_open(ct->fabric, &(ct->eq_attr), &(ct->eq), null);
-	
-	//fi_passive_ep(ct->fabric, ct->fi_pep, &(ct->pep), null);
-	
-	//fi_pep_bind(ct->pep, &(ct->eq->fid), 0);
-	
-	//fi_listen(ct->pep);
-
-	PP_DEBUG("Connected endpoint: server started\n");
-}
-/*
-int pp_server_connect(struct ct_pingpong *ct)
-{
-	struct fi_eq_cm_entry entry;
-	uint32_t event;
-	ssize_t rd;
-	int ret;
-
-	PP_DEBUG("Connected endpoint: connecting server\n");
-
-	ret = pp_exchange_names_connected(ct);
-	if (ret)
-		goto err;
-
-	ret = pp_ctrl_sync(ct);
-	if (ret)
-		goto err;
-
-	/* Listen *
-	rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
-	if (rd != sizeof(entry)) {
-		pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
-		return (int)rd;
-	}
-
-	ct->fi = entry.info;
-	if (event != FI_CONNREQ) {
-		fprintf(stderr, "Unexpected CM event %d\n", event);
-		ret = -FI_EOTHER;
-		goto err;
-	}
-
-	ret = fi_domain(ct->fabric, ct->fi, &(ct->domain), NULL);
-	if (ret) {
-		PP_PRINTERR("fi_domain", ret);
-		goto err;
-	}
-
-	ret = pp_alloc_active_res(ct, ct->fi);
-	if (ret)
-		goto err;
-
-	ret = pp_init_ep(ct);
-	if (ret)
-		goto err;
-
-	PP_DEBUG("accepting\n");
-
-	ret = fi_accept(ct->ep, NULL, 0);
-	if (ret) {
-		PP_PRINTERR("fi_accept", ret);
-		goto err;
-	}
-
-	ret = pp_ctrl_sync(ct);
-	if (ret)
-		goto err;
-
-	/* Accept *
-	rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
-	if (rd != sizeof(entry)) {
-		pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
-		ret = (int)rd;
-		goto err;
-	}
-
-	if (event != FI_CONNECTED || entry.fid != &(ct->ep->fid)) {
-		fprintf(stderr, "Unexpected CM event %d fid %p (ep %p)\n",
-			event, entry.fid, ct->ep);
-		ret = -FI_EOTHER;
-		goto err;
-	}
-
-	PP_DEBUG("Connected endpoint: server connected\n");
-
-	return 0;
-err:
-	fi_reject(ct->pep, ct->fi->handle, NULL, 0);
-	return ret;
-}
-
-int pp_client_connect(struct ct_pingpong *ct)
-{
-	struct fi_eq_cm_entry entry;
-	uint32_t event;
-	ssize_t rd;
-	int ret;
-
-	ret = pp_exchange_names_connected(ct);
-	if (ret)
-		return ret;
-
-	/* Check that the remote is still up *
-	ret = pp_ctrl_sync(ct);
-	if (ret)
-		return ret;
-
-	ret = pp_open_fabric_res(ct);
-	if (ret)
-		return ret;
-
-	ret = pp_alloc_active_res(ct, ct->fi);
-	if (ret)
-		return ret;
-
-	ret = pp_init_ep(ct);
-	if (ret)
-		return ret;
-
-	ret = fi_connect(ct->ep, ct->rem_name, NULL, 0);
-	if (ret) {
-		PP_PRINTERR("fi_connect", ret);
-		return ret;
-	}
-
-	ret = pp_ctrl_sync(ct);
-	if (ret)
-		return ret;
-
-	/* Connect *
-	rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
-	if (rd != sizeof(entry)) {
-		pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
-		ret = (int)rd;
-		return ret;
-	}
-
-	if (event != FI_CONNECTED || entry.fid != &(ct->ep->fid)) {
-		fprintf(stderr, "Unexpected CM event %d fid %p (ep %p)\n",
-			event, entry.fid, ct->ep);
-		ret = -FI_EOTHER;
-		return ret;
-	}
-
-	return 0;
-}
-
+	/*
 int pp_init_fabric(struct ct_pingpong *ct)
 {
 	int ret;
@@ -1491,25 +1399,25 @@ int pp_init_fabric(struct ct_pingpong *ct)
 }
 
 /*******************************************************************************
- *                                Deallocations and Final
- ******************************************************************************/
+	 *                                Deallocations and Final
+	 ******************************************************************************/
 
-void freeResources(CTPingPong ct)
-{
-	PP_DEBUG("Freeing resources of test suite\n");
+	void freeResources(CTPingPong ct)
+	{
+		PP_DEBUG("Freeing resources of test suite\n");
 
-	if (!ct.mr.equals(ct.no_mr))
-		PP_CLOSE_FID(ct.mr);
-	PP_CLOSE_FID(ct.ep);
-	PP_CLOSE_FID(ct.pep);
-	PP_CLOSE_FID(ct.rxcq);
-	PP_CLOSE_FID(ct.txcq);
-	PP_CLOSE_FID(ct.av);
-	PP_CLOSE_FID(ct.eq);
-	PP_CLOSE_FID(ct.domain);
-	PP_CLOSE_FID(ct.fabric);
+		if (!ct.mr.equals(ct.no_mr))
+			PP_CLOSE_FID(ct.mr);
+		PP_CLOSE_FID(ct.ep);
+		PP_CLOSE_FID(ct.pep);
+		PP_CLOSE_FID(ct.rxcq);
+		PP_CLOSE_FID(ct.txcq);
+		PP_CLOSE_FID(ct.av);
+		PP_CLOSE_FID(ct.eq);
+		PP_CLOSE_FID(ct.domain);
+		PP_CLOSE_FID(ct.fabric);
 
-	/*if (ct->fi_pep) { //TODO: add free method for info
+		/*if (ct->fi_pep) { //TODO: add free method for info
 		fi_freeinfo(ct->fi_pep);
 		ct->fi_pep = NULL;
 	}
@@ -1522,9 +1430,9 @@ void freeResources(CTPingPong ct)
 		ct->hints = NULL;
 	}*/
 
-	PP_DEBUG("Resources of test suite freed\n");
-}
-/*
+		PP_DEBUG("Resources of test suite freed\n");
+	}
+	/*
 int pp_finalize(struct ct_pingpong *ct)
 {
 	struct iovec iov;
@@ -1568,75 +1476,75 @@ int pp_finalize(struct ct_pingpong *ct)
 }
 
 /*******************************************************************************
- *                                CLI: Usage and Options parsing
- ******************************************************************************/
+	 *                                CLI: Usage and Options parsing
+	 ******************************************************************************/
 
-private void pingPongUsage() {
-	System.err.println("Usage: java PingPongTest [OPTIONS] <address:portnum>");
-	System.err.println("\tOptions:");
-	System.err.println("\t\t-I <number> (specify number of iterations)");
-	System.err.println("\t\t-D (Debug mode)");
-	System.err.println("\t\t-S (server - use this in the first call)");
-	System.err.println("\t\t-L <length> (length of transfers or 'all')");
-	
-	System.exit(-1);
-}
+	private void pingPongUsage() {
+		System.err.println("Usage: java PingPongTest [OPTIONS] <address:portnum>");
+		System.err.println("\tOptions:");
+		System.err.println("\t\t-I <number> (specify number of iterations)");
+		System.err.println("\t\t-D (Debug mode)");
+		System.err.println("\t\t-S (server - use this in the first call)");
+		System.err.println("\t\t-L <length> (length of transfers or 'all')");
 
-private void parseArgs(CTPingPong ct, String[] args) {
-	for(int i = 0; i < args.length - 1; i+=2) { //last arg will be address
-		char op = args[i].length() == 1 ? args[i].charAt(0) : args[i].charAt(1); //allows a minus
-		switch (op) {
-		case 'D':
-			PP_ACTIVATE_DEBUG = true;
-			i = i-1;
-			break;
-		case 'I':
-			ct.opts.options |= PP_OPT_ITER;
-			ct.opts.iterations = Integer.parseInt(args[i+1]);
-			if (ct.opts.iterations < 0)
-				ct.opts.iterations = 0;
-			break;
-		case 'S':
-			ct.opts.isServer = true;
-			i = i-1;
-			break;
-		case 'L':
-			if(args[i+1].equalsIgnoreCase("all")) {
-				ct.opts.sizes_enabled = ~0;
-			} else {
-				ct.opts.options |=PP_OPT_SIZE;
-				try {
-					ct.opts.transfer_size = Integer.parseInt(args[i+1]);
-				} catch(NumberFormatException e) {
-					System.err.println(e.getMessage());
-					pingPongUsage();
+		System.exit(-1);
+	}
+
+	private void parseArgs(CTPingPong ct, String[] args) {
+		for(int i = 0; i < args.length - 1; i+=2) { //last arg will be address
+			char op = args[i].length() == 1 ? args[i].charAt(0) : args[i].charAt(1); //allows a minus
+			switch (op) {
+			case 'D':
+				PP_ACTIVATE_DEBUG = true;
+				i = i-1;
+				break;
+			case 'I':
+				ct.opts.options |= PP_OPT_ITER;
+				ct.opts.iterations = Integer.parseInt(args[i+1]);
+				if (ct.opts.iterations < 0)
+					ct.opts.iterations = 0;
+				break;
+			case 'S':
+				ct.opts.isServer = true;
+				i = i-1;
+				break;
+			case 'L':
+				if(args[i+1].equalsIgnoreCase("all")) {
+					ct.opts.sizes_enabled = ~0;
+				} else {
+					ct.opts.options |=PP_OPT_SIZE;
+					try {
+						ct.opts.transfer_size = Integer.parseInt(args[i+1]);
+					} catch(NumberFormatException e) {
+						System.err.println(e.getMessage());
+						pingPongUsage();
+					}
 				}
+				break;
+			default:
+				pingPongUsage();
 			}
-			break;
-		default:
+		}
+
+		try {
+			String[] splitAddr = args[args.length -1].split(":");
+			if(!ct.opts.isServer) {
+				ct.opts.dst_addr = splitAddr[0];
+				ct.opts.dst_port = splitAddr[1];
+			} else {
+				//ct.opts.src_addr = splitAddr[0]; //no addr for server, just a port
+				ct.opts.src_port = splitAddr[0];
+			}
+		} catch (IndexOutOfBoundsException | NumberFormatException e) {
+			System.err.println(e.getMessage());
 			pingPongUsage();
 		}
-	}
-	
-	try {
-		String[] splitAddr = args[args.length -1].split(":");
-		if(!ct.opts.isServer) {
-			ct.opts.dst_addr = splitAddr[0];
-			ct.opts.dst_port = splitAddr[1];
-		} else {
-			//ct.opts.src_addr = splitAddr[0]; //no addr for server, just a port
-			ct.opts.src_port = splitAddr[0];
-		}
-	} catch (IndexOutOfBoundsException | NumberFormatException e) {
-		System.err.println(e.getMessage());
-		pingPongUsage();
-	}
-	
-}
 
-/*******************************************************************************
- *      PingPong core and implemenations for endpoints
- ******************************************************************************
+	}
+
+	/*******************************************************************************
+	 *      PingPong core and implemenations for endpoints
+	 ******************************************************************************
 
 int pingpong(struct ct_pingpong *ct)
 {
@@ -1717,68 +1625,68 @@ out:
 	free(sizes);
 	return ret;
 }
-*/
-private static void run_pingpong_msg(CTPingPong ct) {
-	int ret;
+	 */
+	private void run_pingpong_msg(CTPingPong ct) {
+		int ret;
 
-	PP_DEBUG("Selected endpoint: MSG\n");
+		PP_DEBUG("Selected endpoint: MSG\n");
 
-	ppCtrlInit(ct);
-	
-	if (ct.opts.isServer) {
-		pp_start_server(ct);
+		ppCtrlInit(ct);
+
+		if (ct.opts.isServer) {
+			pp_start_server(ct);
+		}
+
+		/*if (ct.opts.isServer) { TODO: working here
+			pp_server_connect(ct);
+			PP_DEBUG("SERVER: server_connect=%s\n", ret ? "KO" : "OK");
+		} else {
+			pp_client_connect(ct);
+			PP_DEBUG("CLIENT: client_connect=%s\n", ret ? "KO" : "OK");
+		}
+
+		if (ret)
+			return ret;
+
+		ret = run_suite_pingpong(ct);
+		if (ret)
+			goto out;
+
+		ret = pp_finalize(ct);
+		out:
+			fi_shutdown(ct->ep, 0);
+		return ret;*/
 	}
-/*
-	if (ct->opts.dst_addr) {
-		ret = pp_client_connect(ct);
-		PP_DEBUG("CLIENT: client_connect=%s\n", ret ? "KO" : "OK");
-	} else {
-		ret = pp_server_connect(ct);
-		PP_DEBUG("SERVER: server_connect=%s\n", ret ? "KO" : "OK");
-	}
 
-	if (ret)
-		return ret;
 
-	ret = run_suite_pingpong(ct);
-	if (ret)
-		goto out;
-
-	ret = pp_finalize(ct);
-out:
-	fi_shutdown(ct->ep, 0);
-	return ret;*/
-}
-
-	
 	//D - debug | L - length | S - server | I - iterations | address last argument 
-	public void main(String[] args) { //allow itteration and message length arguments
-	char op;
+	public static void main(String[] args) { //allow itteration and message length arguments
+		PingPongTest tester = new PingPongTest();
 
-	String ret = "EXIT_SUCCESS";
-	
-	CTPingPong ct = new CTPingPong();
-	ct.timeout = -1;
-	ct.opts = new PPOpts();
-	ct.opts.iterations = 1000;
-	ct.opts.transfer_size = 1024;
-	ct.opts.sizes_enabled = PP_DEFAULT_SIZE;
-	ct.eq_attr.setWaitObj(WaitObj.WAIT_UNSPEC);
+		String ret = "EXIT_SUCCESS";
 
-	ct.hints = new Info();
-	ct.hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG);
-	ct.hints.setCaps(LibFabric.FI_MSG);
-	ct.hints.setMode(LibFabric.FI_CONTEXT | LibFabric.FI_LOCAL_MR);
+		CTPingPong ct = tester.new CTPingPong();
+		ct.timeout = -1;
+		ct.opts = tester.new PPOpts();
+		ct.opts.iterations = 1000;
+		ct.opts.transfer_size = 1024;
+		ct.opts.sizes_enabled = tester.PP_DEFAULT_SIZE;
+		ct.eq_attr.setWaitObj(WaitObj.WAIT_UNSPEC);
 
-	parseArgs(ct, args);
+		ct.hints = new Info();
+		ct.hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG);
+		ct.hints.setCaps(LibFabric.FI_MSG);
+		ct.hints.setMode(LibFabric.FI_CONTEXT | LibFabric.FI_LOCAL_MR);
 
-	pp_banner_options(ct);
+		tester.parseArgs(ct, args);
 
-	ct.hints.setCaps(1);//caps = FI_MSG; ask for input on these types of values.
-	ct.hints.setMode(LibFabric.FI_LOCAL_MR); //add this
-	run_pingpong_msg(ct);
-	
-	freeResources(ct);
-}
+		tester.pp_banner_options(ct);
+
+		ct.hints.setCaps(1);//caps = FI_MSG; ask for input on these types of values.
+		ct.hints.setMode(LibFabric.FI_LOCAL_MR); //add this
+		tester.run_pingpong_msg(ct);
+
+		tester.freeResources(ct);
+	}
 }
 

@@ -32,7 +32,7 @@
 
 package org.ofi.libjfabric;
 
-public class PassiveEndPoint extends EndPoint {
+public class PassiveEndPoint extends EndPointSharedOps {
 	
 	public PassiveEndPoint(long handle) {
 		super(handle);
