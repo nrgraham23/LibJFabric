@@ -306,7 +306,7 @@ public class PingPongTest {
 			System.err.printf("\"\n");
 		}
 	}
-/* TODO: was working here
+	/* TODO: was working here
 private void pp_send_name(CTPingPong ct, *endpoint)
 {
 	String local_name;
@@ -316,7 +316,7 @@ private void pp_send_name(CTPingPong ct, *endpoint)
 	PP_DEBUG("Fetching local address\n");
 
 	fi_getname(endpoint, local_name, &addrlen);
-	
+
 	PP_DEBUG("Sending name length\n");
 	len = htonl(addrlen);
 	pp_ctrl_send(ct, len);
@@ -377,11 +377,11 @@ int pp_recv_name(struct ct_pingpong *ct)
 
 		if (ct.opts.isServer) {
 			PP_DEBUG("SERVER: syncing\n");
-			
+
 			pp_ctrl_recv(ct, ct.ctrl_buf);
-			
+
 			PP_DEBUG("SERVER: after recv\n");
-			
+
 			if (ct.ctrl_buf.toString().equals(PP_MSG_SYNC_Q)) {
 				ct.ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
 				PP_DEBUG("SERVER: sync error while acking Q: " + ct.ctrl_buf.toString() + " (len=" + ct.ctrl_buf.length + ")\n");
@@ -389,10 +389,10 @@ int pp_recv_name(struct ct_pingpong *ct)
 
 			PP_DEBUG("SERVER: syncing now\n");
 			ct.ctrl_buf = PP_MSG_SYNC_A.getBytes();
-			
+
 			pp_ctrl_send(ct, ct.ctrl_buf);
 			PP_DEBUG("SERVER: after send\n");
-			
+
 			PP_DEBUG("SERVER: synced\n");
 		} else {
 			ct.ctrl_buf = PP_MSG_SYNC_Q.getBytes();
@@ -400,12 +400,12 @@ int pp_recv_name(struct ct_pingpong *ct)
 			PP_DEBUG("CLIENT: syncing\n");
 			pp_ctrl_send(ct, ct.ctrl_buf);
 			PP_DEBUG("CLIENT: after send\n");
-			
+
 			PP_DEBUG("CLIENT: syncing now\n");
 
 			pp_ctrl_recv(ct, ct.ctrl_buf);
 			PP_DEBUG("CLIENT: after recv\n");
-			
+
 			if (!ct.ctrl_buf.toString().equals(PP_MSG_SYNC_A)) {
 				ct.ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
 				PP_DEBUG(
@@ -426,16 +426,16 @@ int pp_recv_name(struct ct_pingpong *ct)
 
 			PP_DEBUG("SERVER: receiving count\n");
 			pp_ctrl_recv(ct, ct.ctrl_buf);
-			
+
 			ct.cnt_ack_msg = Long.parseLong(ct.ctrl_buf.toString());
-			
+
 			PP_DEBUG("SERVER: received count = <%ld> (len=%lu)\n",
 					ct.cnt_ack_msg, ct.ctrl_buf.length);
 
 			ct.ctrl_buf = PP_MSG_CHECK_CNT_OK.getBytes();
 
 			pp_ctrl_send(ct, ct.ctrl_buf);
-			
+
 			PP_DEBUG("SERVER: acked count to client\n");
 		} else {
 			Arrays.fill(ct.ctrl_buf, (byte)'\0');
@@ -444,7 +444,7 @@ int pp_recv_name(struct ct_pingpong *ct)
 			PP_DEBUG("CLIENT: sending count = <%s> (len=%lu)\n",
 					ct.ctrl_buf, ct.ctrl_buf.length);
 			pp_ctrl_send(ct, ct.ctrl_buf);
-			
+
 			PP_DEBUG("CLIENT: sent count\n");
 
 			pp_ctrl_recv(ct, ct.ctrl_buf);
@@ -1187,7 +1187,7 @@ int pp_av_insert(struct fid_av *av, void *addr, size_t count,
 
 		PP_DEBUG("Connected endpoint: server started\n");
 	}
-/*
+	/*
 	private void pp_server_connect(CTPingPong ct) {
 		EQCMEntry entry;
 		int event;
@@ -1417,18 +1417,18 @@ int pp_init_fabric(struct ct_pingpong *ct)
 		PP_CLOSE_FID(ct.domain);
 		PP_CLOSE_FID(ct.fabric);
 
-		/*if (ct->fi_pep) { //TODO: add free method for info
-		fi_freeinfo(ct->fi_pep);
-		ct->fi_pep = NULL;
-	}
-	if (ct->fi) {
-		fi_freeinfo(ct->fi);
-		ct->fi = NULL;
-	}
-	if (ct->hints) {
-		fi_freeinfo(ct->hints);
-		ct->hints = NULL;
-	}*/
+		if (ct.fi_pep != null) {
+			ct.fi_pep.free();
+			ct.fi_pep = null;
+		}
+		if (ct.fi != null) {
+			ct.fi.free();
+			ct.fi = null;
+		}
+		if (ct.hints != null) {
+			ct.hints.free();
+			ct.hints = null;
+		}
 
 		PP_DEBUG("Resources of test suite freed\n");
 	}

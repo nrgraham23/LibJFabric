@@ -40,7 +40,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initInfo
 {
 	char *error;
 
-	struct fi_info *info = fi_dupinfo(NULL);
+	struct fi_info *info = fi_allocinfo();
 
 	info->next = NULL;
 	info->caps = caps;
@@ -71,21 +71,12 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initEmpty
 	return (jlong)info_list[info_list_tail - 1];
 }
 
-JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Info_freeJNI
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Info_free
 	(JNIEnv *env, jobject jthis, jlong handle)
 {
-	if(handle != 0) {
-		((struct fi_info*)handle)->next = NULL;
-		((struct fi_info*)handle)->src_addr = NULL;
-		((struct fi_info*)handle)->dest_addr = NULL;
-		((struct fi_info*)handle)->tx_attr = NULL;
-		((struct fi_info*)handle)->rx_attr = NULL;
-		((struct fi_info*)handle)->ep_attr = NULL;
-		((struct fi_info*)handle)->domain_attr = NULL;
-		((struct fi_info*)handle)->fabric_attr = NULL;
-
-		free(((struct fi_info*)handle));
-	}
+	struct fi_info* info = (struct fi_info*)handle;
+	fi_freeinfo(info);
+	info = NULL;
 }
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_getCaps
