@@ -188,16 +188,7 @@ void deleteInfoList() {
 
 	while(i < info_list_tail) {
 		if(info_list[i] != NULL) {
-			info_list[i]->next = NULL;
-			info_list[i]->src_addr = NULL;
-			info_list[i]->dest_addr = NULL;
-			info_list[i]->tx_attr = NULL;
-			info_list[i]->rx_attr = NULL;
-			info_list[i]->ep_attr = NULL;
-			info_list[i]->domain_attr = NULL;
-			info_list[i]->fabric_attr = NULL;
-
-			free(info_list[i]);
+			fi_freeinfo(info_list[i]);
 		}
 		i++;
 	}
@@ -397,6 +388,6 @@ int getLinkedListLength(struct fi_info **infoLinkedList) {
 
 void* getDirectBufferAddress(JNIEnv *env, jobject buffer)
 {
-    /* Allow NULL buffers to send/recv 0 items as control messages. */
-    return buffer == NULL ? NULL : (*env)->GetDirectBufferAddress(env, buffer);
+	/* Allow NULL buffers to send/recv 0 items as control messages. */
+	return buffer == NULL ? NULL : (*env)->GetDirectBufferAddress(env, buffer);
 }
