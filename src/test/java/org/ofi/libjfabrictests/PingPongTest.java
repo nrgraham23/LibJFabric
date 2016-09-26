@@ -306,47 +306,47 @@ public class PingPongTest {
 			System.err.printf("\"\n");
 		}
 	}
-	
-private void pp_send_name(CTPingPong ct, EndPointSharedOps endpoint) {
-	String local_name;
-	//long addrlen;
-	//int len;
 
-	PP_DEBUG("Fetching local address\n");
-	
-	local_name = endpoint.getName();
+	private void pp_send_name(CTPingPong ct, EndPointSharedOps endpoint) {
+		String local_name;
+		//long addrlen;
+		//int len;
 
-	//PP_DEBUG("Sending name length\n");
-	
-	//pp_ctrl_send(ct, local_name.length()); sending name length, think i can skip this in Java
+		PP_DEBUG("Fetching local address\n");
 
-	PP_DEBUG("Sending name\n");
-	pp_ctrl_send(ct, local_name.getBytes());
-	PP_DEBUG("Sent name\n");
-}
+		local_name = endpoint.getName();
 
-private void pp_recv_name(CTPingPong ct) {
+		//PP_DEBUG("Sending name length\n");
 
-	//PP_DEBUG("Receiving name length\n");
-	//pp_ctrl_recv(ct, (char *) &len, sizeof(len));
-	
-	//len = ntohl(len);
+		//pp_ctrl_send(ct, local_name.length()); sending name length, think i can skip this in Java
 
-	//if (len > sizeof(ct->rem_name)) {
-	//	PP_DEBUG("Address length exceeds address storage\n");
-	//	return -EMSGSIZE;
-	//}
+		PP_DEBUG("Sending name\n");
+		pp_ctrl_send(ct, local_name.getBytes());
+		PP_DEBUG("Sent name\n");
+	}
 
-	PP_DEBUG("Receiving name\n");
-	pp_ctrl_recv(ct, ct.rem_name);
-	
-	PP_DEBUG("Received name\n");
+	private void pp_recv_name(CTPingPong ct) {
 
-	/* fi_freeinfo will free the dest_addr field. */
-	ct.hints.setDestAddr(ct.rem_name.toString());
-	
-	ct.hints.setDestAddrLen(ct.rem_name.length);
-}
+		//PP_DEBUG("Receiving name length\n");
+		//pp_ctrl_recv(ct, (char *) &len, sizeof(len));
+
+		//len = ntohl(len);
+
+		//if (len > sizeof(ct->rem_name)) {
+		//	PP_DEBUG("Address length exceeds address storage\n");
+		//	return -EMSGSIZE;
+		//}
+
+		PP_DEBUG("Receiving name\n");
+		pp_ctrl_recv(ct, ct.rem_name);
+
+		PP_DEBUG("Received name\n");
+
+		/* fi_freeinfo will free the dest_addr field. */
+		ct.hints.setDestAddr(ct.rem_name.toString());
+
+		ct.hints.setDestAddrLen(ct.rem_name.length);
+	}
 
 	private void pp_ctrl_finish(CTPingPong ct) {
 		if (!ct.ctrl_connfd.isClosed()) {
