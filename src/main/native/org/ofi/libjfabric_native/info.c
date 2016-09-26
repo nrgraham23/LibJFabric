@@ -198,3 +198,10 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Info_setFabricAttr
 {
 	((struct fi_info*)thisHandle)->fabric_attr = (struct fi_fabric_attr*)fabricAttrHandle;
 }
+
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Info_setDestAddr  //TODO: Ask Howard about this
+	(JNIEnv *env, jobject jthis, jstring destAddr, jlong thisHandle)
+{
+	const char *addr = (*env)->GetStringUTFChars(env, destAddr, NULL);
+	((struct fi_info*)thisHandle)->dest_addr = (void *)*addr;
+}

@@ -37,4 +37,9 @@ public class EndPointSharedOps extends FIDescriptor { //TODO: find a better name
 	public EndPointSharedOps(long handle) {
 		super(handle);
 	}
+	
+	public String getName() {
+		return getName(this.handle);
+	}
+	private native String getName(long handle);
 }

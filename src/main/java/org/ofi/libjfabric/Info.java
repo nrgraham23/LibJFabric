@@ -165,4 +165,8 @@ public class Info {
 	}
 	private native void setFabricAttr(long fabricAttrHandle, long thisHandle);
 
+	public void setDestAddr(String destAddr) {  //NOTE: Only added a set for this one because I am just coding to the PingPongTest at this point.
+		setDestAddr(destAddr, this.handle);
+	}
+	private native void setDestAddr(String destAddr, long infoHandle);
 }
