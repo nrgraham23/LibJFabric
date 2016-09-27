@@ -33,7 +33,7 @@
 #include "org_ofi_libjfabric_Fabric.h"
 #include "libfabric.h"
 
-JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_endPointOpen
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 	(JNIEnv *env, jobject jthis, jlong domHandle, jlong infoHandle, jlong contextHandle)
 {
 	struct fid_ep *endPoint = (struct fid_ep *)calloc(1, sizeof(struct fid_ep));
@@ -49,4 +49,22 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_endPointOpen
 		exit(1);
 	}
 	return (jlong)endPoint;
+}
+
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
+	(JNIEnv *env, jobject jthis, jlong domHandle, jlong infoHandle)
+{
+struct fid_ep *endPoint = (struct fid_ep *)calloc(1, sizeof(struct fid_ep));
+
+ep_list[ep_list_tail] = endPoint;
+ep_list_tail++;
+
+int res = ((struct fid_domain *)domHandle)->ops->endpoint((struct fid_domain *)domHandle,
+		(struct fi_info *)infoHandle, &endPoint, NULL);
+
+if(res) {
+	printf("Error opening endPoint: %d\n", res);
+	exit(1);
+}
+return (jlong)endPoint;
 }

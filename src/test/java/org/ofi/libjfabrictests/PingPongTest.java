@@ -127,6 +127,7 @@ public class PingPongTest {
 
 		long remote_fi_addr;
 		Buffer buf, tx_buf, rx_buf;
+		long buf_size, tx_size, rx_size;
 
 		int timeout;
 		//struct timespec start, end;  TODO:probably need this later on
@@ -904,7 +905,7 @@ ssize_t pp_rx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
 		if (ret)
 			return ret;
 	}
-	/* TODO: verify CQ data, if available */
+	/* TODO: verify CQ data, if available */ //todo from test, not mine
 
 	/* Ignore the size arg. Post a buffer large enough to handle all message
 	 * sizes. pp_sync() makes use of pp_rx() and gets called in tests just
@@ -942,57 +943,52 @@ uint64_t pp_init_cq_data(struct fi_info *info)
 		       ((0x1ULL << (info->domain_attr->cq_data_size * 8)) - 1);
 	}
 }
+	 */
+	private void pp_alloc_msgs(CTPingPong ct) {
+		long alignment = 1;
 
-int pp_alloc_msgs(struct ct_pingpong *ct)
-{
-	int ret;
-	long alignment = 1;
+		ct.tx_size = ((ct.opts.options & PP_OPT_SIZE) != 0) ? ct.opts.transfer_size : PP_MAX_DATA_MSG;
+		if (ct.tx_size > ct.fi.getEndPointAttr().getMaxMsgSize())
+			ct.tx_size = ct.fi.getEndPointAttr().getMaxMsgSize();
 
-	ct->tx_size = ct->opts.options & PP_OPT_SIZE ? ct->opts.transfer_size
-						     : PP_MAX_DATA_MSG;
-	if (ct->tx_size > ct->fi->ep_attr->max_msg_size)
-		ct->tx_size = ct->fi->ep_attr->max_msg_size;
-	ct->rx_size = ct->tx_size;
-	ct->buf_size = MAX(ct->tx_size, PP_MAX_CTRL_MSG) +
-		       MAX(ct->rx_size, PP_MAX_CTRL_MSG);
+		ct.rx_size = ct.tx_size; //TODO: duplication?
+		ct.buf_size = Math.max(ct.tx_size, PP_MAX_CTRL_MSG) + Math.max(ct.rx_size, PP_MAX_CTRL_MSG);
 
-	alignment = sysconf(_SC_PAGESIZE);
-	if (alignment < 0) {
-		ret = -errno;
-		PP_PRINTERR("sysconf", ret);
-		return ret;
-	}
-	/* Extra alignment for the second part of the buffer *
-	ct->buf_size += alignment;
-
-	ret = posix_memalign(&(ct->buf), (size_t)alignment, ct->buf_size);
-	if (ret) {
-		PP_PRINTERR("posix_memalign", ret);
-		return ret;
-	}
-	memset(ct->buf, 0, ct->buf_size);
-	ct->rx_buf = ct->buf;
-	ct->tx_buf = (char *)ct->buf + MAX(ct->rx_size, PP_MAX_CTRL_MSG);
-	ct->tx_buf = (void *)(((uintptr_t)ct->tx_buf + alignment - 1) &
-			      ~(alignment - 1));
-
-	ct->remote_cq_data = pp_init_cq_data(ct->fi);
-
-	if (ct->fi->mode & FI_LOCAL_MR) {
-		ret = fi_mr_reg(ct->domain, ct->buf, ct->buf_size,
-				FI_SEND | FI_RECV, 0, PP_MR_KEY, 0, &(ct->mr),
-				NULL);
-		if (ret) {
-			PP_PRINTERR("fi_mr_reg", ret);
+		/*alignment = sysconf(_SC_PAGESIZE); //TODO: Memory alignment area
+		if (alignment < 0) {
+			ret = -errno;
+			PP_PRINTERR("sysconf", ret);
 			return ret;
 		}
-	} else {
-		ct->mr = &(ct->no_mr);
+		/* Extra alignment for the second part of the buffer *
+		ct->buf_size += alignment;
+
+		ret = posix_memalign(&(ct->buf), (size_t)alignment, ct->buf_size); //this is where the buffer is initialized
+		if (ret) {
+			PP_PRINTERR("posix_memalign", ret);
+			return ret;
+		}
+		memset(ct->buf, 0, ct->buf_size);
+		ct->rx_buf = ct->buf;
+		ct->tx_buf = (char *)ct->buf + MAX(ct->rx_size, PP_MAX_CTRL_MSG);
+		ct->tx_buf = (void *)(((uintptr_t)ct->tx_buf + alignment - 1) &
+				~(alignment - 1));
+
+		ct->remote_cq_data = pp_init_cq_data(ct->fi);
+
+		if (ct->fi->mode & FI_LOCAL_MR) {
+			ret = fi_mr_reg(ct->domain, ct->buf, ct->buf_size,
+					FI_SEND | FI_RECV, 0, PP_MR_KEY, 0, &(ct->mr),
+					NULL);
+			if (ret) {
+				PP_PRINTERR("fi_mr_reg", ret);
+				return ret;
+			}
+		} else {
+			ct->mr = &(ct->no_mr);
+		}*/
 	}
-
-	return 0;
-}
-
+	/*
 int pp_open_fabric_res(struct ct_pingpong *ct)
 {
 	int ret;
@@ -1021,55 +1017,26 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 
 	return 0;
 }
-
-int pp_alloc_active_res(struct ct_pingpong *ct, struct fi_info *fi)
-{
-	int ret;
-
-	ret = pp_alloc_msgs(ct);
-	if (ret)
-		return ret;
-
-	if (ct->cq_attr.format == FI_CQ_FORMAT_UNSPEC)
-		ct->cq_attr.format = FI_CQ_FORMAT_CONTEXT;
-
-	ct->cq_attr.wait_obj = FI_WAIT_NONE;
-
-	ct->cq_attr.size = fi->tx_attr->size;
-	ret = fi_cq_open(ct->domain, &(ct->cq_attr), &(ct->txcq), &(ct->txcq));
-	if (ret) {
-		PP_PRINTERR("fi_cq_open", ret);
-		return ret;
-	}
-
-	ct->cq_attr.size = fi->rx_attr->size;
-	ret = fi_cq_open(ct->domain, &(ct->cq_attr), &(ct->rxcq), &(ct->rxcq));
-	if (ret) {
-		PP_PRINTERR("fi_cq_open", ret);
-		return ret;
-	}
-
-	if (fi->ep_attr->type == FI_EP_RDM ||
-	    fi->ep_attr->type == FI_EP_DGRAM) {
-		if (fi->domain_attr->av_type != FI_AV_UNSPEC)
-			ct->av_attr.type = fi->domain_attr->av_type;
-
-		ret = fi_av_open(ct->domain, &(ct->av_attr), &(ct->av), NULL);
-		if (ret) {
-			PP_PRINTERR("fi_av_open", ret);
-			return ret;
-		}
-	}
-
-	ret = fi_endpoint(ct->domain, fi, &(ct->ep), NULL);
-	if (ret) {
-		PP_PRINTERR("fi_endpoint", ret);
-		return ret;
-	}
-
-	return 0;
-}
 	 */
+	private void pp_alloc_active_res(CTPingPong ct, Info fi) {
+		pp_alloc_msgs(ct); //TODO: HERE
+
+		if (ct.cq_attr.getCQFormat() == CQFormat.FI_CQ_FORMAT_UNSPEC)
+			ct.cq_attr.setCQFormat(CQFormat.FI_CQ_FORMAT_CONTEXT);
+
+		ct.cq_attr.setWaitObj(WaitObj.WAIT_NONE);
+
+		ct.cq_attr.setSize(fi.getTransmitAttr().getSize());
+		ct.txcq = ct.domain.cqOpen(ct.cq_attr, new Context(ct.txcq.getHandle())); //this is messy, but i think it will work.  See line below for C version.
+		//fi_cq_open(ct->domain, &(ct->cq_attr), &(ct->txcq), &(ct->txcq));
+
+		ct.cq_attr.setSize(fi.getReceiveAttr().getSize());
+		ct.rxcq = ct.domain.cqOpen(ct.cq_attr, new Context(ct.rxcq.getHandle())); //same as above
+		//fi_cq_open(ct->domain, &(ct->cq_attr), &(ct->rxcq), &(ct->rxcq));
+
+		ct.ep = ct.domain.epOpen(fi);
+	}
+
 	private Info pp_getinfo(CTPingPong ct, Info hints) {
 		long flags = 0;
 
@@ -1148,11 +1115,11 @@ int pp_av_insert(struct fid_av *av, void *addr, size_t count,
 		pp_ctrl_sync(ct);
 
 		if (ct.opts.isServer) {
-			//pp_send_name(ct, ct.pep); TODO: was working here
+			pp_send_name(ct, ct.pep);
 
 		} else {
-			/*ret = pp_recv_name(ct);
-			ret = pp_getinfo(ct, ct->hints, &(ct->fi));*/
+			pp_recv_name(ct);
+			ct.fi = pp_getinfo(ct, ct.hints);
 		}
 	}
 	private void pp_start_server(CTPingPong ct) {
@@ -1173,139 +1140,87 @@ int pp_av_insert(struct fid_av *av, void *addr, size_t count,
 
 		PP_DEBUG("Connected endpoint: server started\n");
 	}
-	/*
+
 	private void pp_server_connect(CTPingPong ct) {
+		EventEntry eventEntry;
+		EQCMEntry eqCMEntry = null;
+		long rd;
+
+		PP_DEBUG("Connected endpoint: connecting server\n");
+		try {
+			pp_exchange_names_connected(ct);
+
+			pp_ctrl_sync(ct);
+
+			/* Listen */
+			eventEntry = ct.eq.sread(-1, 0);
+			if(eventEntry.getClass().isAssignableFrom(EQCMEntry.class) && eqCMEntry.getEQEvent() == EQEvent.FI_CONNREQ) {
+				eqCMEntry = (EQCMEntry)eventEntry;
+			} else {
+				throw new Exception("Unexpected CM event " + eventEntry.getEQEvent() + "\n");
+			}
+
+			ct.fi = eqCMEntry.getInfo();
+
+			ct.domain = ct.fabric.createDomain(ct.fi);
+
+			pp_alloc_active_res(ct, ct.fi);
+
+			/*pp_init_ep(ct);
+
+			PP_DEBUG("accepting\n");
+
+			fi_accept(ct->ep, NULL, 0);
+
+			pp_ctrl_sync(ct);
+
+			/* Accept *
+			rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
+			if (rd != sizeof(entry)) {
+				pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
+			}
+
+			if (event != FI_CONNECTED || entry.fid != &(ct->ep->fid)) {
+				fprintf(stderr, "Unexpected CM event %d fid %p (ep %p)\n",
+						event, entry.fid, ct->ep);
+			}
+
+			PP_DEBUG("Connected endpoint: server connected\n");*/
+		} catch(Exception e) { //better exception handling should be implemented in a more complete version
+			//fi_reject(ct->pep, ct->fi->handle, NULL, 0);
+		}
+	}
+
+	private void pp_client_connect(CTPingPong ct) {
 		EQCMEntry entry;
 		int event;
 		long rd;
 
-		PP_DEBUG("Connected endpoint: connecting server\n");
+		pp_exchange_names_connected(ct);
 
-		ret = pp_exchange_names_connected(ct);
-		if (ret)
-			goto err;
+		/* Check that the remote is still up */
+		pp_ctrl_sync(ct);
 
-		ret = pp_ctrl_sync(ct);
-		if (ret)
-			goto err;
+		/*pp_open_fabric_res(ct);
 
-		/* Listen *
-		rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
-		if (rd != sizeof(entry)) {
-			pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
-			return (int)rd;
-		}
+		pp_alloc_active_res(ct, ct->fi);
 
-		ct->fi = entry.info;
-		if (event != FI_CONNREQ) {
-			fprintf(stderr, "Unexpected CM event %d\n", event);
-			ret = -FI_EOTHER;
-			goto err;
-		}
+		pp_init_ep(ct);
 
-		ret = fi_domain(ct->fabric, ct->fi, &(ct->domain), NULL);
-		if (ret) {
-			PP_PRINTERR("fi_domain", ret);
-			goto err;
-		}
+		fi_connect(ct->ep, ct->rem_name, NULL, 0);
 
-		ret = pp_alloc_active_res(ct, ct->fi);
-		if (ret)
-			goto err;
-
-		ret = pp_init_ep(ct);
-		if (ret)
-			goto err;
-
-		PP_DEBUG("accepting\n");
-
-		ret = fi_accept(ct->ep, NULL, 0);
-		if (ret) {
-			PP_PRINTERR("fi_accept", ret);
-			goto err;
-		}
-
-		ret = pp_ctrl_sync(ct);
-		if (ret)
-			goto err;
-
-		/* Accept *
-		rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
-		if (rd != sizeof(entry)) {
-			pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
-			ret = (int)rd;
-			goto err;
-		}
-
-		if (event != FI_CONNECTED || entry.fid != &(ct->ep->fid)) {
-			fprintf(stderr, "Unexpected CM event %d fid %p (ep %p)\n",
-					event, entry.fid, ct->ep);
-			ret = -FI_EOTHER;
-			goto err;
-		}
-
-		PP_DEBUG("Connected endpoint: server connected\n");
-
-		return 0;
-		err:
-			fi_reject(ct->pep, ct->fi->handle, NULL, 0);
-		return ret;
-	}
-
-	int pp_client_connect(struct ct_pingpong *ct)
-	{
-		struct fi_eq_cm_entry entry;
-		uint32_t event;
-		ssize_t rd;
-		int ret;
-
-		ret = pp_exchange_names_connected(ct);
-		if (ret)
-			return ret;
-
-		/* Check that the remote is still up *
-		ret = pp_ctrl_sync(ct);
-		if (ret)
-			return ret;
-
-		ret = pp_open_fabric_res(ct);
-		if (ret)
-			return ret;
-
-		ret = pp_alloc_active_res(ct, ct->fi);
-		if (ret)
-			return ret;
-
-		ret = pp_init_ep(ct);
-		if (ret)
-			return ret;
-
-		ret = fi_connect(ct->ep, ct->rem_name, NULL, 0);
-		if (ret) {
-			PP_PRINTERR("fi_connect", ret);
-			return ret;
-		}
-
-		ret = pp_ctrl_sync(ct);
-		if (ret)
-			return ret;
+		pp_ctrl_sync(ct);
 
 		/* Connect *
 		rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
 		if (rd != sizeof(entry)) {
 			pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
-			ret = (int)rd;
-			return ret;
 		}
 
 		if (event != FI_CONNECTED || entry.fid != &(ct->ep->fid)) {
 			fprintf(stderr, "Unexpected CM event %d fid %p (ep %p)\n",
 					event, entry.fid, ct->ep);
-			ret = -FI_EOTHER;
-			return ret;
-		}
-
-		return 0;
+		}*/
 	}
 	/*
 int pp_init_fabric(struct ct_pingpong *ct)
@@ -1613,7 +1528,6 @@ out:
 }
 	 */
 	private void run_pingpong_msg(CTPingPong ct) {
-		int ret;
 
 		PP_DEBUG("Selected endpoint: MSG\n");
 
@@ -1623,25 +1537,19 @@ out:
 			pp_start_server(ct);
 		}
 
-		/*if (ct.opts.isServer) { TODO: working here
+		if (ct.opts.isServer) {
 			pp_server_connect(ct);
-			PP_DEBUG("SERVER: server_connect=%s\n", ret ? "KO" : "OK");
+			PP_DEBUG("SERVER: server_connected\n");
 		} else {
 			pp_client_connect(ct);
-			PP_DEBUG("CLIENT: client_connect=%s\n", ret ? "KO" : "OK");
+			PP_DEBUG("CLIENT: client_connected\n");
 		}
 
-		if (ret)
-			return ret;
+		//run_suite_pingpong(ct);
 
-		ret = run_suite_pingpong(ct);
-		if (ret)
-			goto out;
+		//pp_finalize(ct);
 
-		ret = pp_finalize(ct);
-		out:
-			fi_shutdown(ct->ep, 0);
-		return ret;*/
+		//fi_shutdown(ct->ep, 0);
 	}
 
 
