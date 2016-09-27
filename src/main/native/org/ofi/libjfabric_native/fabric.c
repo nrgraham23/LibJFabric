@@ -67,7 +67,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_initFabric2
 	return (jlong)fabric;
 }
 
-JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createDomainJNI
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createDomain
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong infoHandle, jlong contextHandle)
 {
 	struct fid_domain *domain = (struct fid_domain *)calloc(1, sizeof(struct fid_domain));
@@ -82,6 +82,24 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createDomainJNI
 			printf("Error creating domain: %d\n", res);
 			exit(1);
 		}
+	return (jlong)domain;
+}
+
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createDomain2
+	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong infoHandle)
+{
+	struct fid_domain *domain = (struct fid_domain *)calloc(1, sizeof(struct fid_domain)); //TODO: do i need to calloc this or does libfabric do it for me?
+
+	domain_list[domain_list_tail] = domain;
+	domain_list_tail++;
+
+	int res = ((struct fid_fabric *)fabricHandle)->ops->domain((struct fid_fabric *)fabricHandle,
+			(struct fi_info *)infoHandle, &domain, NULL);
+
+	if(res) {
+		printf("Error creating domain: %d\n", res);
+		exit(1);
+	}
 	return (jlong)domain;
 }
 

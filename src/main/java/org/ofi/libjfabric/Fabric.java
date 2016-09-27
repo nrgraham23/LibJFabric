@@ -58,9 +58,14 @@ public class Fabric extends FIDescriptor {
 	}
 	
 	public Domain createDomain(Info info, Context context) {
-		return new Domain(createDomainJNI(this.handle, info.getHandle(), context.getHandle()));
+		return new Domain(createDomain(this.handle, info.getHandle(), context.getHandle()));
 	}
-	private native long createDomainJNI(long fabricHandle, long infoHandle, long contextHandle);
+	private native long createDomain(long fabricHandle, long infoHandle, long contextHandle);
+	
+	public Domain createDomain(Info info) {
+		return new Domain(createDomain2(this.handle, info.getHandle()));
+	}
+	private native long createDomain2(long fabricHandle, long infoHandle);
 	
 	public PassiveEndPoint createPassiveEndPoint(Info info, Context context) {
 		return new PassiveEndPoint(createPassiveEP(this.handle, info.getHandle(), context.getHandle()));
