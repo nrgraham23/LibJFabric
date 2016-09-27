@@ -38,6 +38,8 @@ public class Constant {
 	protected long FI_LOCAL_MR;
 	protected long FI_SOURCE;
 	protected long FI_MSG;
+	protected long FI_TRANSMIT;
+	protected long FI_RECV;
 	
 	protected Constant() {
 		setConstant();

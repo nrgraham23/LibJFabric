@@ -33,7 +33,7 @@
 #include "libfabric.h"
 #include "org_ofi_libjfabric_EndPoint.h"
 
-JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Domain_send4
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_send4
 	(JNIEnv *env, jobject jthis, jlong epHandle, jobject buffer, jint length, jlong destAddress)
 {
 	void *ptr = getDirectBufferAddress(env, buffer);
@@ -41,10 +41,16 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Domain_send4
 	((struct fid_ep *)epHandle)->msg->send((struct fid_ep *)epHandle, &ptr, length, NULL, destAddress, NULL);
 }
 
-JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Domain_recv5
-	(JNIEnv *env, jobject jthis, jlong epHandle, jobject buffer, jint length, jlong destAddress)
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_recv5
+	(JNIEnv *env, jobject jthis, jlong epHandle, jobject buffer, jint length)
 {
 	void *ptr = getDirectBufferAddress(env, buffer);
 
 	((struct fid_ep *)epHandle)->msg->recv((struct fid_ep *)epHandle, &ptr, length, NULL, FI_ADDR_UNSPEC, NULL);
+}
+
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_enable
+	(JNIEnv *env, jobject jthis, jlong epHandle)
+{
+	fi_enable((struct fid_ep *)epHandle);
 }

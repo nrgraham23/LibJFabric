@@ -78,11 +78,8 @@ public class EndPoint extends EndPointSharedOps {
 	}
 	private native void send4(long handle, Buffer buffer, int length, long destAddress);
 	
-	public void setName(String name) {
-		throw new UnsupportedOperationException("Not implemented yet!");
+	public void enable() {
+		enable(this.handle);
 	}
-	
-	public String getName() {
-		throw new UnsupportedOperationException("Not implemented yet!");
-	}
+	private native void enable(long handle);
 }

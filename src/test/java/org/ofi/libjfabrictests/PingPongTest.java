@@ -130,7 +130,7 @@ public class PingPongTest {
 		long buf_size, tx_size, rx_size;
 
 		int timeout;
-		//struct timespec start, end;  TODO:probably need this later on
+		long start, end;
 
 		EventQueueAttr eq_attr;
 		CQAttr cq_attr;
@@ -328,7 +328,7 @@ public class PingPongTest {
 
 	private void pp_recv_name(CTPingPong ct) {
 
-		//PP_DEBUG("Receiving name length\n");
+		//PP_DEBUG("Receiving name length\n"); //sending length not needed in java
 		//pp_ctrl_recv(ct, (char *) &len, sizeof(len));
 
 		//len = ntohl(len);
@@ -448,85 +448,74 @@ public class PingPongTest {
 
 	/*******************************************************************************
 	 *                                         Options
-	 ******************************************************************************
+	 ******************************************************************************/
 
-static inline void pp_start(struct ct_pingpong *ct)
-{
-	PP_DEBUG("Starting test chrono\n");
-	ct->opts.options |= PP_OPT_ACTIVE;
-	clock_gettime(CLOCK_MONOTONIC, &(ct->start));
-}
-
-static inline void pp_stop(struct ct_pingpong *ct)
-{
-	clock_gettime(CLOCK_MONOTONIC, &(ct->end));
-	ct->opts.options &= ~PP_OPT_ACTIVE;
-	PP_DEBUG("Stopped test chrono\n");
-}
-
-static inline int pp_check_opts(struct ct_pingpong *ct, uint64_t flags)
-{
-	return (ct->opts.options & flags) == flags;
-}
-
-/*******************************************************************************
-	 *                                         Data Verification
-	 ******************************************************************************
-
-void pp_fill_buf(void *buf, int size)
-{
-	char *msg_buf;
-	int msg_index;
-	static unsigned int iter;
-	int i;
-
-	msg_index = ((iter++) * INTEG_SEED) % integ_alphabet_length;
-	msg_buf = (char *)buf;
-	for (i = 0; i < size; i++) {
-		PP_DEBUG("index=%d msg_index=%d\n", i, msg_index);
-		msg_buf[i] = integ_alphabet[msg_index++];
-		if (msg_index >= integ_alphabet_length)
-			msg_index = 0;
+	private void pp_start(CTPingPong ct) {
+		PP_DEBUG("Starting test chrono\n");
+		ct.opts.options |= PP_OPT_ACTIVE;
+		ct.start = System.nanoTime();
 	}
-}
 
-int pp_check_buf(void *buf, int size)
-{
-	char *recv_data;
-	char c;
-	static unsigned int iter;
-	int msg_index;
-	int i;
+	private void pp_stop(CTPingPong ct) {
+		ct.end = System.nanoTime();
+		ct.opts.options &= ~PP_OPT_ACTIVE;
+		PP_DEBUG("Stopped test chrono\n");
+	}
 
-	PP_DEBUG("Verifying buffer content\n");
+	private boolean pp_check_opts(CTPingPong ct, long flags) {
+		return (ct.opts.options & flags) == flags;
+	}
 
-	msg_index = ((iter++) * INTEG_SEED) % integ_alphabet_length;
-	recv_data = (char *)buf;
+	/*******************************************************************************
+	 *                                         Data Verification
+	 ******************************************************************************/
 
-	for (i = 0; i < size; i++) {
-		c = integ_alphabet[msg_index++];
-		if (msg_index >= integ_alphabet_length)
-			msg_index = 0;
-		if (c != recv_data[i]) {
-			PP_DEBUG("index=%d msg_index=%d expected=%d got=%d\n",
-				 i, msg_index, c, recv_data[i]);
-			break;
+	private void pp_fill_buf(ByteBuffer buf) {
+		int msg_index;
+		int iter = 0;
+
+		msg_index = ((iter++) * INTEG_SEED) % integ_alphabet.length;
+
+		for (int i = 0; i < buf.capacity(); i++) {
+			PP_DEBUG("index=%d msg_index=%d\n", i, msg_index);
+			buf.put(i, integ_alphabet[msg_index++]);
+			if (msg_index >= integ_alphabet.length)
+				msg_index = 0;
 		}
 	}
-	if (i != size) {
-		PP_DEBUG("Finished veryfing buffer: content is corrupted\n");
-		printf("Error at iteration=%d size=%d byte=%d\n", iter, size,
-		       i);
-		return 1;
+
+	private boolean pp_check_buf(ByteBuffer buf) {
+		byte c;
+		int iter = 0;
+		int msg_index, i;
+
+		PP_DEBUG("Verifying buffer content\n");
+
+		msg_index = ((iter++) * INTEG_SEED) % integ_alphabet.length;
+
+		for (i = 0; i < buf.capacity(); i++) {
+			c = integ_alphabet[msg_index++];
+			if (msg_index >= integ_alphabet.length)
+				msg_index = 0;
+			if (c != buf.get(i)) {
+				PP_DEBUG("index=%d msg_index=%d expected=%d got=%d\n",
+						i, msg_index, c, buf.get(i));
+				break;
+			}
+		}
+		if (i != buf.capacity()) {
+			PP_DEBUG("Finished veryfing buffer: content is corrupted\n");
+			System.err.printf("Error at iteration=%d size=%d byte=%d\n", iter, buf.capacity(), i);
+			return false;
+		}
+
+		PP_DEBUG("Buffer verified\n");
+
+		return true;
 	}
 
-	PP_DEBUG("Buffer verified\n");
 
-	return 0;
-}
-
-
-/*******************************************************************************
+	/*******************************************************************************
 	 *                                         Error handling
 	 ******************************************************************************
 
@@ -810,34 +799,33 @@ int pp_get_tx_comp(struct ct_pingpong *ct, uint64_t total)
 	}
 	return ret;
 }
+	 * TODO: AND HERE
+	private void PP_POST(post_fn, comp_fn, seq, op_str, ...) {
+		int timeout_save;
+		int ret, rc;
 
-#define PP_POST(post_fn, comp_fn, seq, op_str, ...)                            \
-	do {                                                                   \
-		int timeout_save;                                              \
-		int ret, rc;                                                   \
-									       \
-		while (1) {                                                    \
-			ret = post_fn(__VA_ARGS__);                            \
-			if (!ret)                                              \
-				break;                                         \
-									       \
-			if (ret != -FI_EAGAIN) {                               \
-				PP_PRINTERR(op_str, ret);                      \
-				return ret;                                    \
-			}                                                      \
-									       \
-			timeout_save = ct->timeout;                            \
-			ct->timeout = 0;                                       \
-			rc = comp_fn(ct, seq);                                 \
-			ct->timeout = timeout_save;                            \
-			if (rc && rc != -FI_EAGAIN) {                          \
-				PP_ERR("Failed to get " op_str " completion"); \
-				return rc;                                     \
-			}                                                      \
-		}                                                              \
-		seq++;                                                         \
-	} while (0)
+		while (true) {
+			ret = post_fn(__VA_ARGS__);
+			if (!ret)
+				break;
 
+			if (ret != -FI_EAGAIN) {
+				PP_PRINTERR(op_str, ret);
+				return ret;
+			}
+
+			timeout_save = ct->timeout;
+			ct->timeout = 0;
+			rc = comp_fn(ct, seq);
+			ct->timeout = timeout_save;
+			if (rc && rc != -FI_EAGAIN) {
+				PP_ERR("Failed to get " op_str " completion");
+				return rc;
+			}
+		}
+		seq++;
+	}
+	/*
 ssize_t pp_post_tx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size,
 		   struct fi_context *ctx)
 {
@@ -883,15 +871,12 @@ ssize_t pp_inject(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
 
 	return ret;
 }
-
-ssize_t pp_post_rx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size,
-		   struct fi_context *ctx)
-{
-	PP_POST(fi_recv, pp_get_rx_comp, ct->rx_seq, "receive", ep, ct->rx_buf,
-		MAX(size, PP_MAX_CTRL_MSG), fi_mr_desc(ct->mr), 0, ctx);
-	return 0;
-}
-
+	 * TODO: HERE TOO
+	private void pp_post_rx(CTPingPong ct, EndPoint ep, long size, Context ctx) {
+		PP_POST(fi_recv, pp_get_rx_comp, ct->rx_seq, "receive", ep, ct->rx_buf,
+				MAX(size, PP_MAX_CTRL_MSG), fi_mr_desc(ct->mr), 0, ctx);
+	}
+	/*
 ssize_t pp_rx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
 {
 	ssize_t ret;
@@ -1045,70 +1030,56 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 
 		return LibFabric.getInfo(version, flags, hints)[0];
 	}
-	/*
-#define PP_EP_BIND(ep, fd, flags)                                              \
-	do {                                                                   \
-		int ret;                                                       \
-		if ((fd)) {                                                    \
-			ret = fi_ep_bind((ep), &(fd)->fid, (flags));           \
-			if (ret) {                                             \
-				PP_PRINTERR("fi_ep_bind", ret);                \
-				return ret;                                    \
-			}                                                      \
-		}                                                              \
-	} while (0)
 
-int pp_init_ep(struct ct_pingpong *ct)
-{
-	int ret;
+	/*private void PP_EP_BIND(EndPoint ep, EventQueue fd, long flags) {TODO: delete this when done
+		if ((fd)) {
+			ret = fi_ep_bind((ep), &(fd)->fid, (flags));
+			if (ret) {
+				PP_PRINTERR("fi_ep_bind", ret);
+				return ret;
+			}
+		}
+	} while (0)*/
 
-	PP_DEBUG("Initializing endpoint\n");
+	private void pp_init_ep(CTPingPong ct) {
+		PP_DEBUG("Initializing endpoint\n");
 
-	if (ct->fi->ep_attr->type == FI_EP_MSG)
-		PP_EP_BIND(ct->ep, ct->eq, 0);
-	PP_EP_BIND(ct->ep, ct->av, 0);
-	PP_EP_BIND(ct->ep, ct->txcq, FI_TRANSMIT);
-	PP_EP_BIND(ct->ep, ct->rxcq, FI_RECV);
+		if (ct.fi.getEndPointAttr().getEpType() == EPType.FI_EP_MSG)
+			ct.ep.bind(ct.eq, 0);
+		ct.ep.bind(ct.av, 0);
+		ct.ep.bind(ct.txcq, LibFabric.FI_TRANSMIT);
+		ct.ep.bind(ct.rxcq, LibFabric.FI_RECV);
 
-	ret = fi_enable(ct->ep);
-	if (ret) {
-		PP_PRINTERR("fi_enable", ret);
-		return ret;
+		ct.ep.enable();
+
+		//pp_post_rx(ct, ct.ep, Math.max(ct.rx_size, PP_MAX_CTRL_MSG), ct.rx_ctx); TODO: uncomment!
+
+		PP_DEBUG("Endpoint initialzed\n");
 	}
+/* TODO: working here
+	int pp_av_insert(struct fid_av *av, void *addr, size_t count,
+			fi_addr_t *fi_addr, uint64_t flags, void *context)
+	{
+		int ret;
 
-	ret = pp_post_rx(ct, ct->ep, MAX(ct->rx_size, PP_MAX_CTRL_MSG),
-			 &(ct->rx_ctx));
-	if (ret)
-		return ret;
+		PP_DEBUG("Connection-less endpoint: inserting new address in vector\n");
 
-	PP_DEBUG("Endpoint initialzed\n");
+		ret = fi_av_insert(av, addr, count, fi_addr, flags, context);
+		if (ret < 0) {
+			PP_PRINTERR("fi_av_insert", ret);
+			return ret;
+		} else if (ret != count) {
+			PP_ERR("fi_av_insert: number of addresses inserted = %d;"
+					" number of addresses given = %zd\n",
+					ret, count);
+			return -EXIT_FAILURE;
+		}
 
-	return 0;
-}
+		PP_DEBUG("Connection-less endpoint: new address inserted in vector\n");
 
-int pp_av_insert(struct fid_av *av, void *addr, size_t count,
-		 fi_addr_t *fi_addr, uint64_t flags, void *context)
-{
-	int ret;
-
-	PP_DEBUG("Connection-less endpoint: inserting new address in vector\n");
-
-	ret = fi_av_insert(av, addr, count, fi_addr, flags, context);
-	if (ret < 0) {
-		PP_PRINTERR("fi_av_insert", ret);
-		return ret;
-	} else if (ret != count) {
-		PP_ERR("fi_av_insert: number of addresses inserted = %d;"
-		       " number of addresses given = %zd\n",
-		       ret, count);
-		return -EXIT_FAILURE;
+		return 0;
 	}
-
-	PP_DEBUG("Connection-less endpoint: new address inserted in vector\n");
-
-	return 0;
-}
-	 */
+	*/
 	private void pp_exchange_names_connected(CTPingPong ct) {
 		PP_DEBUG("Connection-based endpoint: setting up connection\n");
 
@@ -1166,11 +1137,11 @@ int pp_av_insert(struct fid_av *av, void *addr, size_t count,
 
 			pp_alloc_active_res(ct, ct.fi);
 
-			/*pp_init_ep(ct);
+			pp_init_ep(ct);
 
 			PP_DEBUG("accepting\n");
 
-			fi_accept(ct->ep, NULL, 0);
+			//fi_accept(ct->ep, NULL, 0);
 
 			pp_ctrl_sync(ct);
 
