@@ -34,10 +34,10 @@
 #include "libfabric.h"
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_initDomainAttr
-(JNIEnv *env, jobject jthis, jstring name, jint jthreading, jint jcntrlProgress, jint jdataProgress,
-		jint jresourceMgmt, jint javType, jint jmrMode, jint jmrKeySize, jint jcqDataSize, jint jcqCnt,
-		jint jepCnt, jint jtxCtxCnt, jint jrxCtxCnt, jint jmaxEpTxCtx, jint jmaxEpRxCtx,
-		jint jmaxEpStxCtx, jint jmaxEpSrxCtx)
+(JNIEnv *env, jobject jthis, jstring name, jlong jthreading, jlong jcntrlProgress, jlong jdataProgress,
+		jlong jresourceMgmt, jlong javType, jlong jmrMode, jlong jmrKeySize, jlong jcqDataSize, jlong jcqCnt,
+		jlong jepCnt, jlong jtxCtxCnt, jlong jrxCtxCnt, jlong jmaxEpTxCtx, jlong jmaxEpRxCtx,
+		jlong jmaxEpStxCtx, jlong jmaxEpSrxCtx)
 {
 	struct fi_domain_attr *domain_attr = (struct fi_domain_attr*)calloc(1, sizeof(struct fi_domain_attr));
 
@@ -82,100 +82,100 @@ JNIEXPORT jstring JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getName
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getThreading
 (JNIEnv *env, jobject jthis, jlong handle)
 {
-	int threading = ((struct fi_domain_attr*)handle)->threading;
+	long threading = ((struct fi_domain_attr*)handle)->threading;
 	return (*env)->CallObjectMethod(env, lib_globals.ThreadingClass, lib_globals.GetThreading, threading);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getCntrlProgress
 (JNIEnv *env, jobject jthis, jlong handle)
 {
-	int cntrlProgress = ((struct fi_domain_attr*)handle)->control_progress;
+	long cntrlProgress = ((struct fi_domain_attr*)handle)->control_progress;
 	return (*env)->CallObjectMethod(env, lib_globals.ProgressClass, lib_globals.GetProgress, cntrlProgress);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getdataProgress
 (JNIEnv *env, jobject jthis, jlong handle)
 {
-	int dataProgress = ((struct fi_domain_attr*)handle)->data_progress;
+	long dataProgress = ((struct fi_domain_attr*)handle)->data_progress;
 	return (*env)->CallObjectMethod(env, lib_globals.ProgressClass, lib_globals.GetProgress, dataProgress);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getResourceMgmt
 (JNIEnv *env, jobject jthis, jlong handle)
 {
-	int resourceMgmt = ((struct fi_domain_attr*)handle)->resource_mgmt;
+	long resourceMgmt = ((struct fi_domain_attr*)handle)->resource_mgmt;
 	return (*env)->CallObjectMethod(env, lib_globals.ResourceMgmtClass, lib_globals.GetResourceMgmt, resourceMgmt);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getAVType
 (JNIEnv *env, jobject jthis, jlong handle)
 {
-	int avType = ((struct fi_domain_attr*)handle)->av_type;
+	long avType = ((struct fi_domain_attr*)handle)->av_type;
 	return (*env)->CallObjectMethod(env, lib_globals.AVTypeClass, lib_globals.GetAVType, avType);
 }
 
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMRMode
 (JNIEnv *env, jobject jthis, jlong handle)
 {
-	int mrMode = ((struct fi_domain_attr*)handle)->mr_mode;
+	long mrMode = ((struct fi_domain_attr*)handle)->mr_mode;
 	return (*env)->CallObjectMethod(env, lib_globals.MRModeClass, lib_globals.GetMRMode, mrMode);
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMrKeySize
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMrKeySize
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->mr_key_size;
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getCQDataSize
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getCQDataSize
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->cq_data_size;
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getCQCnt
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getCQCnt
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->cq_cnt;
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getEndPointCnt
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getEndPointCnt
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->ep_cnt;
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getTxCtxCnt
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getTxCtxCnt
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->tx_ctx_cnt;
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getRxCtxCnt
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getRxCtxCnt
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->rx_ctx_cnt;
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMaxEpTxCtx
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMaxEpTxCtx
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->max_ep_tx_ctx;
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMaxEpRxCtx
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMaxEpRxCtx
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->max_ep_rx_ctx;
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMaxEpStxCtx
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMaxEpStxCtx
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->max_ep_stx_ctx;
 }
 
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMaxEpSrxCtx
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_getMaxEpSrxCtx
 (JNIEnv *env, jobject jthis, jlong handle)
 {
 	return ((struct fi_domain_attr*)handle)->max_ep_srx_ctx;
@@ -188,97 +188,97 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setName
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setThreading
-(JNIEnv *env, jobject jthis, jint jthreading, jlong handle)
+(JNIEnv *env, jobject jthis, jlong jthreading, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->threading = jthreading;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setCntrlProgress
-(JNIEnv *env, jobject jthis, jint cntrlProgress, jlong handle)
+(JNIEnv *env, jobject jthis, jlong cntrlProgress, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->control_progress = cntrlProgress;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setDataProgress
-(JNIEnv *env, jobject jthis, jint dataProgress, jlong handle)
+(JNIEnv *env, jobject jthis, jlong dataProgress, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->data_progress = dataProgress;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setResourceMgmt
-(JNIEnv *env, jobject jthis, jint resourceMgmt, jlong handle)
+(JNIEnv *env, jobject jthis, jlong resourceMgmt, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->resource_mgmt = resourceMgmt;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setAVType
-(JNIEnv *env, jobject jthis, jint avType, jlong handle)
+(JNIEnv *env, jobject jthis, jlong avType, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->av_type = avType;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setMRMode
-(JNIEnv *env, jobject jthis, jint mrMode, jlong handle)
+(JNIEnv *env, jobject jthis, jlong mrMode, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->mr_mode = mrMode;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setMRKeySize
-(JNIEnv *env, jobject jthis, jint mrKeySize, jlong handle)
+(JNIEnv *env, jobject jthis, jlong mrKeySize, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->mr_key_size = mrKeySize;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setCQDataSize
-(JNIEnv *env, jobject jthis, jint cqDataSize, jlong handle)
+(JNIEnv *env, jobject jthis, jlong cqDataSize, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->cq_data_size = cqDataSize;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setCQCnt
-(JNIEnv *env, jobject jthis, jint cqCnt, jlong handle)
+(JNIEnv *env, jobject jthis, jlong cqCnt, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->cq_cnt = cqCnt;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setEndpointCnt
-(JNIEnv *env, jobject jthis, jint endpointCnt, jlong handle)
+(JNIEnv *env, jobject jthis, jlong endpointCnt, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->ep_cnt = endpointCnt;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setTxCtxCnt
-(JNIEnv *env, jobject jthis, jint txCtxCnt, jlong handle)
+(JNIEnv *env, jobject jthis, jlong txCtxCnt, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->tx_ctx_cnt = txCtxCnt;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setRxCtxCnt
-(JNIEnv *env, jobject jthis, jint rxCtxCnt, jlong handle)
+(JNIEnv *env, jobject jthis, jlong rxCtxCnt, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->rx_ctx_cnt = rxCtxCnt;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setMaxEpTxCtx
-(JNIEnv *env, jobject jthis, jint maxEpTxCtx, jlong handle)
+(JNIEnv *env, jobject jthis, jlong maxEpTxCtx, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->max_ep_tx_ctx = maxEpTxCtx;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setMaxEpRxCtx
-(JNIEnv *env, jobject jthis, jint maxEpRxCtx, jlong handle)
+(JNIEnv *env, jobject jthis, jlong maxEpRxCtx, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->max_ep_rx_ctx = maxEpRxCtx;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setMaxEpStxCtx
-(JNIEnv *env, jobject jthis, jint maxEpStxCtx, jlong handle)
+(JNIEnv *env, jobject jthis, jlong maxEpStxCtx, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->max_ep_stx_ctx = maxEpStxCtx;
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_attributes_DomainAttr_setMaxEpSrxCtx
-(JNIEnv *env, jobject jthis, jint maxEpSrxCtx, jlong handle)
+(JNIEnv *env, jobject jthis, jlong maxEpSrxCtx, jlong handle)
 {
 	((struct fi_domain_attr*)handle)->max_ep_srx_ctx = maxEpSrxCtx;
 }

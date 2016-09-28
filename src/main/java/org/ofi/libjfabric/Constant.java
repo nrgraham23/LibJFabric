@@ -40,6 +40,7 @@ public class Constant {
 	protected long FI_MSG;
 	protected long FI_TRANSMIT;
 	protected long FI_RECV;
+	protected long FI_SEND;
 	
 	protected Constant() {
 		setConstant();

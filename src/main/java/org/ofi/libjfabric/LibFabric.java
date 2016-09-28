@@ -42,6 +42,7 @@ public class LibFabric {
 	public static final long FI_MSG;
 	public static final long FI_TRANSMIT;
 	public static final long FI_RECV;
+	public static final long FI_SEND;
 
 	static {
 		System.loadLibrary("jfab_native");
@@ -54,6 +55,7 @@ public class LibFabric {
 		FI_MSG = c.FI_MSG;
 		FI_TRANSMIT = c.FI_TRANSMIT;
 		FI_RECV = c.FI_RECV;
+		FI_SEND = c.FI_SEND;
 	}
 	
 	public static void loadVerbose() {
