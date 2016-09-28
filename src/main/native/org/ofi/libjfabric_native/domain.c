@@ -54,17 +54,34 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 	(JNIEnv *env, jobject jthis, jlong domHandle, jlong infoHandle)
 {
-struct fid_ep *endPoint = (struct fid_ep *)calloc(1, sizeof(struct fid_ep));
+	struct fid_ep *endPoint = (struct fid_ep *)calloc(1, sizeof(struct fid_ep));
 
-ep_list[ep_list_tail] = endPoint;
-ep_list_tail++;
+	ep_list[ep_list_tail] = endPoint;
+	ep_list_tail++;
 
-int res = ((struct fid_domain *)domHandle)->ops->endpoint((struct fid_domain *)domHandle,
-		(struct fi_info *)infoHandle, &endPoint, NULL);
+	int res = ((struct fid_domain *)domHandle)->ops->endpoint((struct fid_domain *)domHandle,
+			(struct fi_info *)infoHandle, &endPoint, NULL);
 
-if(res) {
-	printf("Error opening endPoint: %d\n", res);
-	exit(1);
+	if(res) {
+		printf("Error opening endPoint: %d\n", res);
+		exit(1);
+	}
+	return (jlong)endPoint;
 }
-return (jlong)endPoint;
+
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_mrRegister
+	(JNIEnv *env, jobject jthis, jlong domHandle, jobject buf, jlong length, jlong access, jlong requestedKey)
+{
+	void *ptr = getDirectBufferAddress(env, buffer);
+	
+	struct fid_mr *mr; //TODO: A place for memory management code (not adding now because I will just do the free manually).
+	
+	int res = ((struct fid_domain *)domHandle)->mr->reg((struct fid_domain *)domHandle, ptr, length, access, 0, 
+			requestedKey, 0, &mr, NULL);
+	
+	if(res) {
+		printf("Error registering memory region: %d\n", res);
+		exit(1);
+	}
+	return (jlong)mr;
 }

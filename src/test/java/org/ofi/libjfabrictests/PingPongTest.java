@@ -71,7 +71,7 @@ public class PingPongTest {
 	final int PP_STR_LEN = 32;
 	final int PP_MAX_CTRL_MSG = 64;
 	final int PP_CTRL_BUF_LEN = 64;
-	final int PP_MR_KEY = 49374;
+	final long PP_MR_KEY = 49374;
 
 	final int INTEG_SEED = 7;
 	final int PP_ENABLE_ALL = ~0;
@@ -126,7 +126,7 @@ public class PingPongTest {
 		long tx_seq, rx_seq, tx_cq_cntr, rx_cq_cntr;
 
 		long remote_fi_addr;
-		Buffer buf, tx_buf, rx_buf;
+		ByteBuffer buf, tx_buf, rx_buf;
 		long buf_size, tx_size, rx_size;
 
 		int timeout;
@@ -799,7 +799,7 @@ int pp_get_tx_comp(struct ct_pingpong *ct, uint64_t total)
 	}
 	return ret;
 }
-	 * TODO: AND HERE
+	 * TODO:HERE
 	private void PP_POST(post_fn, comp_fn, seq, op_str, ...) {
 		int timeout_save;
 		int ret, rc;
@@ -871,10 +871,38 @@ ssize_t pp_inject(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
 
 	return ret;
 }
-	 * TODO: HERE TOO
+	 */
 	private void pp_post_rx(CTPingPong ct, EndPoint ep, long size, Context ctx) {
-		PP_POST(fi_recv, pp_get_rx_comp, ct->rx_seq, "receive", ep, ct->rx_buf,
+		/*PP_POST(fi_recv, pp_get_rx_comp, ct->rx_seq, "receive", ep, ct->rx_buf,
 				MAX(size, PP_MAX_CTRL_MSG), fi_mr_desc(ct->mr), 0, ctx);
+
+		int timeout_save;
+		int rc;
+
+		while (true) { //TODO:HERE
+			try {
+				ep.recv(ct.rx_buf, Math.max(size, PP_MAX_CTRL_MSG),);
+			} catch (Exception e) {
+
+			}
+			if (!ret)
+				break;
+
+			if (ret != -FI_EAGAIN) {
+				PP_PRINTERR(op_str, ret);
+				return ret;
+			}
+
+			timeout_save = ct->timeout;
+			ct->timeout = 0;
+			rc = comp_fn(ct, seq);
+			ct->timeout = timeout_save;
+			if (rc && rc != -FI_EAGAIN) {
+				PP_ERR("Failed to get " op_str " completion");
+				return rc;
+			}
+		}
+		seq++;*/
 	}
 	/*
 ssize_t pp_rx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
@@ -918,17 +946,15 @@ void init_test(struct ct_pingpong *ct, struct pp_opts *opts)
 
 	ct->cnt_ack_msg = 0;
 }
-
-uint64_t pp_init_cq_data(struct fi_info *info)
-{
-	if (info->domain_attr->cq_data_size >= sizeof(uint64_t)) {
-		return 0x0123456789abcdefULL;
-	} else {
-		return 0x0123456789abcdefULL &
-		       ((0x1ULL << (info->domain_attr->cq_data_size * 8)) - 1);
-	}
-}
 	 */
+	private long pp_init_cq_data(Info info) {
+		if (info.getDomainAttr().getCQDataSize() >= Long.MAX_VALUE) {
+			return 81985529216486895L;
+		} else {
+			return 81985529216486895L & ((1 << (info.getDomainAttr().getCQDataSize() * 8)) - 1);
+		}
+	}
+
 	private void pp_alloc_msgs(CTPingPong ct) {
 		long alignment = 1;
 
@@ -958,20 +984,14 @@ uint64_t pp_init_cq_data(struct fi_info *info)
 		ct->tx_buf = (char *)ct->buf + MAX(ct->rx_size, PP_MAX_CTRL_MSG);
 		ct->tx_buf = (void *)(((uintptr_t)ct->tx_buf + alignment - 1) &
 				~(alignment - 1));
+		 */
+		ct.remote_cq_data = pp_init_cq_data(ct.fi);
 
-		ct->remote_cq_data = pp_init_cq_data(ct->fi);
-
-		if (ct->fi->mode & FI_LOCAL_MR) {
-			ret = fi_mr_reg(ct->domain, ct->buf, ct->buf_size,
-					FI_SEND | FI_RECV, 0, PP_MR_KEY, 0, &(ct->mr),
-					NULL);
-			if (ret) {
-				PP_PRINTERR("fi_mr_reg", ret);
-				return ret;
-			}
+		if ((ct.fi.getMode() & LibFabric.FI_LOCAL_MR) != 0) {
+			ct.mr = ct.domain.mrRegister(ct.buf, (LibFabric.FI_SEND | LibFabric.FI_RECV), PP_MR_KEY);
 		} else {
-			ct->mr = &(ct->no_mr);
-		}*/
+			ct.mr = ct.no_mr; //TODO: looks like this can be null if I want.  Delete ct.no_mr in that case
+		}
 	}
 	/*
 int pp_open_fabric_res(struct ct_pingpong *ct)
@@ -1004,7 +1024,7 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 }
 	 */
 	private void pp_alloc_active_res(CTPingPong ct, Info fi) {
-		pp_alloc_msgs(ct); //TODO: HERE
+		pp_alloc_msgs(ct);
 
 		if (ct.cq_attr.getCQFormat() == CQFormat.FI_CQ_FORMAT_UNSPEC)
 			ct.cq_attr.setCQFormat(CQFormat.FI_CQ_FORMAT_CONTEXT);
@@ -1031,16 +1051,6 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 		return LibFabric.getInfo(version, flags, hints)[0];
 	}
 
-	/*private void PP_EP_BIND(EndPoint ep, EventQueue fd, long flags) {TODO: delete this when done
-		if ((fd)) {
-			ret = fi_ep_bind((ep), &(fd)->fid, (flags));
-			if (ret) {
-				PP_PRINTERR("fi_ep_bind", ret);
-				return ret;
-			}
-		}
-	} while (0)*/
-
 	private void pp_init_ep(CTPingPong ct) {
 		PP_DEBUG("Initializing endpoint\n");
 
@@ -1052,12 +1062,12 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 
 		ct.ep.enable();
 
-		//pp_post_rx(ct, ct.ep, Math.max(ct.rx_size, PP_MAX_CTRL_MSG), ct.rx_ctx); TODO: uncomment!
+		pp_post_rx(ct, ct.ep, Math.max(ct.rx_size, PP_MAX_CTRL_MSG), ct.rx_ctx);
 
 		PP_DEBUG("Endpoint initialzed\n");
 	}
-/* TODO: working here
-	int pp_av_insert(struct fid_av *av, void *addr, size_t count,
+
+	/*int pp_av_insert(struct fid_av *av, void *addr, size_t count, //TODO:HERE
 			fi_addr_t *fi_addr, uint64_t flags, void *context)
 	{
 		int ret;
@@ -1078,8 +1088,8 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 		PP_DEBUG("Connection-less endpoint: new address inserted in vector\n");
 
 		return 0;
-	}
-	*/
+	}*/
+
 	private void pp_exchange_names_connected(CTPingPong ct) {
 		PP_DEBUG("Connection-based endpoint: setting up connection\n");
 
@@ -1547,8 +1557,8 @@ out:
 
 		tester.pp_banner_options(ct);
 
-		ct.hints.setCaps(1);//caps = FI_MSG; ask for input on these types of values.
-		ct.hints.setMode(LibFabric.FI_LOCAL_MR); //add this
+		ct.hints.setCaps(1);
+		ct.hints.setMode(LibFabric.FI_LOCAL_MR);
 		tester.run_pingpong_msg(ct);
 
 		tester.freeResources(ct);

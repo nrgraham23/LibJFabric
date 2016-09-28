@@ -32,6 +32,7 @@
 
 package org.ofi.libjfabric;
 
+import java.nio.ByteBuffer;
 import org.ofi.libjfabric.attributes.AVAttr;
 import org.ofi.libjfabric.attributes.CQAttr;
 import org.ofi.libjfabric.attributes.CntrAttr;
@@ -67,6 +68,21 @@ public class Domain extends FIDescriptor {
 	public Counter cntrOpen(CntrAttr cntrAttr, Context context) {
 		throw new UnsupportedOperationException("Not implemented yet!");
 	}
+	//NOTE: should be able to duplicate offset with the slice method of ByteBuffer
+	public MemoryRegion mrRegister(ByteBuffer buf, long access, long offset, long requestedKey, long flags, Context context) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
 	
-	//public Poll pollOpen(PollAttr pollAttr, ) Will have to discuss how to implement this.
+	public MemoryRegion mrRegister(ByteBuffer buf, long access, long offset, long requestedKey, long flags) {
+			throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public MemoryRegion mrRegister(ByteBuffer buf, long access, long offset, long flags) {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+	
+	public MemoryRegion mrRegister(ByteBuffer buf, long access, long requestedKey) {
+		return new MemoryRegion(mrRegister(this.handle, buf, buf.capacity(), access, requestedKey));
+	}
+	private native long mrRegister(long domainHandle, ByteBuffer buf, long length, long access, long requestedKey);
 }

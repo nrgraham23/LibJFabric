@@ -38,17 +38,17 @@ public class DomainAttr {
 	protected long handle;
 	
 	public DomainAttr(String name, Threading threading, Progress cntrlProgress, Progress dataProgress, 
-			ResourceMgmt resourceMgmt, AVType avType, MRMode mrMode, int mrKeySize, int cqDataSize, int cqCnt, 
-			int endpointCount, int txCtxCnt, int rxCtxCnt, int maxEpTxCtx, int maxEpRxCtx, int maxEpStxCtx, int maxEpSrxCtx) 
+			ResourceMgmt resourceMgmt, AVType avType, MRMode mrMode, long mrKeySize, long cqDataSize, long cqCnt, 
+			long endpointCount, long txCtxCnt, long rxCtxCnt, long maxEpTxCtx, long maxEpRxCtx, long maxEpStxCtx, long maxEpSrxCtx) 
 	{
 		this.handle = initDomainAttr(name, threading.getVal(), cntrlProgress.getVal(), dataProgress.getVal(), 
 				resourceMgmt.getVal(), avType.getVal(), mrMode.getVal(), mrKeySize, cqDataSize, cqCnt, endpointCount, 
 				txCtxCnt, rxCtxCnt, maxEpTxCtx, maxEpRxCtx, maxEpStxCtx, maxEpSrxCtx);
 	}
 	
-	private native long initDomainAttr(String name, int threading, int cntrlProgress, int dataProgress, 
-			int resourceMgmt, int avType, int mrMode, int mrKeySize, int cqDataSize, int cqCnt, 
-			int endpointCount, int txCtxCnt, int rxCtxCnt, int maxEpTxCtx, int maxEpRxCtx, int maxEpStxCtx, int maxEpSrxCtx);
+	private native long initDomainAttr(String name, long threading, long cntrlProgress, long dataProgress, 
+			long resourceMgmt, long avType, long mrMode, long mrKeySize, long cqDataSize, long cqCnt, 
+			long endpointCount, long txCtxCnt, long rxCtxCnt, long maxEpTxCtx, long maxEpRxCtx, long maxEpStxCtx, long maxEpSrxCtx);
 	
 	public DomainAttr() {
 		this.handle = initEmpty();
@@ -99,60 +99,55 @@ public class DomainAttr {
 	}
 	private native MRMode getMRMode(long handle);
 	
-	public int getMrKeySize() {
+	public long getMrKeySize() {
 		return getMrKeySize(this.handle);
 	}
-	private native int getMrKeySize(long handle);
+	private native long getMrKeySize(long handle);
 	
-	public int getCQDataSize() {
+	public long getCQDataSize() {
 		return getCQDataSize(this.handle);
 	}
-	private native int getCQDataSize(long handle);
+	private native long getCQDataSize(long handle);
 	
-	public int getCQCnt() {
+	public long getCQCnt() {
 		return getCQCnt(this.handle);
 	}
-	private native int getCQCnt(long handle);
+	private native long getCQCnt(long handle);
 	
-	public int getEndPointCnt() {
+	public long getEndPointCnt() {
 		return getEndPointCnt(handle);
 	}
+	private native long getEndPointCnt(long handle);
 	
-	private native int getEndPointCnt(long handle);
-	
-	public int getTxCtxCnt() {
+	public long getTxCtxCnt() {
 		return getTxCtxCnt(handle);
 	}
+	private native long getTxCtxCnt(long handle);
 	
-	private native int getTxCtxCnt(long handle);
-	
-	public int getRxCtxCnt() {
+	public long getRxCtxCnt() {
 		return getRxCtxCnt(handle);
 	}
+	private native long getRxCtxCnt(long handle);
 	
-	private native int getRxCtxCnt(long handle);
-	
-	public int getMaxEpTxCtx() {
+	public long getMaxEpTxCtx() {
 		return getMaxEpTxCtx(handle);
 	}
+	private native long getMaxEpTxCtx(long handle);
 	
-	private native int getMaxEpTxCtx(long handle);
-	
-	public int getMaxEpRxCtx() {
+	public long getMaxEpRxCtx() {
 		return getMaxEpRxCtx(handle);
 	}
+	private native long getMaxEpRxCtx(long handle);
 	
-	private native int getMaxEpRxCtx(long handle);
-	
-	public int getMaxEpStxCtx() {
+	public long getMaxEpStxCtx() {
 		return getMaxEpStxCtx(this.handle);
 	}
-	private native int getMaxEpStxCtx(long handle);
+	private native long getMaxEpStxCtx(long handle);
 	
-	public int getMaxEpSrxCtx() {
+	public long getMaxEpSrxCtx() {
 		return getMaxEpSrxCtx(this.handle);
 	}
-	private native int getMaxEpSrxCtx(long handle);
+	private native long getMaxEpSrxCtx(long handle);
 	
 	//sets
 	public void setName(String name) {
@@ -163,80 +158,80 @@ public class DomainAttr {
 	public void setThreading(Threading threading) {
 		setThreading(threading.getVal(), this.handle);
 	}
-	private native void setThreading(int threading, long handle);
+	private native void setThreading(long threading, long handle);
 	
 	public void setCntrlProgress(Progress cntrlProgress) {
 		setCntrlProgress(cntrlProgress.getVal(), this.handle);
 	}
-	private native void setCntrlProgress(int cntrlProgress, long handle);
+	private native void setCntrlProgress(long cntrlProgress, long handle);
 	
 	public void setDataProgress(Progress dataProgress) {
 		setDataProgress(dataProgress.getVal(), this.handle);
 	}
-	private native void setDataProgress(int dataProgress, long handle);
+	private native void setDataProgress(long dataProgress, long handle);
 	
 	public void setResourceMgmt(ResourceMgmt resourceMgmt) {
 		setResourceMgmt(resourceMgmt.getVal(), this.handle);
 	}
-	private native void setResourceMgmt(int resourceMgmt, long handle);
+	private native void setResourceMgmt(long resourceMgmt, long handle);
 	
 	public void setAVType(AVType avType) {
 		setAVType(avType.getVal(), this.handle);
 	}
-	private native void setAVType(int avType, long handle);
+	private native void setAVType(long avType, long handle);
 	
 	public void setMRMode(MRMode mrMode) {
 		setMRMode(mrMode.getVal(), this.handle);
 	}
-	private native void setMRMode(int mrMode, long handle);
+	private native void setMRMode(long mrMode, long handle);
 	
-	public void setMRKeySize(int mrKeySize) {
+	public void setMRKeySize(long mrKeySize) {
 		setMRKeySize(mrKeySize, this.handle);
 	}
-	private native void setMRKeySize(int mrKeySize, long handle);
+	private native void setMRKeySize(long mrKeySize, long handle);
 	
-	public void setCQDataSize(int cqDataSize) {
+	public void setCQDataSize(long cqDataSize) {
 		setCQDataSize(cqDataSize, this.handle);
 	}
-	private native void setCQDataSize(int mrKeySize, long handle);
+	private native void setCQDataSize(long mrKeySize, long handle);
 	
-	public void setCQCnt(int cqCnt) {
+	public void setCQCnt(long cqCnt) {
 		setCQCnt(cqCnt, this.handle);
 	}
-	private native void setCQCnt(int cqCnt, long handle);
+	private native void setCQCnt(long cqCnt, long handle);
 	
-	public void setEndpointCnt(int endpointCnt) {
+	public void setEndpointCnt(long endpointCnt) {
 		setEndpointCnt(endpointCnt, this.handle);
 	}
-	private native void setEndpointCnt(int endpointCnt, long handle);
+	private native void setEndpointCnt(long endpolongCnt, long handle);
 	
-	public void setTxCtxCnt(int txCtxCnt) {
+	public void setTxCtxCnt(long txCtxCnt) {
 		setTxCtxCnt(txCtxCnt, this.handle);
 	}
-	private native void setTxCtxCnt(int txCtxCnt, long handle);
+	private native void setTxCtxCnt(long txCtxCnt, long handle);
 	
-	public void setRxCtxCnt(int rxCtxCnt) {
+	public void setRxCtxCnt(long rxCtxCnt) {
 		setRxCtxCnt(rxCtxCnt, this.handle);
 	}
-	private native void setRxCtxCnt(int rxCtxCnt, long handle);
+	private native void setRxCtxCnt(long rxCtxCnt, long handle);
 	
-	public void setMaxEpTxCtx(int maxEpTxCtx) {
+	public void setMaxEpTxCtx(long maxEpTxCtx) {
 		setMaxEpTxCtx(maxEpTxCtx, this.handle);
 	}
-	private native void setMaxEpTxCtx(int maxEpTxCtx, long handle);
+	private native void setMaxEpTxCtx(long maxEpTxCtx, long handle);
 	
-	public void setMaxEpRxCtx(int maxEpRxCtx) {
+	public void setMaxEpRxCtx(long maxEpRxCtx) {
 		setMaxEpRxCtx(maxEpRxCtx, this.handle);
 	}
-	private native void setMaxEpRxCtx(int maxEpRxCtx, long handle);
+	private native void setMaxEpRxCtx(long maxEpRxCtx, long handle);
 	
-	public void setMaxEpStxCtx(int maxEpStxCtx) {
+	public void setMaxEpStxCtx(long maxEpStxCtx) {
 		setMaxEpStxCtx(maxEpStxCtx, this.handle);
 	}
-	private native void setMaxEpStxCtx(int maxEpStxCtx, long handle);
+	private native void setMaxEpStxCtx(long maxEpStxCtx, long handle);
 	
-	public void setMaxEpSrxCtx(int maxEpSrxCtx) {
+	public void setMaxEpSrxCtx(long maxEpSrxCtx) {
 		setMaxEpSrxCtx(maxEpSrxCtx, this.handle);
 	}
-	private native void setMaxEpSrxCtx(int maxEpSrxCtx, long handle);
+	private native void setMaxEpSrxCtx(long maxEpSrxCtx, long handle);
 }

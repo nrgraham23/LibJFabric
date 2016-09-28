@@ -51,4 +51,5 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Constant_setConstant
 	setLongField(env, c, jthis, "FI_MSG", FI_MSG);
 	setLongField(env, c, jthis, "FI_TRANSMIT", FI_TRANSMIT);
 	setLongField(env, c, jthis, "FI_RECV", FI_RECV);
+	setLongField(env, c, jthis, "FI_SEND", FI_RECV);
 }
