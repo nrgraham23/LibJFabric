@@ -993,36 +993,19 @@ void init_test(struct ct_pingpong *ct, struct pp_opts *opts)
 			ct.mr = ct.no_mr; //TODO: looks like this can be null if I want.  Delete ct.no_mr in that case
 		}
 	}
-	/*
-int pp_open_fabric_res(struct ct_pingpong *ct)
-{
-	int ret;
 
-	PP_DEBUG("Opening fabric resources: fabric, eq & domain\n");
+	private void pp_open_fabric_res(CTPingPong ct) {
+		PP_DEBUG("Opening fabric resources: fabric, eq & domain\n");
 
-	ret = fi_fabric(ct->fi->fabric_attr, &(ct->fabric), NULL);
-	if (ret) {
-		PP_PRINTERR("fi_fabric", ret);
-		return ret;
+		ct.fabric = new Fabric(ct.fi.getFabricAttr());
+
+		ct.eq = ct.fabric.eventQueueOpen(ct.eq_attr);
+
+		ct.domain = ct.fabric.createDomain(ct.fi);
+
+		PP_DEBUG("Fabric resources opened\n");
 	}
 
-	ret = fi_eq_open(ct->fabric, &(ct->eq_attr), &(ct->eq), NULL);
-	if (ret) {
-		PP_PRINTERR("fi_eq_open", ret);
-		return ret;
-	}
-
-	ret = fi_domain(ct->fabric, ct->fi, &(ct->domain), NULL);
-	if (ret) {
-		PP_PRINTERR("fi_domain", ret);
-		return ret;
-	}
-
-	PP_DEBUG("Fabric resources opened\n");
-
-	return 0;
-}
-	 */
 	private void pp_alloc_active_res(CTPingPong ct, Info fi) {
 		pp_alloc_msgs(ct);
 
@@ -1112,7 +1095,7 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 
 			/* Listen */
 			eventEntry = ct.eq.sread(-1, 0);
-			if(eventEntry.getClass().isAssignableFrom(EQCMEntry.class) && eqCMEntry.getEQEvent() == EQEvent.FI_CONNREQ) {
+			if(eventEntry.getClass().isAssignableFrom(EQCMEntry.class) &&eventEntry.getEQEvent() == EQEvent.FI_CONNREQ) {
 				eqCMEntry = (EQCMEntry)eventEntry;
 			} else {
 				throw new Exception("Unexpected CM event " + eventEntry.getEQEvent() + "\n");
@@ -1128,61 +1111,61 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 
 			PP_DEBUG("accepting\n");
 
-			//fi_accept(ct->ep, NULL, 0);
+			ct.ep.accept();
 
 			pp_ctrl_sync(ct);
 
-			/* Accept *
-			rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
-			if (rd != sizeof(entry)) {
-				pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
+			/* Accept */
+			eventEntry = ct.eq.sread(-1, 0);
+
+			if(eventEntry.getClass().isAssignableFrom(EQCMEntry.class) && eventEntry.getEQEvent() == EQEvent.FI_CONNECTED) {
+				eqCMEntry = (EQCMEntry)eventEntry;
+			} else {
+				throw new Exception("Unexpected CM event " + eventEntry.getEQEvent() + "\n");
 			}
 
-			if (event != FI_CONNECTED || entry.fid != &(ct->ep->fid)) {
-				fprintf(stderr, "Unexpected CM event %d fid %p (ep %p)\n",
-						event, entry.fid, ct->ep);
-			}
-
-			PP_DEBUG("Connected endpoint: server connected\n");*/
+			PP_DEBUG("Connected endpoint: server connected\n");
 		} catch(Exception e) { //better exception handling should be implemented in a more complete version
 			//fi_reject(ct->pep, ct->fi->handle, NULL, 0);
 		}
 	}
 
 	private void pp_client_connect(CTPingPong ct) {
+		EventEntry eventEntry;
 		EQCMEntry entry;
-		int event;
-		long rd;
+		EQEvent event = null;
 
 		pp_exchange_names_connected(ct);
 
 		/* Check that the remote is still up */
 		pp_ctrl_sync(ct);
 
-		/*pp_open_fabric_res(ct);
+		pp_open_fabric_res(ct);
 
-		pp_alloc_active_res(ct, ct->fi);
+		pp_alloc_active_res(ct, ct.fi);
 
 		pp_init_ep(ct);
 
-		fi_connect(ct->ep, ct->rem_name, NULL, 0);
+		ct.ep.connect(ct.rem_name.toString());
 
 		pp_ctrl_sync(ct);
 
-		/* Connect *
-		rd = fi_eq_sread(ct->eq, &event, &entry, sizeof(entry), -1, 0);
-		if (rd != sizeof(entry)) {
-			pp_process_eq_err(rd, ct->eq, "fi_eq_sread");
+		/* Connect */
+		try {
+			eventEntry = ct.eq.sread(-1, 0);
+
+			if(eventEntry.getClass().isAssignableFrom(EQCMEntry.class) && eventEntry.getEQEvent() == EQEvent.FI_CONNECTED) {
+				entry = (EQCMEntry)eventEntry;
+			} else {
+				throw new Exception("Unexpected CM event " + eventEntry.getEQEvent() + "\n");
+			}
+		} catch(Exception e) {
+			System.err.println(e.getMessage());
+			System.exit(-1);
 		}
-
-		if (event != FI_CONNECTED || entry.fid != &(ct->ep->fid)) {
-			fprintf(stderr, "Unexpected CM event %d fid %p (ep %p)\n",
-					event, entry.fid, ct->ep);
-		}*/
 	}
-	/*
 
-/*******************************************************************************
+	/*******************************************************************************
 	 *                                Deallocations and Final
 	 ******************************************************************************/
 
@@ -1216,50 +1199,49 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 
 		PP_DEBUG("Resources of test suite freed\n");
 	}
-	/*
-int pp_finalize(struct ct_pingpong *ct)
-{
-	struct iovec iov;
-	int ret;
-	struct fi_context ctx;
-	struct fi_msg msg;
 
-	PP_DEBUG("Terminating test\n");
+	/*private void pp_finalize(CTPingPong ct) {
+		struct iovec iov;
+		int ret;
+		struct fi_context ctx;
+		struct fi_msg msg;
 
-	strcpy(ct->tx_buf, "fin");
-	iov.iov_base = ct->tx_buf;
-	iov.iov_len = 4;
+		PP_DEBUG("Terminating test\n");
 
-	memset(&msg, 0, sizeof(msg));
-	msg.msg_iov = &iov;
-	msg.iov_count = 1;
-	msg.addr = ct->remote_fi_addr;
-	msg.context = &ctx;
+		strcpy(ct->tx_buf, "fin");
+		iov.iov_base = ct->tx_buf;
+		iov.iov_len = 4;
 
-	ret = fi_sendmsg(ct->ep, &msg, FI_INJECT | FI_TRANSMIT_COMPLETE);
-	if (ret) {
-		PP_PRINTERR("transmit", ret);
-		return ret;
+		memset(&msg, 0, sizeof(msg));
+		msg.msg_iov = &iov;
+		msg.iov_count = 1;
+		msg.addr = ct->remote_fi_addr;
+		msg.context = &ctx;
+
+		ret = fi_sendmsg(ct->ep, &msg, FI_INJECT | FI_TRANSMIT_COMPLETE);
+		if (ret) {
+			PP_PRINTERR("transmit", ret);
+			return ret;
+		}
+
+		ret = pp_get_tx_comp(ct, ++ct->tx_seq);
+		if (ret)
+			return ret;
+
+		ret = pp_get_rx_comp(ct, ct->rx_seq);
+		if (ret)
+			return ret;
+
+		ret = pp_ctrl_finish(ct);
+		if (ret)
+			return ret;
+
+		PP_DEBUG("Test terminated\n");
+
+		return 0;
 	}
 
-	ret = pp_get_tx_comp(ct, ++ct->tx_seq);
-	if (ret)
-		return ret;
-
-	ret = pp_get_rx_comp(ct, ct->rx_seq);
-	if (ret)
-		return ret;
-
-	ret = pp_ctrl_finish(ct);
-	if (ret)
-		return ret;
-
-	PP_DEBUG("Test terminated\n");
-
-	return 0;
-}
-
-/*******************************************************************************
+	/*******************************************************************************
 	 *                                CLI: Usage and Options parsing
 	 ******************************************************************************/
 

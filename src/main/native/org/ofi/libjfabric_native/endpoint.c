@@ -54,3 +54,21 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_enable
 {
 	fi_enable((struct fid_ep *)epHandle);
 }
+
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_accept
+	(JNIEnv *env, jobject jthis, jlong epHandle)
+{
+	((struct fid_ep *)epHandle)->cm->accept((struct fid_ep *)epHandle, NULL, 0);
+}
+
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_connect
+	(JNIEnv *env, jobject jthis, jlong epHandle, jstring addr)
+{
+	char *addrStr;
+	
+	convertJNIString(env, &addrStr, addr);
+	
+	((struct fid_ep *)epHandle)->cm->connect((struct fid_ep *)epHandle, addrStr, NULL, 0);
+	
+	free(addrStr); //actually may not want to free this
+}
