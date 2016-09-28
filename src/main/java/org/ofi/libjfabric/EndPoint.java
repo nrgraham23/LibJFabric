@@ -82,4 +82,14 @@ public class EndPoint extends EndPointSharedOps {
 		enable(this.handle);
 	}
 	private native void enable(long handle);
+	
+	public void accept() {
+		accept(this.handle);
+	}
+	private native void accept(long handle);
+	
+	public void connect(String addr) { //would want a version that had the option to enter parameters (see libfabric definition)
+		connect(this.handle, addr);
+	}
+	private native void connect(long handle, String addr);
 }
