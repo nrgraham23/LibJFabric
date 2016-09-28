@@ -4,6 +4,12 @@ This project is still very much in development.  It is NOT ready
 to be used as it is incomplete and there are likely bugs and
 memory leaks.
 
+One of the major shortcomings of this project is the lack of good
+error handling.  If these bindings were to be released for public
+use, better error handling would be required.  At the moment, in
+the case of an error, the code is likely to explode with no usefull
+information.
+
 To work on this project with eclipse, clone the git repository into
 your working directory, and then create a new project in eclipse
 called LibJFabric.
