@@ -1067,29 +1067,6 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 		PP_DEBUG("Endpoint initialzed\n");
 	}
 
-	/*int pp_av_insert(struct fid_av *av, void *addr, size_t count, //TODO:HERE
-			fi_addr_t *fi_addr, uint64_t flags, void *context)
-	{
-		int ret;
-
-		PP_DEBUG("Connection-less endpoint: inserting new address in vector\n");
-
-		ret = fi_av_insert(av, addr, count, fi_addr, flags, context);
-		if (ret < 0) {
-			PP_PRINTERR("fi_av_insert", ret);
-			return ret;
-		} else if (ret != count) {
-			PP_ERR("fi_av_insert: number of addresses inserted = %d;"
-					" number of addresses given = %zd\n",
-					ret, count);
-			return -EXIT_FAILURE;
-		}
-
-		PP_DEBUG("Connection-less endpoint: new address inserted in vector\n");
-
-		return 0;
-	}*/
-
 	private void pp_exchange_names_connected(CTPingPong ct) {
 		PP_DEBUG("Connection-based endpoint: setting up connection\n");
 
@@ -1204,81 +1181,6 @@ int pp_open_fabric_res(struct ct_pingpong *ct)
 		}*/
 	}
 	/*
-int pp_init_fabric(struct ct_pingpong *ct)
-{
-	int ret;
-
-	ret = pp_ctrl_init(ct);
-	if (ret)
-		return ret;
-
-	PP_DEBUG("Initializing fabric\n");
-
-	PP_DEBUG("Connection-less endpoint: initializing address vector\n");
-
-	if (ct->opts.dst_addr) {
-		ret = pp_recv_name(ct);
-		if (ret < 0)
-			return ret;
-
-		ret = pp_getinfo(ct, ct->hints, &(ct->fi));
-		if (ret)
-			return ret;
-
-		ret = pp_open_fabric_res(ct);
-		if (ret)
-			return ret;
-
-		ret = pp_alloc_active_res(ct, ct->fi);
-		if (ret)
-			return ret;
-
-		ret = pp_init_ep(ct);
-		if (ret)
-			return ret;
-
-		ret = pp_send_name(ct, &ct->ep->fid);
-	} else {
-		PP_DEBUG("SERVER: getinfo\n");
-		ret = pp_getinfo(ct, ct->hints, &(ct->fi));
-		if (ret)
-			return ret;
-
-		PP_DEBUG("SERVER: open fabric resources\n");
-		ret = pp_open_fabric_res(ct);
-		if (ret)
-			return ret;
-
-		PP_DEBUG("SERVER: allocate active resource\n");
-		ret = pp_alloc_active_res(ct, ct->fi);
-		if (ret)
-			return ret;
-
-		PP_DEBUG("SERVER: initialize endpoint\n");
-		ret = pp_init_ep(ct);
-		if (ret)
-			return ret;
-
-		ret = pp_send_name(ct, &ct->ep->fid);
-		if (ret < 0)
-			return ret;
-
-		ret = pp_recv_name(ct);
-	}
-
-	if (ret < 0)
-		return ret;
-
-	ret = pp_av_insert(ct->av, ct->rem_name, 1, &(ct->remote_fi_addr), 0,
-			   NULL);
-	if (ret)
-		return ret;
-	PP_DEBUG("Connection-less endpoint: address vector initialized\n");
-
-	PP_DEBUG("Fabric Initialized\n");
-
-	return 0;
-}
 
 /*******************************************************************************
 	 *                                Deallocations and Final
