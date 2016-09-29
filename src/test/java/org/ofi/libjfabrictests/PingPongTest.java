@@ -645,7 +645,7 @@ void pp_process_eq_err(ssize_t rd, struct fid_eq *eq, const char *fn)
 		return str;
 	}
 
-	private void show_perf(String name, int tsize, int sent, int acked, long start, long end, int xfers_per_iter) {
+	private void show_perf(int tsize, int sent, long acked, long start, long end, int xfers_per_iter) {
 		long elapsed = end - start; //TODO: format better
 		long bytes = sent * tsize * xfers_per_iter;
 		float usec_per_xfer;
@@ -653,17 +653,9 @@ void pp_process_eq_err(ssize_t rd, struct fid_eq *eq, const char *fn)
 		if (sent == 0)
 			return;
 
-		if (name != null && name != "") {
-			System.out.printf("%-50s%-8s%-8s%-9s%-8s%8s %10s%13s%13s\n",
-					"name", "bytes", "#sent", "#ack", "total",
-					"time", "MB/sec", "usec/xfer", "Mxfers/sec");
-
-			System.out.printf("%-50s", name);
-		} else {
-			System.out.printf("%-8s%-8s%-9s%-8s%8s %10s%13s%13s\n", "bytes",
-					"#sent", "#ack", "total", "time", "MB/sec",
-					"usec/xfer", "Mxfers/sec");
-		}
+		System.out.printf("%-8s%-8s%-9s%-8s%8s %10s%13s%13s\n", "bytes",
+				"#sent", "#ack", "total", "time", "MB/sec",
+				"usec/xfer", "Mxfers/sec");
 
 		System.out.printf("%-8s", size_str(tsize));
 		System.out.printf("%-8s", cnt_str(sent));
@@ -702,11 +694,9 @@ int pp_cq_readerr(struct fid_cq *cq)
 	}
 	return ret;
 }
-
-static int pp_get_cq_comp(struct fid_cq *cq, uint64_t *cur, uint64_t total,
-			  int timeout)
-{
-	struct fi_cq_err_entry comp;
+	 */
+	private void pp_get_cq_comp(CompletionQueue cq, long cur, long total, int timeout) {
+		/*struct fi_cq_err_entry comp; TODO: HERE
 	struct timespec a, b;
 	int ret = 0;
 
@@ -739,39 +729,25 @@ static int pp_get_cq_comp(struct fid_cq *cq, uint64_t *cur, uint64_t total,
 		}
 	}
 
-	return 0;
-}
-
-int pp_get_rx_comp(struct ct_pingpong *ct, uint64_t total)
-{
-	int ret = FI_SUCCESS;
-
-	if (ct->rxcq) {
-		ret = pp_get_cq_comp(ct->rxcq, &(ct->rx_cq_cntr), total,
-				     ct->timeout);
-	} else {
-		PP_ERR(
-		    "Trying to get a RX completion when no RX CQ was opened");
-		ret = -FI_EOTHER;
+	return 0;*/
 	}
-	return ret;
-}
-
-int pp_get_tx_comp(struct ct_pingpong *ct, uint64_t total)
-{
-	int ret;
-
-	if (ct->txcq) {
-		ret = pp_get_cq_comp(ct->txcq, &(ct->tx_cq_cntr), total, -1);
-	} else {
-		PP_ERR(
-		    "Trying to get a TX completion when no TX CQ was opened");
-		ret = -FI_EOTHER;
+	private void pp_get_rx_comp(CTPingPong ct, long total) {
+		if (ct.rxcq != null) {
+			pp_get_cq_comp(ct.rxcq, ct.rx_cq_cntr, total, ct.timeout);
+		} else {
+			PP_ERR("Trying to get a RX completion when no RX CQ was opened");
+		}
 	}
-	return ret;
-}
-	 * TODO:HERE
-	private void PP_POST(post_fn, comp_fn, seq, op_str, ...) {
+
+	private void pp_get_tx_comp(CTPingPong ct, long total) {
+		if (ct.txcq != null) {
+			pp_get_cq_comp(ct.txcq, ct.tx_cq_cntr, total, -1);
+		} else {
+			PP_ERR("Trying to get a TX completion when no TX CQ was opened");
+		}
+	}
+
+	/*private void PP_POST(post_fn, comp_fn, seq, op_str, ...) {//TODO: use as template to implement the 3 different type of methods that use this macro
 		int timeout_save;
 		int ret, rc;
 
@@ -795,54 +771,34 @@ int pp_get_tx_comp(struct ct_pingpong *ct, uint64_t total)
 			}
 		}
 		seq++;
+	}*/
+
+	private void pp_post_tx(CTPingPong ct, EndPoint ep, long size, Context ctx) {
+		/*PP_POST(fi_send, pp_get_tx_comp, ct->tx_seq, "transmit", ep, ct->tx_buf, TODO: HERE
+				size, fi_mr_desc(ct->mr), ct->remote_fi_addr, ctx);*/
 	}
-	/*
-ssize_t pp_post_tx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size,
-		   struct fi_context *ctx)
-{
-	PP_POST(fi_send, pp_get_tx_comp, ct->tx_seq, "transmit", ep, ct->tx_buf,
-		size, fi_mr_desc(ct->mr), ct->remote_fi_addr, ctx);
-	return 0;
-}
 
-ssize_t pp_tx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
-{
-	ssize_t ret;
+	private void pp_tx(CTPingPong ct, EndPoint ep, long size) {
+		if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE))
+			pp_fill_buf(ct.tx_buf);
 
-	if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE))
-		pp_fill_buf((char *)ct->tx_buf, size);
+		pp_post_tx(ct, ep, size, ct.tx_ctx);
 
-	ret = pp_post_tx(ct, ep, size, &(ct->tx_ctx));
-	if (ret)
-		return ret;
+		pp_get_tx_comp(ct, ct.tx_seq);
+	}
 
-	ret = pp_get_tx_comp(ct, ct->tx_seq);
-
-	return ret;
-}
-
-ssize_t pp_post_inject(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
-{
-	PP_POST(fi_inject, pp_get_tx_comp, ct->tx_seq, "inject", ep, ct->tx_buf,
+	private void pp_post_inject(CTPingPong ct, EndPoint ep, long size) {
+		/*PP_POST(fi_inject, pp_get_tx_comp, ct->tx_seq, "inject", ep, ct->tx_buf, //TODO: HERE
 		size, ct->remote_fi_addr);
-	ct->tx_cq_cntr++;
-	return 0;
-}
+	ct.tx_cq_cntr++;*/
+	}
 
-ssize_t pp_inject(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
-{
-	ssize_t ret;
+	private void pp_inject(CTPingPong ct, EndPoint ep, long size) {
+		if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE))
+			pp_fill_buf(ct.tx_buf);
 
-	if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE))
-		pp_fill_buf((char *)ct->tx_buf, size);
-
-	ret = pp_post_inject(ct, ep, size);
-	if (ret)
-		return ret;
-
-	return ret;
-}
-	 */
+		pp_post_inject(ct, ep, size);
+	}
 	private void pp_post_rx(CTPingPong ct, EndPoint ep, long size, Context ctx) {
 		/*PP_POST(fi_recv, pp_get_rx_comp, ct->rx_seq, "receive", ep, ct->rx_buf,
 				MAX(size, PP_MAX_CTRL_MSG), fi_mr_desc(ct->mr), 0, ctx);
@@ -875,47 +831,39 @@ ssize_t pp_inject(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
 		}
 		seq++;*/
 	}
-	/*
-ssize_t pp_rx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
-{
-	ssize_t ret;
 
-	ret = pp_get_rx_comp(ct, ct->rx_seq);
-	if (ret)
-		return ret;
+	private void pp_rx(CTPingPong ct, EndPoint ep, long size) {
 
-	if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE)) {
-		ret = pp_check_buf((char *)ct->rx_buf, size);
-		if (ret)
-			return ret;
+		pp_get_rx_comp(ct, ct.rx_seq);
+
+		if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE)) {
+			pp_check_buf(ct.rx_buf);
+		}
+		/* TODO: verify CQ data, if available */ //todo from test, not mine
+
+		/* Ignore the size arg. Post a buffer large enough to handle all message
+		 * sizes. pp_sync() makes use of pp_rx() and gets called in tests just
+		 * before message size is updated. The recvs posted are always for the
+		 * next incoming message.
+		 */
+		pp_post_rx(ct, ct.ep, ct.rx_size, ct.rx_ctx);
+		//if (!ret)
+		ct.cnt_ack_msg++;
 	}
-	/* TODO: verify CQ data, if available */ //todo from test, not mine
-
-	/* Ignore the size arg. Post a buffer large enough to handle all message
-	 * sizes. pp_sync() makes use of pp_rx() and gets called in tests just
-	 * before message size is updated. The recvs posted are always for the
-	 * next incoming message.
-	 *
-	ret = pp_post_rx(ct, ct->ep, ct->rx_size, &(ct->rx_ctx));
-	if (!ret)
-		ct->cnt_ack_msg++;
-
-	return ret;
-}
 
 	/*******************************************************************************
 	 *                                Initialization and allocations
 	 ******************************************************************************/
 
-	/*private void init_test(CTPingPong ct, PPOpts opts) {
-		char sstr[PP_STR_LEN];
+	private void init_test(CTPingPong ct, PPOpts opts) {
+		String sstr;
 
-		size_str(sstr, opts->transfer_size);
-		if (!(opts->options & PP_OPT_ITER))
-			opts->iterations = size_to_count(opts->transfer_size);
+		sstr = size_str(opts.transfer_size);
+		if ((opts.options & PP_OPT_ITER) == 0)
+			opts.iterations = size_to_count(opts.transfer_size);
 
-			ct->cnt_ack_msg = 0;
-	}*/
+		ct.cnt_ack_msg = 0;
+	}
 
 	private long pp_init_cq_data(Info info) {
 		if (info.getDomainAttr().getCQDataSize() >= Long.MAX_VALUE) {
@@ -1170,7 +1118,7 @@ ssize_t pp_rx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
 		PP_DEBUG("Resources of test suite freed\n");
 	}
 
-	/*private void pp_finalize(CTPingPong ct) {
+	/*private void pp_finalize(CTPingPong ct) { //TODO:HERE  (not sure about iovec)
 		struct iovec iov;
 		int ret;
 		struct fi_context ctx;
@@ -1280,88 +1228,57 @@ ssize_t pp_rx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
 
 	/*******************************************************************************
 	 *      PingPong core and implemenations for endpoints
-	 ******************************************************************************
+	 ******************************************************************************/
 
-int pingpong(struct ct_pingpong *ct)
-{
-	int ret, i;
+	private void pingpong(CTPingPong ct) {
+		pp_ctrl_sync(ct);
 
-	ret = pp_ctrl_sync(ct);
-	if (ret)
-		return ret;
+		pp_start(ct);
+		if (ct.opts.isServer) {
+			for (int i = 0; i < ct.opts.iterations; i++) {
 
-	pp_start(ct);
-	if (ct->opts.dst_addr) {
-		for (i = 0; i < ct->opts.iterations; i++) {
+				pp_rx(ct, ct.ep, ct.opts.transfer_size);
 
-			if (ct->opts.transfer_size <
-			    ct->fi->tx_attr->inject_size)
-				ret = pp_inject(ct, ct->ep,
-						ct->opts.transfer_size);
-			else
-				ret = pp_tx(ct, ct->ep, ct->opts.transfer_size);
-			if (ret)
-				return ret;
+				if (ct.opts.transfer_size < ct.fi.getTransmitAttr().getInjectSize())
+					pp_inject(ct, ct.ep, ct.opts.transfer_size);
+				else
+					pp_tx(ct, ct.ep, ct.opts.transfer_size);
+			}
+		} else {
+			for (int i = 0; i < ct.opts.iterations; i++) {
 
-			ret = pp_rx(ct, ct->ep, ct->opts.transfer_size);
-			if (ret)
-				return ret;
+				if (ct.opts.transfer_size < ct.fi.getTransmitAttr().getInjectSize())
+					pp_inject(ct, ct.ep, ct.opts.transfer_size);
+				else
+					pp_tx(ct, ct.ep, ct.opts.transfer_size);
+
+				pp_rx(ct, ct.ep, ct.opts.transfer_size);
+			}
 		}
-	} else {
-		for (i = 0; i < ct->opts.iterations; i++) {
+		pp_stop(ct);
 
-			ret = pp_rx(ct, ct->ep, ct->opts.transfer_size);
-			if (ret)
-				return ret;
+		pp_ctrl_txrx_msg_count(ct);
 
-			if (ct->opts.transfer_size <
-			    ct->fi->tx_attr->inject_size)
-				ret = pp_inject(ct, ct->ep,
-						ct->opts.transfer_size);
-			else
-				ret = pp_tx(ct, ct->ep, ct->opts.transfer_size);
-			if (ret)
-				return ret;
-		}
-	}
-	pp_stop(ct);
-
-	ret = pp_ctrl_txrx_msg_count(ct);
-	if (ret)
-		return ret;
-
-	PP_DEBUG("Results:\n");
-	show_perf(NULL, ct->opts.transfer_size, ct->opts.iterations,
-		  ct->cnt_ack_msg, &(ct->start), &(ct->end), 2);
-
-	return 0;
-}
-
-int run_suite_pingpong(struct ct_pingpong *ct)
-{
-	int i, sizes_cnt;
-	int ret = 0;
-	int *sizes = NULL;
-
-	pp_banner_fabric_info(ct);
-
-	sizes_cnt = generate_test_sizes(&ct->opts, ct->tx_size, &sizes);
-
-	PP_DEBUG("Count of sizes to test: %d\n", sizes_cnt);
-
-	for (i = 0; i < sizes_cnt; i++) {
-		ct->opts.transfer_size = sizes[i];
-		init_test(ct, &(ct->opts));
-		ret = pingpong(ct);
-		if (ret)
-			goto out;
+		PP_DEBUG("Results:\n");
+		show_perf(ct.opts.transfer_size, ct.opts.iterations, ct.cnt_ack_msg, ct.start, ct.end, 2);
 	}
 
-out:
-	free(sizes);
-	return ret;
-}
-	 */
+	private void run_suite_pingpong(CTPingPong ct) {
+		int[] sizes;
+
+		pp_banner_fabric_info(ct);
+
+		sizes = generate_test_sizes(ct.opts, ct.tx_size);
+
+		PP_DEBUG("Count of sizes to test: %d\n", sizes.length);
+
+		for (int i = 0; i < sizes.length; i++) {
+			ct.opts.transfer_size = sizes[i];
+			init_test(ct, ct.opts);
+			pingpong(ct);
+		}
+
+	}
 	private void run_pingpong_msg(CTPingPong ct) {
 
 		PP_DEBUG("Selected endpoint: MSG\n");
@@ -1380,9 +1297,9 @@ out:
 			PP_DEBUG("CLIENT: client_connected\n");
 		}
 
-		//run_suite_pingpong(ct);
+		run_suite_pingpong(ct);
 
-		//pp_finalize(ct);
+		//pp_finalize(ct); //TODO:HERE
 
 		//fi_shutdown(ct->ep, 0);
 	}
