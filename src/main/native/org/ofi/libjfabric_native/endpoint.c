@@ -38,7 +38,7 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_send
 {
 	void *ptr = getDirectBufferAddress(env, buffer);
 	
-	((struct fid_ep *)epHandle)->msg->send((struct fid_ep *)epHandle, &ptr, length, mrDesc, destAddr, (void *)contextHandle);
+	((struct fid_ep *)epHandle)->msg->send((struct fid_ep *)epHandle, &ptr, length, (void *)mrDesc, destAddr, (void *)contextHandle);
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_send4
@@ -79,4 +79,12 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_connect
 	((struct fid_ep *)epHandle)->cm->connect((struct fid_ep *)epHandle, addrStr, NULL, 0);
 	
 	free(addrStr); //actually may not want to free this
+}
+
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_inject
+	(JNIEnv *env, jobject jthis, jlong epHandle, jobject buffer, jint length, jlong destAddr)
+{
+	void *ptr = getDirectBufferAddress(env, buffer);
+	
+	((struct fid_ep *)epHandle)->msg->inject((struct fid_ep *)epHandle, &ptr, length, destAddr);
 }
