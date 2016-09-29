@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Los Alamos Nat. Security, LLC. All rights reserved.
+ * Copyright (c) 2016 Los Alamos Nat. Security, LLC. All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -30,16 +30,11 @@
  * SOFTWARE.
  */
 
-package org.ofi.libjfabric;
+#include "libfabric.h"
+#include "org_ofi_libjfabric_CompletionQueue.h"
 
-public class CompletionQueue extends FIDescriptor {
-
-	public CompletionQueue(long handle) {
-		super(handle);
-	}
-	
-	public void read(int count) { //TODO: Should also be on with the void *buff option (see libfabric fi_cq_read)
-		read(this.handle, count);
-	}
-	private native void read(long cqHandle, int count);
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_CompletionQueue_read
+	(JNIEnv *env, jobject jthis, jlong cqHandle, jint count)
+{
+	((struct fid_cq *)cqHandle)->ops->read((struct fid_cq *)cqHandle, NULL, count);
 }

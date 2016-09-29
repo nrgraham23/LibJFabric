@@ -131,6 +131,7 @@ set(SOURCE_FILES
   event_queue.c
   eq_event.c
   memory_region.c
+  completion_queue.c
 )
 
 set(INTERFACE_FILES
