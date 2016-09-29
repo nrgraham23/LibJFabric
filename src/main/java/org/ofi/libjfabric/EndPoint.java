@@ -41,8 +41,9 @@ public class EndPoint extends EndPointSharedOps {
 	}
 	
 	public void recv(ByteBuffer buffer, long mrDesc, long srcAddress, Context context) { //TODO: mrDesc would be replaced with something cleaner when the todo in MemoryRegion.java is fixed
-		throw new UnsupportedOperationException("Not implemented yet!");
+		recv(this.handle, buffer, buffer.capacity(), mrDesc, srcAddress, context.getHandle());
 	}
+	private native void recv(long epHandle, ByteBuffer buffer, int length, long mrDesc, long srcAddress, long contextHandle);
 	
 	public void recv(ByteBuffer buffer, long mrDesc, long srcAddress) {
 		throw new UnsupportedOperationException("Not implemented yet!");
