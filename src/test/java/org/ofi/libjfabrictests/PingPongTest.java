@@ -809,9 +809,30 @@ int pp_cq_readerr(struct fid_cq *cq)
 	}
 
 	private void pp_post_inject(CTPingPong ct, EndPoint ep, long size) {
-		/*PP_POST(fi_inject, pp_get_tx_comp, ct->tx_seq, "inject", ep, ct->tx_buf, //TODO: HERE
-		size, ct->remote_fi_addr);
-	ct.tx_cq_cntr++;*/
+		//int timeout_save;
+		//int ret, rc;
+
+		while (true) {
+			ep.inject(ct.tx_buf, ct.remote_fi_addr);
+			//if (!ret)
+			break;
+
+			/*if (ret != -FI_EAGAIN) { //TODO: see pp_post_tx
+				PP_PRINTERR(op_str, ret);
+				return ret;
+			}
+
+			timeout_save = ct->timeout;
+			ct->timeout = 0;
+			rc = comp_fn(ct, seq);
+			ct->timeout = timeout_save;
+			if (rc && rc != -FI_EAGAIN) {
+				PP_ERR("Failed to get " op_str " completion");
+				return rc;
+			}*/
+		}
+		ct.tx_seq++;
+		ct.tx_cq_cntr++;
 	}
 
 	private void pp_inject(CTPingPong ct, EndPoint ep, long size) {

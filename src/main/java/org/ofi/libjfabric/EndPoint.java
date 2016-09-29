@@ -93,4 +93,9 @@ public class EndPoint extends EndPointSharedOps {
 		connect(this.handle, addr);
 	}
 	private native void connect(long handle, String addr);
+	
+	public void inject(ByteBuffer buffer, long destAddr) {
+		inject(this.handle, buffer, buffer.capacity(), destAddr);
+	}
+	private native void inject(long epHandle, ByteBuffer buffer, int length, long destAddr);
 }
