@@ -130,6 +130,7 @@ set(SOURCE_FILES
   passive_ep.c
   event_queue.c
   eq_event.c
+  memory_region.c
 )
 
 set(INTERFACE_FILES

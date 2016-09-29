@@ -32,7 +32,7 @@
 
 package org.ofi.libjfabric;
 
-import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 public class EndPoint extends EndPointSharedOps {
 	
@@ -40,43 +40,44 @@ public class EndPoint extends EndPointSharedOps {
 		super(handle);
 	}
 	
-	public void recv(Buffer buffer, MemoryRegion desc, long srcAddress, Context context) {
+	public void recv(ByteBuffer buffer, long mrDesc, long srcAddress, Context context) { //TODO: mrDesc would be replaced with something cleaner when the todo in MemoryRegion.java is fixed
 		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 	
-	public void recv(Buffer buffer, MemoryRegion desc, long srcAddress) {
+	public void recv(ByteBuffer buffer, long mrDesc, long srcAddress) {
 		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 	
-	public void recv(Buffer buffer, long srcAddress, Context context) {
+	public void recv(ByteBuffer buffer, long srcAddress, Context context) {
 		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 	
-	public void recv(Buffer buffer, long srcAddress) {
+	public void recv(ByteBuffer buffer, long srcAddress) {
 		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 	
-	public void recv(Buffer buffer) {
-		recv5(this.getHandle(), buffer, buffer.capacity());
+	public void recv(ByteBuffer buffer) {
+		recv5(this.getHandle(), buffer,buffer.capacity());
 	}
-	private native void recv5(long handle, Buffer buffer, int length);
+	private native void recv5(long handle, ByteBuffer buffer, int length);
 	
-	public void send(Buffer buffer, MemoryRegion desc, long destAddress, Context context) {
+	public void send(ByteBuffer buffer, long mrDesc, long destAddress, Context context) {
+		send(this.handle, buffer, buffer.capacity(), mrDesc, destAddress, context.getHandle());
+	}
+	private native void send(long thisHandle, ByteBuffer buffer, int length, long mrDesc, long destAddress, long contextHandle);
+	
+	public void send(ByteBuffer buffer, long mrDesc, long destAddress) {
 		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 	
-	public void send(Buffer buffer, MemoryRegion desc, long destAddress) {
+	public void send(ByteBuffer buffer, long destAddress, Context context) {
 		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 	
-	public void send(Buffer buffer, long destAddress, Context context) {
-		throw new UnsupportedOperationException("Not implemented yet!");
+	public void send(ByteBuffer buffer, long destAddress) {
+		send4(this.handle, buffer, buffer.capacity(), destAddress);
 	}
-	
-	public void send(Buffer buffer, long destAddress) {
-		send4(this.getHandle(), buffer, buffer.capacity(), destAddress);
-	}
-	private native void send4(long handle, Buffer buffer, int length, long destAddress);
+	private native void send4(long handle, ByteBuffer buffer, int length, long destAddress);
 	
 	public void enable() {
 		enable(this.handle);

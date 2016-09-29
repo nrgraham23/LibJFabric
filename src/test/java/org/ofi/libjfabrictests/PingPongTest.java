@@ -773,16 +773,37 @@ int pp_cq_readerr(struct fid_cq *cq)
 		seq++;
 	}*/
 
-	private void pp_post_tx(CTPingPong ct, EndPoint ep, long size, Context ctx) {
-		/*PP_POST(fi_send, pp_get_tx_comp, ct->tx_seq, "transmit", ep, ct->tx_buf, TODO: HERE
-				size, fi_mr_desc(ct->mr), ct->remote_fi_addr, ctx);*/
+	private void pp_post_tx(CTPingPong ct, EndPoint ep, Context ctx) {
+		//int timeout_save;
+		//int ret, rc;
+
+		while (true) {
+			ep.send(ct.tx_buf, ct.mr.getDesc(), ct.remote_fi_addr, ctx);
+			//if (!ret)
+			break;
+
+			/*if (ret != -FI_EAGAIN) { TODO: Ask about this.  Looks like this is only hit in the case of an error.
+				PP_PRINTERR(op_str, ret);
+				return ret;
+			}
+
+			timeout_save = ct->timeout;
+			ct->timeout = 0;
+			rc = comp_fn(ct, seq);
+			ct->timeout = timeout_save;
+			if (rc && rc != -FI_EAGAIN) {
+				PP_ERR("Failed to get " op_str " completion");
+				return rc;
+			}*/
+		}
+		ct.tx_seq++;
 	}
 
 	private void pp_tx(CTPingPong ct, EndPoint ep, long size) {
 		if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE))
 			pp_fill_buf(ct.tx_buf);
 
-		pp_post_tx(ct, ep, size, ct.tx_ctx);
+		pp_post_tx(ct, ep, ct.tx_ctx);
 
 		pp_get_tx_comp(ct, ct.tx_seq);
 	}
