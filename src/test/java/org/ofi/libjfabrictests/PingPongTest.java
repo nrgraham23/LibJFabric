@@ -40,6 +40,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.ofi.libjfabric.*;
@@ -542,176 +543,146 @@ void pp_process_eq_err(ssize_t rd, struct fid_eq *eq, const char *fn)
 		PP_PRINTERR(fn, rd);
 }
 
-/*******************************************************************************
+	/*******************************************************************************
 	 *                                         Test sizes
-	 ******************************************************************************
+	 ******************************************************************************/
 
-int generate_test_sizes(struct pp_opts *opts, size_t tx_size, int **sizes_)
-{
-	int defaults[6] = {64, 256, 1024, 4096, 65536, 1048576};
-	int power_of_two;
-	int half_up;
-	int n = 0;
-	int i;
-	int *sizes = NULL;
+	private int[] generate_test_sizes(PPOpts opts, long tx_size) {
+		int[] defaults = new int[] {64, 256, 1024, 4096, 65536, 1048576};
+		ArrayList<Integer> sizes = new ArrayList<Integer>();
+		int power_of_two;
+		int half_up;
+		int n = 0;
 
-	PP_DEBUG("Generating test sizes\n");
+		PP_DEBUG("Generating test sizes\n");
 
-	sizes = calloc(64, sizeof(*sizes));
-	if (sizes == NULL)
-		return 0;
-	 *sizes_ = sizes;
+		if ((opts.options & PP_OPT_SIZE) != 0) {
+			if (opts.transfer_size > tx_size)
+				throw new RuntimeException("tx_size too small!");
 
-	if (opts->options & PP_OPT_SIZE) {
-		if (opts->transfer_size > tx_size)
-			return 0;
+			sizes.add(0, opts.transfer_size);
+			n = 1;
+		} else if (opts.sizes_enabled != PP_ENABLE_ALL) {
+			for (int i = 0; i < defaults.length; i++) {
+				if (defaults[i] > tx_size)
+					break;
 
-		sizes[0] = opts->transfer_size;
-		n = 1;
-	} else if (opts->sizes_enabled != PP_ENABLE_ALL) {
-		for (i = 0; i < (sizeof(defaults) / sizeof(defaults[0])); i++) {
-			if (defaults[i] > tx_size)
-				break;
+				sizes.add(i, defaults[i]);
+				n++;
+			}
+		} else {
+			for (int i = 0;; i++) {
+				power_of_two = (i == 0) ? 0 : (1 << i);
+				half_up =
+						(i == 0) ? 1 : power_of_two + (power_of_two / 2);
 
-			sizes[i] = defaults[i];
-			n++;
+				if (power_of_two > tx_size)
+					break;
+
+				sizes.add(i * 2, power_of_two);
+				n++;
+
+				if (half_up > tx_size)
+					break;
+
+				sizes.add(i * 2, half_up);
+				n++;
+			}
 		}
-	} else {
-		for (i = 0;; i++) {
-			power_of_two = (i == 0) ? 0 : (1 << i);
-			half_up =
-			    (i == 0) ? 1 : power_of_two + (power_of_two / 2);
 
-			if (power_of_two > tx_size)
-				break;
+		PP_DEBUG("Generated %d test sizes\n", n);
 
-			sizes[i * 2] = power_of_two;
-			n++;
-
-			if (half_up > tx_size)
-				break;
-
-			sizes[(i * 2) + 1] = half_up;
-			n++;
-		}
+		return sizes.stream().mapToInt(i -> i).toArray();
 	}
 
-	PP_DEBUG("Generated %d test sizes\n", n);
-
-	return n;
-}
-
-/*******************************************************************************
+	/*******************************************************************************
 	 *                                    Performance output
-	 ******************************************************************************
+	 ******************************************************************************/
 
-/* str must be an allocated buffer of PP_STR_LEN bytes *
-char *size_str(char *str, uint64_t size)
-{
-	uint64_t base, fraction = 0;
-	char mag;
+	/* str must be an allocated buffer of PP_STR_LEN bytes */
+	private String size_str(long size) {
+		String str = "";
+		long base, fraction = 0;
+		char mag;
 
-	memset(str, '\0', PP_STR_LEN);
-
-	if (size >= (1 << 30)) {
-		base = 1 << 30;
-		mag = 'g';
-	} else if (size >= (1 << 20)) {
-		base = 1 << 20;
-		mag = 'm';
-	} else if (size >= (1 << 10)) {
-		base = 1 << 10;
-		mag = 'k';
-	} else {
-		base = 1;
-		mag = '\0';
-	}
-
-	if (size / base < 10)
-		fraction = (size % base) * 10 / base;
-
-	if (fraction)
-		snprintf(str, PP_STR_LEN, "%" PRIu64 ".%" PRIu64 "%c",
-			 size / base, fraction, mag);
-	else
-		snprintf(str, PP_STR_LEN, "%" PRIu64 "%c", size / base, mag);
-
-	return str;
-}
-
-/* str must be an allocated buffer of PP_STR_LEN bytes *
-char *cnt_str(char *str, size_t size, uint64_t cnt)
-{
-	if (cnt >= 1000000000)
-		snprintf(str, size, "%" PRIu64 "b", cnt / 1000000000);
-	else if (cnt >= 1000000)
-		snprintf(str, size, "%" PRIu64 "m", cnt / 1000000);
-	else if (cnt >= 1000)
-		snprintf(str, size, "%" PRIu64 "k", cnt / 1000);
-	else
-		snprintf(str, size, "%" PRIu64, cnt);
-
-	return str;
-}
-
-int64_t get_elapsed(const struct timespec *b, const struct timespec *a,
-		    enum precision p)
-{
-	int64_t elapsed;
-
-	elapsed = difftime(a->tv_sec, b->tv_sec) * 1000 * 1000 * 1000;
-	elapsed += a->tv_nsec - b->tv_nsec;
-	return elapsed / p;
-}
-
-void show_perf(char *name, int tsize, int sent, int acked,
-	       struct timespec *start, struct timespec *end, int xfers_per_iter)
-{
-	static int header = 1;
-	char str[PP_STR_LEN];
-	int64_t elapsed = get_elapsed(start, end, MICRO);
-	uint64_t bytes = (uint64_t)sent * tsize * xfers_per_iter;
-	float usec_per_xfer;
-
-	if (sent == 0)
-		return;
-
-	if (name) {
-		if (header) {
-			printf("%-50s%-8s%-8s%-9s%-8s%8s %10s%13s%13s\n",
-			       "name", "bytes", "#sent", "#ack", "total",
-			       "time", "MB/sec", "usec/xfer", "Mxfers/sec");
-			header = 0;
+		if (size >= (1 << 30)) {
+			base = 1 << 30;
+			mag = 'g';
+		} else if (size >= (1 << 20)) {
+			base = 1 << 20;
+			mag = 'm';
+		} else if (size >= (1 << 10)) {
+			base = 1 << 10;
+			mag = 'k';
+		} else {
+			base = 1;
+			mag = '\0';
 		}
 
-		printf("%-50s", name);
-	} else {
-		if (header) {
-			printf("%-8s%-8s%-9s%-8s%8s %10s%13s%13s\n", "bytes",
-			       "#sent", "#ack", "total", "time", "MB/sec",
-			       "usec/xfer", "Mxfers/sec");
-			header = 0;
-		}
+		if (size / base < 10)
+			fraction = (size % base) * 10 / base;
+
+		if (fraction != 0)
+			str = "" + (size / base) + "." + fraction + mag;
+		else
+			str = "" + (size / base) + "." + mag;
+
+		return str;
 	}
 
-	printf("%-8s", size_str(str, tsize));
-	printf("%-8s", cnt_str(str, sizeof(str), sent));
+	/* str must be an allocated buffer of PP_STR_LEN bytes */
+	private String cnt_str(long cnt) {
+		String str = "";
+		if (cnt >= 1000000000)
+			str += (cnt / 1000000000) + "b";
+		else if (cnt >= 1000000)
+			str += (cnt / 1000000) + "m";
+		else if (cnt >= 1000)
+			str += (cnt / 1000) + "k";
+		else
+			str += cnt;
 
-	if (sent == acked)
-		printf("=%-8s", cnt_str(str, sizeof(str), acked));
-	else if (sent < acked)
-		printf("-%-8s", cnt_str(str, sizeof(str), acked - sent));
-	else
-		printf("+%-8s", cnt_str(str, sizeof(str), sent - acked));
+		return str;
+	}
 
-	printf("%-8s", size_str(str, bytes));
+	private void show_perf(String name, int tsize, int sent, int acked, long start, long end, int xfers_per_iter) {
+		long elapsed = end - start; //TODO: format better
+		long bytes = sent * tsize * xfers_per_iter;
+		float usec_per_xfer;
 
-	usec_per_xfer = ((float)elapsed / sent / xfers_per_iter);
-	printf("%8.2fs%10.2f%11.2f%11.2f\n", elapsed / 1000000.0,
-	       bytes / (1.0 * elapsed), usec_per_xfer, 1.0 / usec_per_xfer);
-}
+		if (sent == 0)
+			return;
 
-/*******************************************************************************
+		if (name != null && name != "") {
+			System.out.printf("%-50s%-8s%-8s%-9s%-8s%8s %10s%13s%13s\n",
+					"name", "bytes", "#sent", "#ack", "total",
+					"time", "MB/sec", "usec/xfer", "Mxfers/sec");
+
+			System.out.printf("%-50s", name);
+		} else {
+			System.out.printf("%-8s%-8s%-9s%-8s%8s %10s%13s%13s\n", "bytes",
+					"#sent", "#ack", "total", "time", "MB/sec",
+					"usec/xfer", "Mxfers/sec");
+		}
+
+		System.out.printf("%-8s", size_str(tsize));
+		System.out.printf("%-8s", cnt_str(sent));
+
+		if (sent == acked)
+			System.out.printf("=%-8s", cnt_str(acked));
+		else if (sent < acked)
+			System.out.printf("-%-8s", cnt_str(acked - sent));
+		else
+			System.out.printf("+%-8s", cnt_str(sent - acked));
+
+		System.out.printf("%-8s", size_str(bytes));
+
+		usec_per_xfer = ((float)elapsed / sent / xfers_per_iter);
+		System.out.printf("%8.2fs%10.2f%11.2f%11.2f\n", elapsed / 1000000.0,
+				bytes / (1.0 * elapsed), usec_per_xfer, 1.0 / usec_per_xfer);
+	}
+
+	/*******************************************************************************
 	 *                                      Data Messaging
 	 ******************************************************************************
 
@@ -932,21 +903,20 @@ ssize_t pp_rx(struct ct_pingpong *ct, struct fid_ep *ep, size_t size)
 	return ret;
 }
 
-/*******************************************************************************
+	/*******************************************************************************
 	 *                                Initialization and allocations
-	 ******************************************************************************
+	 ******************************************************************************/
 
-void init_test(struct ct_pingpong *ct, struct pp_opts *opts)
-{
-	char sstr[PP_STR_LEN];
+	/*private void init_test(CTPingPong ct, PPOpts opts) {
+		char sstr[PP_STR_LEN];
 
-	size_str(sstr, opts->transfer_size);
-	if (!(opts->options & PP_OPT_ITER))
-		opts->iterations = size_to_count(opts->transfer_size);
+		size_str(sstr, opts->transfer_size);
+		if (!(opts->options & PP_OPT_ITER))
+			opts->iterations = size_to_count(opts->transfer_size);
 
-	ct->cnt_ack_msg = 0;
-}
-	 */
+			ct->cnt_ack_msg = 0;
+	}*/
+
 	private long pp_init_cq_data(Info info) {
 		if (info.getDomainAttr().getCQDataSize() >= Long.MAX_VALUE) {
 			return 81985529216486895L;
@@ -1126,7 +1096,7 @@ void init_test(struct ct_pingpong *ct, struct pp_opts *opts)
 
 			PP_DEBUG("Connected endpoint: server connected\n");
 		} catch(Exception e) { //better exception handling should be implemented in a more complete version
-			//fi_reject(ct->pep, ct->fi->handle, NULL, 0);
+			//fi_reject(ct->pep, ct->fi->handle, NULL, 0); TODO:May be able to just ignore this for my purposes.
 		}
 	}
 
