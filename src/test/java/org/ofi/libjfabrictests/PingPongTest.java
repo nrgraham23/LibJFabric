@@ -747,32 +747,6 @@ int pp_cq_readerr(struct fid_cq *cq)
 		}
 	}
 
-	/*private void PP_POST(post_fn, comp_fn, seq, op_str, ...) {//TODO: use as template to implement the 3 different type of methods that use this macro
-		int timeout_save;
-		int ret, rc;
-
-		while (true) {
-			ret = post_fn(__VA_ARGS__);
-			if (!ret)
-				break;
-
-			if (ret != -FI_EAGAIN) {
-				PP_PRINTERR(op_str, ret);
-				return ret;
-			}
-
-			timeout_save = ct->timeout;
-			ct->timeout = 0;
-			rc = comp_fn(ct, seq);
-			ct->timeout = timeout_save;
-			if (rc && rc != -FI_EAGAIN) {
-				PP_ERR("Failed to get " op_str " completion");
-				return rc;
-			}
-		}
-		seq++;
-	}*/
-
 	private void pp_post_tx(CTPingPong ct, EndPoint ep, Context ctx) {
 		//int timeout_save;
 		//int ret, rc;
@@ -841,23 +815,16 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 		pp_post_inject(ct, ep, size);
 	}
-	private void pp_post_rx(CTPingPong ct, EndPoint ep, long size, Context ctx) {
-		/*PP_POST(fi_recv, pp_get_rx_comp, ct->rx_seq, "receive", ep, ct->rx_buf,
-				MAX(size, PP_MAX_CTRL_MSG), fi_mr_desc(ct->mr), 0, ctx);
+	private void pp_post_rx(CTPingPong ct, EndPoint ep, Context ctx) {
+		//int timeout_save;
+		//int rc;
 
-		int timeout_save;
-		int rc;
+		while (true) {
+			ep.recv(ct.rx_buf, ct.mr.getDesc(), 0, ctx);
+			//if (!ret)
+			break;
 
-		while (true) { //TODO:HERE
-			try {
-				ep.recv(ct.rx_buf, Math.max(size, PP_MAX_CTRL_MSG),);
-			} catch (Exception e) {
-
-			}
-			if (!ret)
-				break;
-
-			if (ret != -FI_EAGAIN) {
+			/*if (ret != -FI_EAGAIN) { //TODO: see pp_post_tx
 				PP_PRINTERR(op_str, ret);
 				return ret;
 			}
@@ -869,9 +836,9 @@ int pp_cq_readerr(struct fid_cq *cq)
 			if (rc && rc != -FI_EAGAIN) {
 				PP_ERR("Failed to get " op_str " completion");
 				return rc;
-			}
+			}*/
 		}
-		seq++;*/
+		ct.tx_seq++;
 	}
 
 	private void pp_rx(CTPingPong ct, EndPoint ep, long size) {
@@ -888,7 +855,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 		 * before message size is updated. The recvs posted are always for the
 		 * next incoming message.
 		 */
-		pp_post_rx(ct, ct.ep, ct.rx_size, ct.rx_ctx);
+		pp_post_rx(ct, ct.ep, ct.rx_ctx);
 		//if (!ret)
 		ct.cnt_ack_msg++;
 	}
@@ -1005,7 +972,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 		ct.ep.enable();
 
-		pp_post_rx(ct, ct.ep, Math.max(ct.rx_size, PP_MAX_CTRL_MSG), ct.rx_ctx);
+		pp_post_rx(ct, ct.ep, ct.rx_ctx);
 
 		PP_DEBUG("Endpoint initialzed\n");
 	}
