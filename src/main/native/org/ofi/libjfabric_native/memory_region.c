@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Los Alamos Nat. Security, LLC. All rights reserved.
+ * Copyright (c) 2016 Los Alamos Nat. Security, LLC. All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -30,16 +30,11 @@
  * SOFTWARE.
  */
 
-package org.ofi.libjfabric;
+#include "libfabric.h"
+#include "org_ofi_libjfabric_MemoryRegion.h"
 
-public class MemoryRegion extends FIDescriptor {
-
-	public MemoryRegion(long handle) {
-		super(handle);
-	}
-	
-	public long getDesc() { //TODO: this should probably be wrapped in an object or something better than just returning the address of the pointer
-		return getDesc(this.handle);
-	}
-	private native long getDesc(long handle);
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_MemoryRegion_getDesc
+	(JNIEnv *env, jobject jthis, jlong mrHandle)
+{
+	return (jlong)(((struct fid_mr *)mrHandle)->mem_desc);
 }
