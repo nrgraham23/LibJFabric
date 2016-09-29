@@ -695,45 +695,42 @@ int pp_cq_readerr(struct fid_cq *cq)
 	return ret;
 }
 	 */
-	private void pp_get_cq_comp(CompletionQueue cq, long cur, long total, int timeout) {
-		/*struct fi_cq_err_entry comp; TODO: HERE
-	struct timespec a, b;
-	int ret = 0;
+	private void pp_get_cq_comp(CTPingPong ct, CompletionQueue cq, int timeout) {
+		//struct fi_cq_err_entry comp;
+		long a = 0, b;
+		int ret = 0;
 
-	if (timeout >= 0)
-		clock_gettime(CLOCK_MONOTONIC, &a);
+		if (timeout >= 0)
+			a = System.nanoTime();
 
-	while (total - *cur > 0) {
-		ret = fi_cq_read(cq, &comp, 1);
-		if (ret > 0) {
-			if (timeout >= 0)
-				clock_gettime(CLOCK_MONOTONIC, &a);
+		while (ct.rx_seq - ct.tx_cq_cntr > 0) {
+			cq.read(1);
+			//ret = fi_cq_read(cq, &comp, 1);
+			if (ret > 0) {
+				if (timeout >= 0)
+					a = System.nanoTime();
 
-			(*cur)++;
-		} else if (ret < 0 && ret != -FI_EAGAIN) {
-			if (ret == -FI_EAVAIL) {
-				ret = pp_cq_readerr(cq);
-				(*cur)++;
-			} else {
-				PP_PRINTERR("pp_get_cq_comp", ret);
-			}
+				ct.tx_cq_cntr++;
+			} /*else if (ret < 0 && ret != -FI_EAGAIN) { //TODO: Error handing code
+				if (ret == -FI_EAVAIL) {
+					ret = pp_cq_readerr(cq);
+					ct.tx_cq_cntr++;
+				} else {
+					PP_PRINTERR("pp_get_cq_comp", ret);
+				}
 
-			return ret;
-		} else if (timeout >= 0) {
-			clock_gettime(CLOCK_MONOTONIC, &b);
-			if ((b.tv_sec - a.tv_sec) > timeout) {
-				fprintf(stderr, "%ds timeout expired\n",
-					timeout);
-				return -FI_ENODATA;
+				return ret;
+			}*/ else if (timeout >= 0) {
+				b = System.nanoTime();
+				if ((b - a) / 1000000000 > timeout) { //done in seconds
+					System.err.printf("%ds timeout expired\n", timeout);
+				}
 			}
 		}
 	}
-
-	return 0;*/
-	}
-	private void pp_get_rx_comp(CTPingPong ct, long total) {
+	private void pp_get_rx_comp(CTPingPong ct) {
 		if (ct.rxcq != null) {
-			pp_get_cq_comp(ct.rxcq, ct.rx_cq_cntr, total, ct.timeout);
+			pp_get_cq_comp(ct, ct.rxcq, ct.timeout);
 		} else {
 			PP_ERR("Trying to get a RX completion when no RX CQ was opened");
 		}
@@ -741,7 +738,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 	private void pp_get_tx_comp(CTPingPong ct, long total) {
 		if (ct.txcq != null) {
-			pp_get_cq_comp(ct.txcq, ct.tx_cq_cntr, total, -1);
+			pp_get_cq_comp(ct, ct.txcq, -1);
 		} else {
 			PP_ERR("Trying to get a TX completion when no TX CQ was opened");
 		}
@@ -843,7 +840,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 	private void pp_rx(CTPingPong ct, EndPoint ep, long size) {
 
-		pp_get_rx_comp(ct, ct.rx_seq);
+		pp_get_rx_comp(ct);
 
 		if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE)) {
 			pp_check_buf(ct.rx_buf);

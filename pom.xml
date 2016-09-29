@@ -76,6 +76,7 @@
                                 <javahClassName>org.ofi.libjfabric.PassiveEndPoint</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.EventQueue</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.MemoryRegion</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.CompletionQueue</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.DomainAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.EndPointAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.FabricAttr</javahClassName>
