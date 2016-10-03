@@ -41,6 +41,7 @@ public class EndPoint extends EndPointSharedOps {
 	}
 	
 	public void recv(Buffer buffer, long mrDesc, long srcAddress, Context context) { //TODO: mrDesc would be replaced with something cleaner when the todo in MemoryRegion.java is fixed
+		assert(buffer.isDirect());
 		recv(this.handle, buffer, buffer.capacity(), mrDesc, srcAddress, context.getHandle());
 	}
 	private native void recv(long epHandle, Buffer buffer, int length, long mrDesc, long srcAddress, long contextHandle);
