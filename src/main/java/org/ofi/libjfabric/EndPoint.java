@@ -105,4 +105,9 @@ public class EndPoint extends EndPointSharedOps {
 		sendMessage(this.handle, message.getHandle(), flags);
 	}
 	private native void sendMessage(long epHandle, long msgHandle, long flags);
+	
+	public void shutdown(long flags) {
+		shutdown(this.handle, flags);
+	}
+	private native void shutdown(long handle, long flags);
 }
