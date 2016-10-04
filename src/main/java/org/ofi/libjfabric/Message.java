@@ -40,7 +40,7 @@ public class Message {
 	
 	public Message(Buffer buf, int iovCount, long addr, Context context) {
 		assert(buf.isDirect());
-		this.handle = initMessage(buf, buf.capacity(), iovCount, addr, context.getHandle());
+		this.handle = initMessage(buf, (buf.capacity() + 1), iovCount, addr, context.getHandle());
 	}
 	private native long initMessage(Buffer buf, int length, int iovCount, long addr, long contextHandle);
 	
