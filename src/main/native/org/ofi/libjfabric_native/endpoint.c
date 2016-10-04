@@ -96,3 +96,9 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_inject
 	
 	((struct fid_ep *)epHandle)->msg->inject((struct fid_ep *)epHandle, &ptr, length, destAddr);
 }
+
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_sendMessage
+	(JNIEnv *env, jobject jthis, jlong epHandle, jlong msgHandle, jlong flags)
+{
+	((struct fid_ep *)epHandle)->msg->sendmsg((struct fid_ep *)epHandle, (const struct fi_msg *)msgHandle, flags);
+}

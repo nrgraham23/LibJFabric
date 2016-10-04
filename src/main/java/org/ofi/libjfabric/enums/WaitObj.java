@@ -37,8 +37,7 @@ public enum WaitObj {
 	WAIT_UNSPEC(getUNSPEC()),
 	WAIT_SET(getSET()),
 	WAIT_FD(getFD()),
-	WAIT_MUTEX_COND(getMUTEXCOND()),
-	WAIT_CRITSEC_COND(getCRITSECCOND());
+	WAIT_MUTEX_COND(getMUTEXCOND());
 
 	private int val;
 
@@ -67,9 +66,6 @@ public enum WaitObj {
 		if(val == WaitObj.WAIT_MUTEX_COND.getVal()) {
 			return WaitObj.WAIT_MUTEX_COND;
 		}
-		if(val == WaitObj.WAIT_CRITSEC_COND.getVal()) {
-			return WaitObj.WAIT_CRITSEC_COND;
-		}
 		throw new IllegalArgumentException("Invalid integer value for method getWaitObj!");
 	}
 
@@ -78,5 +74,4 @@ public enum WaitObj {
 	private static native int getSET();
 	private static native int getFD();
 	private static native int getMUTEXCOND();
-	private static native int getCRITSECCOND();
 }

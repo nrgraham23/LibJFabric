@@ -52,7 +52,3 @@ JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_WaitObj_getFD(JNIEnv *env, 
 JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_WaitObj_getMUTEXCOND(JNIEnv *env, jclass jthis) {
 	return FI_WAIT_MUTEX_COND;
 }
-
-JNIEXPORT jint JNICALL Java_org_ofi_libjfabric_enums_WaitObj_getCRITSECCOND(JNIEnv *env, jclass jthis) {
-	return FI_WAIT_CRITSEC_COND;
-}

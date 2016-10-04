@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Los Alamos Nat. Security, LLC. All rights reserved.
+ * Copyright (c) 2016 Los Alamos Nat. Security, LLC. All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -30,28 +30,28 @@
  * SOFTWARE.
  */
 
-#include "org_ofi_libjfabric_Constant.h"
-#include "constant.h"
 #include "libfabric.h"
+#include "org_ofi_libjfabric_Message.h"
 
-void setLongField(JNIEnv *env, jclass c, jobject jthis, char *field, jlong value)
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Message_initMessage
+	(JNIEnv *env, jobject jthis, jobject buffer, jint length, jint iovCount, jlong addr, jlong contextHandle)
 {
-	jfieldID id = (*env)->GetFieldID(env, c, field, "J");
-	(*env)->SetLongField(env, jthis, id, value);
-}
-
-JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Constant_setConstant
-	(JNIEnv *env, jobject jthis)
-{
-	jclass c = (*env)->GetObjectClass(env, jthis);
+	struct iovec iov;
 	
-	setLongField(env, c, jthis, "FI_CONTEXT", FI_CONTEXT);
-	setLongField(env, c, jthis, "FI_LOCAL_MR", FI_LOCAL_MR);
-	setLongField(env, c, jthis, "FI_SOURCE", FI_SOURCE);
-	setLongField(env, c, jthis, "FI_MSG", FI_MSG);
-	setLongField(env, c, jthis, "FI_TRANSMIT", FI_TRANSMIT);
-	setLongField(env, c, jthis, "FI_RECV", FI_RECV);
-	setLongField(env, c, jthis, "FI_SEND", FI_SEND);
-	setLongField(env, c, jthis, "FI_INJECT", FI_INJECT);
-	setLongField(env, c, jthis, "FI_TRANSMIT_COMPLETE", FI_TRANSMIT_COMPLETE);
+	struct fi_msg *message = (struct fi_msg *)calloc(1, sizeof(struct fi_msg));
+	
+	message_list[message_list_tail] = message;
+	message_list_tail++;
+	
+	void *ptr = getDirectBufferAddress(env, buffer);
+	
+	iov.iov_base = ptr;
+	iov.iov_len = length;
+	
+	message->msg_iov = &iov;
+	message->iov_count = 1;
+	message->addr = addr;
+	message->context = (void *)contextHandle;
+	
+	return (jlong)message;
 }
