@@ -44,6 +44,7 @@
 #include "rdma/fi_eq.h"
 #include "rdma/fi_cm.h"
 #include "org_ofi_libjfabric_LibFabric.h"
+#include <sys/uio.h>
 
 /*NOTE: The intent is to eventually replace these lists with linked lists!*/
 extern struct fi_domain_attr *domain_attr_list[];
@@ -81,6 +82,9 @@ extern int ep_list_tail;
 
 extern struct fi_cq_attr *cq_attr_list[];
 extern int cq_attr_list_tail;
+
+extern struct fi_msg *message_list[];
+extern int message_list_tail;
 
 typedef struct {
 	jclass AVTypeClass;
@@ -134,6 +138,7 @@ void deleteEventQueueList();
 void deleteContextList();
 void deleteEPList();
 void deleteCQAttrList();
+void deleteMessageList();
 void nullListsOut();
 int getLinkedListLength(struct fi_info **resultInfo);
 void* getDirectBufferAddress(JNIEnv *env, jobject buffer);

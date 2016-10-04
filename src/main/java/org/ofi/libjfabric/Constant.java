@@ -41,6 +41,8 @@ public class Constant {
 	protected long FI_TRANSMIT;
 	protected long FI_RECV;
 	protected long FI_SEND;
+	protected long FI_INJECT;
+	protected long FI_TRANSMIT_COMPLETE;
 	
 	protected Constant() {
 		setConstant();

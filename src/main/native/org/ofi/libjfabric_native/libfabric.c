@@ -71,6 +71,9 @@ int ep_list_tail = 0;
 struct fi_cq_attr *cq_attr_list[LISTSIZE];
 int cq_attr_list_tail = 0;
 
+struct fi_msg *message_list[LISTSIZE];
+int message_list_tail = 0;
+
 libfabric_globals_t lib_globals;
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_init(JNIEnv *env, jclass jthis) {
@@ -92,6 +95,7 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_LibFabric_deleteCachedVars(JNIEnv
 	deleteContextList();
 	deleteEPList();
 	deleteCQAttrList();
+	deleteMessageList();
 }
 
 void initGlobals(JNIEnv *env) {
@@ -135,6 +139,9 @@ void deleteGlobals(JNIEnv *env) {
 	(*env)->DeleteGlobalRef(env, lib_globals.VersionClass);
 	(*env)->DeleteGlobalRef(env, lib_globals.CQFormatClass);
 	(*env)->DeleteGlobalRef(env, lib_globals.CQWaitCondClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.VersionClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.EQCMEntryClass);
+	(*env)->DeleteGlobalRef(env, lib_globals.EQEventClass);
 }
 
 void convertJNIString(JNIEnv *env, char **charPointer, jstring javaString) {
@@ -276,6 +283,17 @@ void deleteCQAttrList() {
 	while(i < cq_attr_list_tail) {
 		if(cq_attr_list[i] != NULL) {
 			free(cq_attr_list[i]);
+		}
+		i++;
+	}
+}
+
+void deleteMessageList() {
+	int i = 0;
+
+	while(i < message_list_tail) {
+		if(message_list[i] != NULL) {
+			free(message_list[i]);
 		}
 		i++;
 	}

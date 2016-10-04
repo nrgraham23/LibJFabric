@@ -706,7 +706,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 		while (ct.rx_seq - ct.tx_cq_cntr > 0) {
 			cq.read(1);
 			//ret = fi_cq_read(cq, &comp, 1);
-			if (ret > 0) {
+			if (ret > 0) { //TODO: fix
 				if (timeout >= 0)
 					a = System.nanoTime();
 
@@ -1124,45 +1124,29 @@ int pp_cq_readerr(struct fid_cq *cq)
 		PP_DEBUG("Resources of test suite freed\n");
 	}
 
-	/*private void pp_finalize(CTPingPong ct) { //TODO:HERE  (not sure about iovec)
-		struct iovec iov;
-		int ret;
-		struct fi_context ctx;
-		struct fi_msg msg;
+	private void pp_finalize(CTPingPong ct) {
+		//struct iovec iov;
+		Context ctx = new Context(1); //TODO: this doesnt appear to be used in the test... can i just delete it or is it here for a reason?
+		Message msg;
 
 		PP_DEBUG("Terminating test\n");
 
-		strcpy(ct->tx_buf, "fin");
-		iov.iov_base = ct->tx_buf;
-		iov.iov_len = 4;
+		ct.tx_buf.put(0, (byte)'f').put(1, (byte)'i').put(2, (byte)'n');
+		//strcpy(ct->tx_buf, "fin");
+		//iov.iov_base = ct->tx_buf;
+		//iov.iov_len = 4; 4?  shouldnt it be 3? TODO
 
-		memset(&msg, 0, sizeof(msg));
-		msg.msg_iov = &iov;
-		msg.iov_count = 1;
-		msg.addr = ct->remote_fi_addr;
-		msg.context = &ctx;
+		msg = new Message(ct.tx_buf, 1, ct.remote_fi_addr, ctx);
 
-		ret = fi_sendmsg(ct->ep, &msg, FI_INJECT | FI_TRANSMIT_COMPLETE);
-		if (ret) {
-			PP_PRINTERR("transmit", ret);
-			return ret;
-		}
+		ct.ep.sendMessage(msg, LibFabric.FI_INJECT | LibFabric.FI_TRANSMIT_COMPLETE);
 
-		ret = pp_get_tx_comp(ct, ++ct->tx_seq);
-		if (ret)
-			return ret;
-
-		ret = pp_get_rx_comp(ct, ct->rx_seq);
-		if (ret)
-			return ret;
-
-		ret = pp_ctrl_finish(ct);
-		if (ret)
-			return ret;
-
+		pp_get_tx_comp(ct, ++ct.tx_seq);
+		
+		pp_get_rx_comp(ct);
+		
+		pp_ctrl_finish(ct);
+		
 		PP_DEBUG("Test terminated\n");
-
-		return 0;
 	}
 
 	/*******************************************************************************

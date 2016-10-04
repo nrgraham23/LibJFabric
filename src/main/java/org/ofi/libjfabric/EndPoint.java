@@ -100,4 +100,9 @@ public class EndPoint extends EndPointSharedOps {
 		inject(this.handle, buffer, buffer.capacity(), destAddr);
 	}
 	private native void inject(long epHandle, Buffer buffer, int length, long destAddr);
+	
+	public void sendMessage(Message message, long flags) {
+		sendMessage(this.handle, message.getHandle(), flags);
+	}
+	private native void sendMessage(long epHandle, long msgHandle, long flags);
 }
