@@ -1289,9 +1289,9 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 		run_suite_pingpong(ct);
 
-		//pp_finalize(ct); //TODO:HERE
+		pp_finalize(ct); //TODO:HERE
 
-		//fi_shutdown(ct->ep, 0);
+		ct.ep.shutdown(0);
 	}
 
 

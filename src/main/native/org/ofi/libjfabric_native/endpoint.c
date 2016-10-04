@@ -102,3 +102,9 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_sendMessage
 {
 	((struct fid_ep *)epHandle)->msg->sendmsg((struct fid_ep *)epHandle, (const struct fi_msg *)msgHandle, flags);
 }
+
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_shutdown
+	(JNIEnv *env, jobject jthis, jlong handle, jlong flags)
+{
+	((struct fid_ep *)handle)->cm->shutdown((struct fid_ep *)handle, flags);
+}
