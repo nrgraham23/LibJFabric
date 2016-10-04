@@ -1283,6 +1283,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 	//D - debug | L - length | S - server | I - iterations | address last argument 
 	public static void main(String[] args) { //allow itteration and message length arguments
+		LibFabric.load();
 		PingPongTest tester = new PingPongTest();
 
 		CTPingPong ct = tester.new CTPingPong();
@@ -1291,6 +1292,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 		ct.opts.iterations = 1000;
 		ct.opts.transfer_size = 1024;
 		ct.opts.sizes_enabled = tester.PP_DEFAULT_SIZE;
+		ct.eq_attr = new EventQueueAttr();
 		ct.eq_attr.setWaitObj(WaitObj.WAIT_UNSPEC);
 
 		ct.hints = new Info();

@@ -133,6 +133,7 @@ set(SOURCE_FILES
   memory_region.c
   completion_queue.c
   message.c
+  eq_attr.c
 )
 
 set(INTERFACE_FILES

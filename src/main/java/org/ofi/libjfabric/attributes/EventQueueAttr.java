@@ -47,6 +47,10 @@ public class EventQueueAttr {
 		this.handle = handle;
 	}
 
+	public EventQueueAttr() {
+		this.handle = eventQueueAttrInit(0, 0, 0, 0, 0);
+	}
+	
 	//gets
 	public long getHandle() {
 		return this.handle;
