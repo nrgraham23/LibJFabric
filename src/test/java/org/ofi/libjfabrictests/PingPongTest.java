@@ -67,7 +67,7 @@ public class PingPongTest {
 		boolean isServer = false;
 	};
 	final int PP_SIZE_MAX_POWER_TWO = 22;
-	final long PP_MAX_DATA_MSG = ((1 << PP_SIZE_MAX_POWER_TWO) + (1 << (PP_SIZE_MAX_POWER_TWO - 1)));
+	final int PP_MAX_DATA_MSG = ((1 << PP_SIZE_MAX_POWER_TWO) + (1 << (PP_SIZE_MAX_POWER_TWO - 1)));
 
 	final int PP_STR_LEN = 32;
 	final int PP_MAX_CTRL_MSG = 64;
@@ -120,7 +120,6 @@ public class PingPongTest {
 		AddressVector av;
 		EventQueue eq;
 
-		MemoryRegion no_mr;
 		Context tx_ctx, rx_ctx;
 		long remote_cq_data;
 
@@ -128,7 +127,7 @@ public class PingPongTest {
 
 		long remote_fi_addr;
 		ByteBuffer buf, tx_buf, rx_buf;
-		long buf_size, tx_size, rx_size;
+		int buf_size, tx_size, rx_size;
 
 		int timeout;
 		long start, end;
@@ -697,21 +696,23 @@ int pp_cq_readerr(struct fid_cq *cq)
 	 */
 	private void pp_get_cq_comp(CTPingPong ct, CompletionQueue cq, int timeout) {
 		//struct fi_cq_err_entry comp;
-		long a = 0, b;
-		int ret = 0;
+		//long a = 0, b;
+		//int ret = 0;
 
-		if (timeout >= 0)
-			a = System.nanoTime();
+		//if (timeout >= 0)
+		//	a = System.nanoTime();
 
 		while (ct.rx_seq - ct.tx_cq_cntr > 0) {
-			cq.read(1);
-			//ret = fi_cq_read(cq, &comp, 1);
-			if (ret > 0) { //TODO: fix
+			try {
+				cq.read(1);
+			} catch(Exception e) {
+				/*ret = fi_cq_read(cq, &comp, 1); //Error handing code, hope to be able to ignore.
+			if (ret > 0) {
 				if (timeout >= 0)
 					a = System.nanoTime();
 
 				ct.tx_cq_cntr++;
-			} /*else if (ret < 0 && ret != -FI_EAGAIN) { //TODO: Error handing code
+			} /*else if (ret < 0 && ret != -FI_EAGAIN) { 
 				if (ret == -FI_EAVAIL) {
 					ret = pp_cq_readerr(cq);
 					ct.tx_cq_cntr++;
@@ -720,11 +721,12 @@ int pp_cq_readerr(struct fid_cq *cq)
 				}
 
 				return ret;
-			}*/ else if (timeout >= 0) {
+			}* else if (timeout >= 0) {
 				b = System.nanoTime();
 				if ((b - a) / 1000000000 > timeout) { //done in seconds
 					System.err.printf("%ds timeout expired\n", timeout);
 				}
+			}*/
 			}
 		}
 	}
@@ -748,25 +750,28 @@ int pp_cq_readerr(struct fid_cq *cq)
 		//int timeout_save;
 		//int ret, rc;
 
-		while (true) {
+		//while (true) {
+		try {
 			ep.send(ct.tx_buf, ct.mr.getDesc(), ct.remote_fi_addr, ctx);
+		} catch(Exception e) {
 			//if (!ret)
-			break;
+			//break;
 
-			/*if (ret != -FI_EAGAIN) { TODO: Ask about this.  Looks like this is only hit in the case of an error.
-				PP_PRINTERR(op_str, ret);
-				return ret;
-			}
+			/*if (ret != -FI_EAGAIN) {
+					PP_PRINTERR(op_str, ret);
+					return ret;
+				}
 
-			timeout_save = ct->timeout;
-			ct->timeout = 0;
-			rc = comp_fn(ct, seq);
-			ct->timeout = timeout_save;
-			if (rc && rc != -FI_EAGAIN) {
-				PP_ERR("Failed to get " op_str " completion");
-				return rc;
-			}*/
+				timeout_save = ct->timeout;
+				ct->timeout = 0;
+				rc = comp_fn(ct, seq);
+				ct->timeout = timeout_save;
+				if (rc && rc != -FI_EAGAIN) {
+					PP_ERR("Failed to get " op_str " completion");
+					return rc;
+				}*/
 		}
+		//}
 		ct.tx_seq++;
 	}
 
@@ -783,15 +788,16 @@ int pp_cq_readerr(struct fid_cq *cq)
 		//int timeout_save;
 		//int ret, rc;
 
-		while (true) {
+		//while (true) {
+		try {
 			ep.inject(ct.tx_buf, ct.remote_fi_addr);
 			//if (!ret)
-			break;
-
-			/*if (ret != -FI_EAGAIN) { //TODO: see pp_post_tx
-				PP_PRINTERR(op_str, ret);
-				return ret;
-			}
+			//break;
+		} catch(Exception e) {
+			/*if (ret != -FI_EAGAIN) {
+			PP_PRINTERR(op_str, ret);
+			return ret;
+		}
 
 			timeout_save = ct->timeout;
 			ct->timeout = 0;
@@ -802,6 +808,10 @@ int pp_cq_readerr(struct fid_cq *cq)
 				return rc;
 			}*/
 		}
+
+
+
+		//}
 		ct.tx_seq++;
 		ct.tx_cq_cntr++;
 	}
@@ -816,12 +826,15 @@ int pp_cq_readerr(struct fid_cq *cq)
 		//int timeout_save;
 		//int rc;
 
-		while (true) {
+		//while (true) {
+		try {
 			ep.recv(ct.rx_buf, ct.mr.getDesc(), 0, ctx);
 			//if (!ret)
-			break;
+			//break;
+		} catch (Exception e) {
 
-			/*if (ret != -FI_EAGAIN) { //TODO: see pp_post_tx
+
+			/*if (ret != -FI_EAGAIN) {
 				PP_PRINTERR(op_str, ret);
 				return ret;
 			}
@@ -834,6 +847,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 				PP_ERR("Failed to get " op_str " completion");
 				return rc;
 			}*/
+			//}
 		}
 		ct.tx_seq++;
 	}
@@ -845,7 +859,6 @@ int pp_cq_readerr(struct fid_cq *cq)
 		if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE)) {
 			pp_check_buf(ct.rx_buf);
 		}
-		/* TODO: verify CQ data, if available */ //todo from test, not mine
 
 		/* Ignore the size arg. Post a buffer large enough to handle all message
 		 * sizes. pp_sync() makes use of pp_rx() and gets called in tests just
@@ -879,42 +892,25 @@ int pp_cq_readerr(struct fid_cq *cq)
 		}
 	}
 
-	private void pp_alloc_msgs(CTPingPong ct) {
-		long alignment = 1;
-
+	private void pp_alloc_msgs(CTPingPong ct) { //removed memory alignment code here
 		ct.tx_size = ((ct.opts.options & PP_OPT_SIZE) != 0) ? ct.opts.transfer_size : PP_MAX_DATA_MSG;
 		if (ct.tx_size > ct.fi.getEndPointAttr().getMaxMsgSize())
 			ct.tx_size = ct.fi.getEndPointAttr().getMaxMsgSize();
 
-		ct.rx_size = ct.tx_size; //TODO: duplication?
+		ct.rx_size = ct.tx_size;
 		ct.buf_size = Math.max(ct.tx_size, PP_MAX_CTRL_MSG) + Math.max(ct.rx_size, PP_MAX_CTRL_MSG);
 
-		/*alignment = sysconf(_SC_PAGESIZE); //TODO: Memory alignment area
-		if (alignment < 0) {
-			ret = -errno;
-			PP_PRINTERR("sysconf", ret);
-			return ret;
-		}
-		/* Extra alignment for the second part of the buffer *
-		ct->buf_size += alignment;
+		ct.buf = ByteBuffer.allocateDirect(ct.buf_size);
 
-		ret = posix_memalign(&(ct->buf), (size_t)alignment, ct->buf_size); //this is where the buffer is initialized
-		if (ret) {
-			PP_PRINTERR("posix_memalign", ret);
-			return ret;
-		}
-		memset(ct->buf, 0, ct->buf_size);
-		ct->rx_buf = ct->buf;
-		ct->tx_buf = (char *)ct->buf + MAX(ct->rx_size, PP_MAX_CTRL_MSG);
-		ct->tx_buf = (void *)(((uintptr_t)ct->tx_buf + alignment - 1) &
-				~(alignment - 1));
-		 */
+		ct.rx_buf = ct.buf;
+		ct.buf.position(Math.max(ct.rx_size, PP_MAX_CTRL_MSG));
+		ct.tx_buf = ct.buf.slice();
+		ct.buf.position(0);
+
 		ct.remote_cq_data = pp_init_cq_data(ct.fi);
 
 		if ((ct.fi.getMode() & LibFabric.FI_LOCAL_MR) != 0) {
 			ct.mr = ct.domain.mrRegister(ct.buf, (LibFabric.FI_SEND | LibFabric.FI_RECV), PP_MR_KEY);
-		} else {
-			ct.mr = ct.no_mr; //TODO: looks like this can be null if I want.  Delete ct.no_mr in that case
 		}
 	}
 
@@ -953,7 +949,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 		long flags = 0;
 
 		if (hints.getEndPointAttr().getEpType() == null)
-			hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG); //he had datagram here
+			hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG);
 
 		return LibFabric.getInfo(version, flags, hints)[0];
 	}
@@ -1050,7 +1046,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 			PP_DEBUG("Connected endpoint: server connected\n");
 		} catch(Exception e) { //better exception handling should be implemented in a more complete version
-			//fi_reject(ct->pep, ct->fi->handle, NULL, 0); TODO:May be able to just ignore this for my purposes.
+			//fi_reject(ct->pep, ct->fi->handle, NULL, 0);
 		}
 	}
 
@@ -1097,7 +1093,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 	{
 		PP_DEBUG("Freeing resources of test suite\n");
 
-		if (!ct.mr.equals(ct.no_mr))
+		if (ct.mr != null)
 			PP_CLOSE_FID(ct.mr);
 		PP_CLOSE_FID(ct.ep);
 		PP_CLOSE_FID(ct.pep);
@@ -1125,27 +1121,23 @@ int pp_cq_readerr(struct fid_cq *cq)
 	}
 
 	private void pp_finalize(CTPingPong ct) {
-		//struct iovec iov;
-		Context ctx = new Context(1); //TODO: this doesnt appear to be used in the test... can i just delete it or is it here for a reason?
+		Context ctx = new Context(1);
 		Message msg;
 
 		PP_DEBUG("Terminating test\n");
 
 		ct.tx_buf.put(0, (byte)'f').put(1, (byte)'i').put(2, (byte)'n');
-		//strcpy(ct->tx_buf, "fin");
-		//iov.iov_base = ct->tx_buf;
-		//iov.iov_len = 4; 4?  shouldnt it be 3? TODO
 
 		msg = new Message(ct.tx_buf, 1, ct.remote_fi_addr, ctx);
 
 		ct.ep.sendMessage(msg, LibFabric.FI_INJECT | LibFabric.FI_TRANSMIT_COMPLETE);
 
 		pp_get_tx_comp(ct, ++ct.tx_seq);
-		
+
 		pp_get_rx_comp(ct);
-		
+
 		pp_ctrl_finish(ct);
-		
+
 		PP_DEBUG("Test terminated\n");
 	}
 
@@ -1289,7 +1281,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 		run_suite_pingpong(ct);
 
-		pp_finalize(ct); //TODO:HERE
+		pp_finalize(ct);
 
 		ct.ep.shutdown(0);
 	}
