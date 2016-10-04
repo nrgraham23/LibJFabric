@@ -32,13 +32,10 @@
 package org.ofi.libjfabrictests;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,8 +59,6 @@ public class PingPongTest {
 		int transfer_size;
 		int sizes_enabled;
 		int options;
-		int argc;
-		String[] args;
 		boolean isServer = false;
 	};
 	final int PP_SIZE_MAX_POWER_TWO = 22;
@@ -86,10 +81,10 @@ public class PingPongTest {
 	final static String PP_MSG_SYNC_A = "a";
 	static boolean PP_ACTIVATE_DEBUG = false;
 
-	private void PP_PRINTERR(String call, int retv) {
+	/*private void PP_PRINTERR(String call, int retv) { //not needed since ignoring possible errors atm
 		System.err.printf("%s(): ret=%d \n", call,
-				(int) retv/*, fi_strerror((int) -retv)*/);
-	}
+				(int) retv, fi_strerror((int) -retv));
+	}*/
 	private void PP_ERR(String fmt, Object ... items) {
 		System.err.printf("[" + fmt + "]: error\n");
 		//can add something to handle variable arguments if its worth while
@@ -1005,7 +1000,6 @@ int pp_cq_readerr(struct fid_cq *cq)
 	private void pp_server_connect(CTPingPong ct) {
 		EventEntry eventEntry;
 		EQCMEntry eqCMEntry = null;
-		long rd;
 
 		PP_DEBUG("Connected endpoint: connecting server\n");
 		try {
@@ -1290,8 +1284,6 @@ int pp_cq_readerr(struct fid_cq *cq)
 	//D - debug | L - length | S - server | I - iterations | address last argument 
 	public static void main(String[] args) { //allow itteration and message length arguments
 		PingPongTest tester = new PingPongTest();
-
-		String ret = "EXIT_SUCCESS";
 
 		CTPingPong ct = tester.new CTPingPong();
 		ct.timeout = -1;
