@@ -69,7 +69,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 	return (jlong)endPoint;
 }
 
-JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen2
 	(JNIEnv *env, jobject jthis, jlong domHandle, jlong infoHandle)
 {
 	struct fid_ep *endPoint;
@@ -90,11 +90,11 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_mrRegister
 	(JNIEnv *env, jobject jthis, jlong domHandle, jobject buf, jlong length, jlong access, jlong requestedKey)
 {
-	void *ptr = getDirectBufferAddress(env, buffer);
+	void *ptr = getDirectBufferAddress(env, buf);
 	
 	struct fid_mr *mr; //TODO: A place for memory management code (not adding now because I will just do the free manually).
 	
-	int res = ((struct fid_domain *)domHandle)->mr->reg((struct fid_domain *)domHandle, ptr, length, access, 0, 
+	int res = ((struct fid_domain *)domHandle)->mr->reg((struct fid *)domHandle, ptr, length, access, 0, 
 			requestedKey, 0, &mr, NULL);
 	
 	if(res) {

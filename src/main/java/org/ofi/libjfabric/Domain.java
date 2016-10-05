@@ -58,9 +58,9 @@ public class Domain extends FIDescriptor {
 	private native long epOpen(long domHandle, long infoHandle, long contextHandle);
 	
 	public EndPoint epOpen(Info info) {
-		return new EndPoint(epOpen(this.handle, info.getHandle()));
+		return new EndPoint(epOpen2(this.handle, info.getHandle()));
 	}
-	private native long epOpen(long domHandle, long infoHandle);
+	private native long epOpen2(long domHandle, long infoHandle);
 	
 	public ScalableEP scalableEPOpen(Info info, Context context) {
 		throw new UnsupportedOperationException("Not implemented yet!");

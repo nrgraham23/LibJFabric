@@ -134,6 +134,8 @@ set(SOURCE_FILES
   completion_queue.c
   message.c
   eq_attr.c
+  domain.c
+  completion_queue.c
 )
 
 set(INTERFACE_FILES
