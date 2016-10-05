@@ -30,13 +30,31 @@
  * SOFTWARE.
  */
 
-#include "org_ofi_libjfabric_Fabric.h"
+#include "org_ofi_libjfabric_Domain.h"
 #include "libfabric.h"
+
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_cqOpen
+	(JNIEnv *env, jobject jthis, jlong domHandle, jlong cqAttrHandle, jlong contextHandle)
+{
+	struct fid_cq *completionQueue;
+
+	cq_list[cq_list_tail] = completionQueue;
+	cq_list_tail++;
+
+	int res = ((struct fid_domain *)domHandle)->ops->cq_open((struct fid_domain *)domHandle,
+			(struct fi_cq_attr *)cqAttrHandle, &completionQueue, (void *)contextHandle);
+
+	if(res) {
+		printf("Error opening endPoint: %d\n", res);
+		exit(1);
+	}
+	return (jlong)completionQueue;
+}
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 	(JNIEnv *env, jobject jthis, jlong domHandle, jlong infoHandle, jlong contextHandle)
 {
-	struct fid_ep *endPoint = (struct fid_ep *)calloc(1, sizeof(struct fid_ep));
+	struct fid_ep *endPoint;
 
 	ep_list[ep_list_tail] = endPoint;
 	ep_list_tail++;
@@ -54,7 +72,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 	(JNIEnv *env, jobject jthis, jlong domHandle, jlong infoHandle)
 {
-	struct fid_ep *endPoint = (struct fid_ep *)calloc(1, sizeof(struct fid_ep));
+	struct fid_ep *endPoint;
 
 	ep_list[ep_list_tail] = endPoint;
 	ep_list_tail++;

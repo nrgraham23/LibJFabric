@@ -48,8 +48,9 @@ public class Domain extends FIDescriptor {
 	}
 	
 	public CompletionQueue cqOpen(CQAttr cqAttr, Context context) {
-		throw new UnsupportedOperationException("Not implemented yet!");
+		return new CompletionQueue(cqOpen(this.handle, cqAttr.getHandle(), context.getHandle()));
 	}
+	private native long cqOpen(long handle, long cqAttrHandle, long contextHandle);
 	
 	public EndPoint epOpen(Info info, Context context) {
 		return new EndPoint(epOpen(this.handle, info.getHandle(), context.getHandle()));

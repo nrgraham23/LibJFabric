@@ -36,7 +36,7 @@
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_initFabric
 	(JNIEnv *env, jobject jthis, jlong fabricAttrHandle, jlong contextHandle)
 {
-	struct fid_fabric *fabric = (struct fid_fabric *)calloc(1, sizeof(struct fid_fabric));
+	struct fid_fabric *fabric;
 
 	fabric_list[fabric_list_tail] = fabric;
 	fabric_list_tail++;
@@ -53,7 +53,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_initFabric
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_initFabric2
 	(JNIEnv *env, jobject jthis, jlong fabricAttrHandle)
 {
-	struct fid_fabric *fabric = (struct fid_fabric *)calloc(1, sizeof(struct fid_fabric));
+	struct fid_fabric *fabric;
 
 	fabric_list[fabric_list_tail] = fabric;
 	fabric_list_tail++;
@@ -70,7 +70,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_initFabric2
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createDomain
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong infoHandle, jlong contextHandle)
 {
-	struct fid_domain *domain = (struct fid_domain *)calloc(1, sizeof(struct fid_domain));
+	struct fid_domain *domain;
 
 	domain_list[domain_list_tail] = domain;
 	domain_list_tail++;
@@ -88,7 +88,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createDomain
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createDomain2
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong infoHandle)
 {
-	struct fid_domain *domain = (struct fid_domain *)calloc(1, sizeof(struct fid_domain)); //TODO: do i need to calloc this or does libfabric do it for me?
+	struct fid_domain *domain;
 
 	domain_list[domain_list_tail] = domain;
 	domain_list_tail++;
@@ -106,7 +106,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createDomain2
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong infoHandle, jlong contextHandle)
 {
-	struct fid_pep *passive_ep = (struct fid_pep *)calloc(1, sizeof(struct fid_pep));
+	struct fid_pep *passive_ep;
 
 	passive_ep_list[passive_ep_list_tail] = passive_ep;
 	passive_ep_list_tail++;
@@ -124,7 +124,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP2
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong infoHandle)
 {
-	struct fid_pep *passive_ep = (struct fid_pep *)calloc(1, sizeof(struct fid_pep));
+	struct fid_pep *passive_ep;
 
 	passive_ep_list[passive_ep_list_tail] = passive_ep;
 	passive_ep_list_tail++;
@@ -142,7 +142,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP2
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong eqAttrHandle, jlong contextHandle)
 {
-	struct fid_eq *event_queue = (struct fid_eq *)calloc(1, sizeof(struct fid_eq));
+	struct fid_eq *event_queue;
 
 	event_queue_list[event_queue_list_tail] = event_queue;
 	event_queue_list_tail++;
@@ -160,7 +160,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen2
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong eqAttrHandle)
 {
-	struct fid_eq *event_queue = (struct fid_eq *)calloc(1, sizeof(struct fid_eq));
+	struct fid_eq *event_queue;
 
 	event_queue_list[event_queue_list_tail] = event_queue;
 	event_queue_list_tail++;
@@ -178,7 +178,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen2
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_waitOpen
 	(JNIEnv *env, jobject jthis, jlong fabricHandle, jlong waitAttrHandle)
 {
-	struct fid_wait *wait = (struct fid_wait *)calloc(1, sizeof(struct fid_wait));
+	struct fid_wait *wait;
 
 	wait_list[wait_list_tail] = wait;
 	wait_list_tail++;

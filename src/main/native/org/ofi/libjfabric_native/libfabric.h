@@ -89,6 +89,9 @@ extern int message_list_tail;
 extern struct fi_eq_attr *eq_attr_list[];
 extern int eq_attr_list_tail;
 
+extern struct fid_cq *cq_list[];
+extern int cq_list_tail;
+
 typedef struct {
 	jclass AVTypeClass;
 	jclass EPTypeClass;
@@ -143,6 +146,7 @@ void deleteEPList();
 void deleteCQAttrList();
 void deleteMessageList();
 void deleteEQAttrList();
+void deleteCQList();
 void nullListsOut();
 int getLinkedListLength(struct fi_info **resultInfo);
 void* getDirectBufferAddress(JNIEnv *env, jobject buffer);

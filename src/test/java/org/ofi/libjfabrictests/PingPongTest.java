@@ -221,7 +221,12 @@ public class PingPongTest {
 			try {
 				ct.ctrl_connfd = new Socket(ct.opts.dst_addr, Integer.parseInt(ct.opts.dst_port)); //creates and connects the socket
 				ct.ctrl_connfd.setReceiveBufferSize(PP_MSG_LEN_PORT);
+				ct.ctrl_connfd.setSoTimeout(5000);
 			} catch (UnknownHostException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			} catch (SocketException e) {
 				System.err.println(e.getMessage());
 				e.printStackTrace();
 				System.exit(-1);
@@ -254,14 +259,7 @@ public class PingPongTest {
 
 			PP_DEBUG("SERVER: connection acquired\n");
 		}
-		try {
-			ct.ctrl_connfd.setSoTimeout(5000);
-		} catch (SocketException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-			System.exit(-1);
-		}
-
+		
 		PP_DEBUG("Control messages initialized\n");
 	}
 
@@ -389,9 +387,8 @@ public class PingPongTest {
 			PP_DEBUG("CLIENT: after recv\n");
 
 			if (!ct.ctrl_buf.toString().equals(PP_MSG_SYNC_A)) {
-				ct.ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
-				PP_DEBUG(
-						"CLIENT: sync error while acking A: <%s> (len=%lu)\n",
+				//ct.ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
+				PP_DEBUG("CLIENT: sync error while acking A: <%s> (len=%lu)\n",
 						ct.ctrl_buf, ct.ctrl_buf.length);
 			}
 			PP_DEBUG("CLIENT: synced\n");
@@ -924,17 +921,17 @@ int pp_cq_readerr(struct fid_cq *cq)
 	private void pp_alloc_active_res(CTPingPong ct, Info fi) {
 		pp_alloc_msgs(ct);
 
-		if (ct.cq_attr.getCQFormat() == CQFormat.FI_CQ_FORMAT_UNSPEC)
+		if (ct.cq_attr.getCQFormat() == null || ct.cq_attr.getCQFormat() == CQFormat.FI_CQ_FORMAT_UNSPEC)
 			ct.cq_attr.setCQFormat(CQFormat.FI_CQ_FORMAT_CONTEXT);
 
 		ct.cq_attr.setWaitObj(WaitObj.WAIT_NONE);
 
 		ct.cq_attr.setSize(fi.getTransmitAttr().getSize());
-		ct.txcq = ct.domain.cqOpen(ct.cq_attr, new Context(ct.txcq.getHandle())); //this is messy, but i think it will work.  See line below for C version.
+		ct.txcq = ct.domain.cqOpen(ct.cq_attr, new Context(1000)); //this is messy, but i think it will work.  See line below for C version.
 		//fi_cq_open(ct->domain, &(ct->cq_attr), &(ct->txcq), &(ct->txcq));
 
 		ct.cq_attr.setSize(fi.getReceiveAttr().getSize());
-		ct.rxcq = ct.domain.cqOpen(ct.cq_attr, new Context(ct.rxcq.getHandle())); //same as above
+		ct.rxcq = ct.domain.cqOpen(ct.cq_attr, new Context(2000)); //same as above
 		//fi_cq_open(ct->domain, &(ct->cq_attr), &(ct->rxcq), &(ct->rxcq));
 
 		ct.ep = ct.domain.epOpen(fi);
@@ -1193,7 +1190,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 				ct.opts.dst_port = splitAddr[1];
 			} else {
 				//ct.opts.src_addr = splitAddr[0]; //no addr for server, just a port
-				ct.opts.src_port = splitAddr[0];
+				ct.opts.src_port = splitAddr[1];
 			}
 		} catch (IndexOutOfBoundsException | NumberFormatException e) {
 			System.err.println(e.getMessage());
@@ -1282,17 +1279,19 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 
 	//D - debug | L - length | S - server | I - iterations | address last argument 
-	public static void main(String[] args) { //allow itteration and message length arguments
+	public static void main(String[] args) { //allow iteration and message length arguments
 		LibFabric.load();
 		PingPongTest tester = new PingPongTest();
-
 		CTPingPong ct = tester.new CTPingPong();
+		ct.eq_attr = new EventQueueAttr();
+		ct.cq_attr = new CQAttr();
+
 		ct.timeout = -1;
 		ct.opts = tester.new PPOpts();
 		ct.opts.iterations = 1000;
 		ct.opts.transfer_size = 1024;
 		ct.opts.sizes_enabled = tester.PP_DEFAULT_SIZE;
-		ct.eq_attr = new EventQueueAttr();
+
 		ct.eq_attr.setWaitObj(WaitObj.WAIT_UNSPEC);
 
 		ct.hints = new Info();
