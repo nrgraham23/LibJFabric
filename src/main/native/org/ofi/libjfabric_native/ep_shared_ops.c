@@ -30,17 +30,23 @@
  * SOFTWARE.
  */
 
-package org.ofi.libjfabric;
+#include "org_ofi_libjfabric_EndPointSharedOps.h"
+#include "libfabric.h"
 
-public class EndPointSharedOps extends FIDescriptor { //TODO: find a better name for this
+JNIEXPORT jstring JNICALL Java_org_ofi_libjfabric_EndPointSharedOps_getName
+	(JNIEnv *env, jobject jthis, jlong epHandle, jlong addrLength)
+{
+	int ret;
+	char *name = (char *)calloc(1, addrLength);
+	size_t len = (size_t)addrLength;
 	
-	public EndPointSharedOps(long handle) {
-		super(handle);
-	}
+	ret = fi_getname((struct fid *)epHandle, (void *)name, &len); //TODO: ERROR CHECKING: check for a
+	if (ret) {
+        fprintf(stderr, "fi_getname error: %s", fi_strerror(- ret));
+        exit(-1);
+    }
+	jstring jName = (*env)->NewStringUTF(env, name);
 	
-	//name == address.
-	public String getName(long addrLength) { //NOTE: I do not like having a length field here, but I think it is necessary based on the libfabric api
-		return getName(this.handle, addrLength);
-	}
-	private native String getName(long handle, long addrLength);
+	free(name);
+	return jName;
 }
