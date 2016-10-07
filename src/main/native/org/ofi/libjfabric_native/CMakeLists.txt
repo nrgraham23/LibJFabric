@@ -136,6 +136,7 @@ set(SOURCE_FILES
   eq_attr.c
   domain.c
   completion_queue.c
+  ep_shared_ops.c
 )
 
 set(INTERFACE_FILES

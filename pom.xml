@@ -78,6 +78,7 @@
                                 <javahClassName>org.ofi.libjfabric.MemoryRegion</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.CompletionQueue</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.Message</javahClassName>
+                                <javahClassName>org.ofi.libjfabric.EndPointSharedOps</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.DomainAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.EndPointAttr</javahClassName>
                                 <javahClassName>org.ofi.libjfabric.attributes.FabricAttr</javahClassName>

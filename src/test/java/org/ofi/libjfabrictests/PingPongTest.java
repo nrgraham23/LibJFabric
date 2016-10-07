@@ -145,8 +145,8 @@ public class PingPongTest {
 
 		long cnt_ack_msg;
 
-		Socket ctrl_listenfd;
-		Socket ctrl_connfd;
+		Socket ctrl_serverfd;
+		Socket ctrl_clientfd;
 		byte[] ctrl_buf = new byte[PP_CTRL_BUF_LEN + 1];
 		byte[] rem_name = new byte[PP_MAX_CTRL_MSG];
 	};
@@ -234,9 +234,9 @@ public class PingPongTest {
 		if (!ct.opts.isServer) { //client
 			PP_DEBUG("CLIENT: connecting to <%s>", ct.opts.dst_addr);
 			try {
-				ct.ctrl_connfd = new Socket(ct.opts.dst_addr, Integer.parseInt(ct.opts.dst_port)); //creates and connects the socket
-				ct.ctrl_connfd.setReceiveBufferSize(PP_MSG_LEN_PORT);
-				ct.ctrl_connfd.setSoTimeout(5000);
+				ct.ctrl_clientfd = new Socket(ct.opts.dst_addr, Integer.parseInt(ct.opts.dst_port)); //creates and connects the socket
+				ct.ctrl_clientfd.setReceiveBufferSize(PP_MSG_LEN_PORT);
+				ct.ctrl_clientfd.setSoTimeout(5000);
 			} catch (UnknownHostException e) {
 				System.err.println(e.getMessage());
 				e.printStackTrace();
@@ -249,7 +249,11 @@ public class PingPongTest {
 				System.err.println(e.getMessage());
 				e.printStackTrace();
 				System.exit(-1);
-			} 
+			} catch (Exception e) {
+				System.err.println("Error in ppCtrlInit: " + e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			}
 
 			PP_DEBUG("CLIENT: connected");
 		} else { //server
@@ -265,7 +269,7 @@ public class PingPongTest {
 			//serverSock.bind(new InetSocketAddress(ct.opts.src_addr, ct.opts.src_port)); //should be able to not use this
 			PP_DEBUG("SERVER: waiting for connection ...");
 			try {
-				ct.ctrl_listenfd = serverSock.accept();
+				ct.ctrl_serverfd = serverSock.accept();
 			} catch (IOException e) {
 				System.err.println(e.getMessage());
 				e.printStackTrace();
@@ -280,13 +284,17 @@ public class PingPongTest {
 
 	private static void pp_ctrl_send(CTPingPong ct, byte[] buf) {
 		try {
-			ct.ctrl_connfd.getOutputStream().write(buf);
+			if(ct.opts.isServer) {
+				ct.ctrl_serverfd.getOutputStream().write(buf);
+			} else {
+				ct.ctrl_clientfd.getOutputStream().write(buf);
+			}
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
 
-		PP_DEBUG("----> sent (%d) : \"", "" + buf.length);
+		PP_DEBUG("----> sent (%s) : \"", "" + buf.length);
 		if (PP_ACTIVATE_DEBUG) {
 			int i;
 			for (i = 0; i < buf.length; i++) {
@@ -296,21 +304,30 @@ public class PingPongTest {
 		}
 	}
 
-	private static void pp_ctrl_recv(CTPingPong ct, byte[] buf) {
+	private void pp_ctrl_recv(CTPingPong ct, byte[] buf) {
 		try {
-			ct.ctrl_connfd.getInputStream().read(buf);
+			//TODO: exception thrown here
+			if(ct.opts.isServer) {
+				ct.ctrl_serverfd.getInputStream().read(buf);
+			} else {
+				ct.ctrl_clientfd.getInputStream().read(buf);
+			}
 		} catch (IOException e) {
-			System.err.println(e.getMessage());
+			System.err.println("IO Exception in pp_ctrl_recv: " + e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
+		} catch (Exception e) {
+			System.err.println("Error in pp_ctrl_recv: " + e.getMessage());
 			e.printStackTrace();
 			System.exit(-1);
 		}
 		//ret = recv(ct->ctrl_connfd, buf, size, 0);
 
-		PP_DEBUG("----> received (%d/%ld) : \"", "" + PP_MSG_LEN_PORT);
+		PP_DEBUG("----> received (%s) : \"", "" + PP_MSG_LEN_PORT);
 		if (PP_ACTIVATE_DEBUG) {
 			int i;
-			for (i = 0; i < PP_MSG_LEN_PORT; i++) {
-				System.err.printf("%b.", buf[i]);
+			for (i = 0; i < buf.length; i++) {
+				System.err.printf("%c.", (char)buf[i]);
 			}
 			System.err.printf("\"\n");
 		}
@@ -323,11 +340,11 @@ public class PingPongTest {
 
 		PP_DEBUG("Fetching local address");
 
-		local_name = endpoint.getName();
+		local_name = endpoint.getName(64);
 
 		//PP_DEBUG("Sending name length\n");
 
-		//pp_ctrl_send(ct, local_name.length()); sending name length, think i can skip this in Java
+		//pp_ctrl_send(ct, local_name.length()); //sending name length, think i can skip this in Java
 
 		PP_DEBUG("Sending name");
 		pp_ctrl_send(ct, local_name.getBytes());
@@ -358,9 +375,9 @@ public class PingPongTest {
 	}
 
 	private void pp_ctrl_finish(CTPingPong ct) {
-		if (!ct.ctrl_connfd.isClosed()) {
+		if (!ct.ctrl_clientfd.isClosed()) {
 			try {
-				ct.ctrl_connfd.close();
+				ct.ctrl_clientfd.close();
 			} catch (IOException e) { 
 				System.err.println("Failed to close ctrl_connfd: " + e.getMessage());
 			}
@@ -403,7 +420,7 @@ public class PingPongTest {
 
 			if (!ct.ctrl_buf.toString().equals(PP_MSG_SYNC_A)) {
 				//ct.ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
-				PP_DEBUG("CLIENT: sync error while acking A: <%s> (len=%lu)",
+				PP_DEBUG("CLIENT: sync error while acking A: <%s> (len=%s)",
 						ct.ctrl_buf.toString(), "" + ct.ctrl_buf.length);
 			}
 			PP_DEBUG("CLIENT: synced");
@@ -423,7 +440,7 @@ public class PingPongTest {
 
 			ct.cnt_ack_msg = Long.parseLong(ct.ctrl_buf.toString());
 
-			PP_DEBUG("SERVER: received count = <%ld> (len=%lu)",
+			PP_DEBUG("SERVER: received count = <%s> (len=%s)",
 					"" + ct.cnt_ack_msg, "" + ct.ctrl_buf.length);
 
 			ct.ctrl_buf = PP_MSG_CHECK_CNT_OK.getBytes();
@@ -980,10 +997,10 @@ int pp_cq_readerr(struct fid_cq *cq)
 		PP_DEBUG("Connection-based endpoint: setting up connection");
 
 		pp_ctrl_sync(ct);
-
+System.err.println("after ctrl sync");
 		if (ct.opts.isServer) {
 			pp_send_name(ct, ct.pep);
-
+System.err.println("after send name");
 		} else {
 			pp_recv_name(ct);
 			ct.fi = pp_getinfo(ct);
@@ -1014,12 +1031,14 @@ int pp_cq_readerr(struct fid_cq *cq)
 
 		PP_DEBUG("Connected endpoint: connecting server");
 		try {
+System.err.println("entering try in pp_server_connect");
 			pp_exchange_names_connected(ct);
-
+System.err.println("after exchange names");
 			pp_ctrl_sync(ct);
-
+System.err.println("after sync");
 			/* Listen */
 			eventEntry = ct.eq.sread(-1, 0);
+System.err.println("after sread");
 			if(eventEntry.getClass().isAssignableFrom(EQCMEntry.class) &&eventEntry.getEQEvent() == EQEvent.FI_CONNREQ) {
 				eqCMEntry = (EQCMEntry)eventEntry;
 			} else {
@@ -1027,7 +1046,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 			}
 
 			ct.fi = eqCMEntry.getInfo();
-
+System.err.println(ct.fi);
 			ct.domain = ct.fabric.createDomain(ct.fi);
 
 			pp_alloc_active_res(ct, ct.fi);
@@ -1052,6 +1071,8 @@ int pp_cq_readerr(struct fid_cq *cq)
 			PP_DEBUG("Connected endpoint: server connected");
 		} catch(Exception e) { //better exception handling should be implemented in a more complete version
 			//fi_reject(ct->pep, ct->fi->handle, NULL, 0);
+			System.err.println("Error in pp_server_connect: " + e.getMessage());
+			System.exit(-1);
 		}
 	}
 
@@ -1253,7 +1274,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 	private void run_suite_pingpong(CTPingPong ct) {
 		int[] sizes;
 
-		pp_banner_fabric_info(ct);
+		pp_banner_fabric_info(ct);  //TODO: called here
 
 		sizes = generate_test_sizes(ct.opts, ct.tx_size);
 
@@ -1312,12 +1333,11 @@ int pp_cq_readerr(struct fid_cq *cq)
 		ct.hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG);
 		ct.hints.setCaps(LibFabric.FI_MSG);
 		ct.hints.setMode(LibFabric.FI_CONTEXT | LibFabric.FI_LOCAL_MR);
-
+		
 		tester.parseArgs(ct, args);
 
 		tester.pp_banner_options(ct);
 
-		ct.hints.setMode(LibFabric.FI_LOCAL_MR);
 		tester.run_pingpong_msg(ct);
 
 		tester.freeResources(ct);
