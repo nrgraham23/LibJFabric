@@ -351,14 +351,15 @@ JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_LibFabric_getInfoJNI(JNIE
 	jlongArray infoArray;
 
 	uint32_t convertedVersion= FI_VERSION((uint32_t)majorVersion, (uint32_t)minorVersion);
-
+if(hintsHandle)
+	fprintf(stderr, "EP ATTR TYPE: %d\n", ((struct fi_info*)hintsHandle)->ep_attr->type);
 	convertJNIString(env, &nodeName, node);
 	convertJNIString(env, &serviceName, service);
 
 	getInfoRet = fi_getinfo(convertedVersion, nodeName, serviceName, flags, (struct fi_info*)hintsHandle, &resultInfo);
 
 	if (getInfoRet != 0) {
-		printf("fi_getinfo error!!!\n");
+		fprintf(stderr, "getInfo error: %s\n", fi_strerror(- getInfoRet));
 		exit(1);
 	}
 
@@ -374,7 +375,7 @@ JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_LibFabric_getInfoJNI(JNIE
 	curInfo = resultInfo;
 	for(i = 0; i < infoNum; i++) {
 		filler[i] = (jlong)curInfo;
-
+		fprintf(stderr, "EP ATTR TYPE: %s\n", ((struct fi_info*)curInfo)->fabric_attr->prov_name);
 		info_list[info_list_tail] = curInfo;
 		info_list_tail++;
 
@@ -392,13 +393,14 @@ JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_LibFabric_getInfoJNI2(JNI
 	char *error;
 	struct fi_info *resultInfo, *curInfo;
 	jlongArray infoArray;
-
+fprintf(stderr, "FI MSG VALUE: %llu\n", FI_MSG);
 	uint32_t convertedVersion= FI_VERSION((uint32_t)majorVersion, (uint32_t)minorVersion);
-
+	if(hintsHandle)
+		fprintf(stderr, "EP ATTR TYPE:: %d\n", ((struct fi_info*)hintsHandle)->ep_attr->type);
 	getInfoRet = fi_getinfo(convertedVersion, NULL, NULL, flags, (struct fi_info*)hintsHandle, &resultInfo);
 
 	if (getInfoRet != 0) {
-		printf("fi_getinfo error!!!\n");
+		fprintf(stderr, "getInfo error: %s\n", fi_strerror(- getInfoRet));
 		exit(1);
 	}
 
@@ -414,7 +416,7 @@ JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_LibFabric_getInfoJNI2(JNI
 	curInfo = resultInfo;
 	for(i = 0; i < infoNum; i++) {
 		filler[i] = (jlong)curInfo;
-
+		fprintf(stderr, "EP ATTR TYPE: %s\n", ((struct fi_info*)curInfo)->fabric_attr->prov_name);
 		info_list[info_list_tail] = curInfo;
 		info_list_tail++;
 

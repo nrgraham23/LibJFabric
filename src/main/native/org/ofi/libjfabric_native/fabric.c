@@ -115,7 +115,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP
 			(struct fi_info *)infoHandle, &passive_ep, (void *)contextHandle);
 
 	if(res) {
-		printf("Error creating passive endpoint: %d\n", res);
+		fprintf(stderr, "Error creating passive endpoint: %s\n", fi_strerror(- res));
 		exit(1);
 	}
 	return (jlong)passive_ep;
@@ -133,7 +133,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP2
 			(struct fi_info *)infoHandle, &passive_ep, NULL);
 
 	if(res) {
-		printf("Error creating passive endpoint: %d\n", res);
+		fprintf(stderr, "Error creating passive endpoint: %s\n", fi_strerror(- res));
 		exit(1);
 	}
 	return (jlong)passive_ep;

@@ -34,7 +34,7 @@
 #include "libfabric.h"
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_attributes_FabricAttr_initFabricAttr
-(JNIEnv *env, jobject jthis, jstring jname, jstring providerName, jint majorVersion, jint minorVersion)
+	(JNIEnv *env, jobject jthis, jstring jname, jstring providerName, jint majorVersion, jint minorVersion)
 {
 	struct fi_fabric_attr *fabric_attr = (struct fi_fabric_attr*)calloc(1, sizeof(struct fi_fabric_attr));
 	uint32_t version = FI_VERSION((uint32_t)majorVersion, (uint32_t)minorVersion);

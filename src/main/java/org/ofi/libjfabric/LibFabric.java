@@ -107,7 +107,7 @@ public class LibFabric {
 	private static native void deleteCachedVars();
 
 	public static Info[] getInfo(Version version, String node, String service, long flags, Info hints) {
-		long infoHandleArray[] = null;
+		long infoHandleArray[];
 		
 		infoHandleArray = getInfoJNI(version.getMajorVersion(), version.getMinorVersion(), node, service, flags, hints.getHandle());
 		
@@ -125,7 +125,7 @@ public class LibFabric {
 	}
 	
 	public static Info[] getInfo(Version version, String node, String service, long flags) {
-		long infoHandleArray[] = null;
+		long infoHandleArray[];
 
 		infoHandleArray = getInfoJNI(version.getMajorVersion(), version.getMinorVersion(), node, service, flags, 0);
 
@@ -143,9 +143,9 @@ public class LibFabric {
 	}
 	
 	public static Info[] getInfo(Version version, long flags, Info hints) {
-		long infoHandleArray[] = null;
+		long infoHandleArray[];
 
-		infoHandleArray = getInfoJNI2(version.getMajorVersion(), version.getMinorVersion(), flags, 0);
+		infoHandleArray = getInfoJNI2(version.getMajorVersion(), version.getMinorVersion(), flags, hints.getHandle());
 
 		if(infoHandleArray == null) {
 			return null; //should probably handle this better
