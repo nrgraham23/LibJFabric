@@ -33,20 +33,64 @@
 #include "org_ofi_libjfabric_EndPointSharedOps.h"
 #include "libfabric.h"
 
-JNIEXPORT jstring JNICALL Java_org_ofi_libjfabric_EndPointSharedOps_getName
-	(JNIEnv *env, jobject jthis, jlong epHandle, jlong addrLength)
+//testcode
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <poll.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <limits.h> //end test code
+
+JNIEXPORT jbyteArray JNICALL Java_org_ofi_libjfabric_EndPointSharedOps_getName
+	(JNIEnv *env, jobject jthis, jlong epHandle)
 {
 	int ret;
-	char *name = (char *)calloc(1, addrLength);
-	size_t len = (size_t)addrLength;
+	size_t len;
+	char *name;
+	int i;
+
+	fi_getname((struct fid *)epHandle, name, &len); //TODO: check for an unexpected error.  There is an expected error from this call, but I am not sure what it is.
+	name = (char *)calloc(len, sizeof(char));
 	
-	ret = fi_getname((struct fid *)epHandle, (void *)name, &len); //TODO: ERROR CHECKING: check for a
+	ret = fi_getname((struct fid *)epHandle, name, &len);
 	if (ret) {
-        fprintf(stderr, "fi_getname error: %s", fi_strerror(- ret));
+        fprintf(stderr, "fi_getname error: %s", fi_strerror(-ret));
         exit(-1);
     }
-	jstring jName = (*env)->NewStringUTF(env, name);
+	jbyteArray ara = (*env)->NewByteArray(env, len);
+	jbyte testAra[len];
+fprintf(stderr, "START PRINT OF NAME\n");	
+	for(i = 0; i < len; i++) {
+		testAra[i] = name[i];
+fprintf(stderr, "    char[i] value: %d    jbyte[i] value: %d\n", (int)name[i], (int)testAra[i]);
+	}
 	
+	//(*env)->SetByteArrayRegion(env, ara, 0, len, (jbyte *)name);
+	(*env)->SetByteArrayRegion(env, ara, 0, len, testAra);
+	
+	//test code
+	struct sockaddr_in sa;
+	int lent=20;
+	char buffer[lent];
+	
+	inet_ntop(AF_INET, &(name), buffer, lent);
+	printf("address:%s\n",buffer);
+	
+	fprintf(stderr, "fi_getname returned: 0x%x\n", *(uint32_t *)name); //end test code
 	free(name);
-	return jName;
+	
+	return ara;
 }

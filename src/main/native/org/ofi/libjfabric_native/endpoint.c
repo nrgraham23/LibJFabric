@@ -52,9 +52,9 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_send4
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_recv
 	(JNIEnv *env, jobject jthis, jlong epHandle, jobject buffer, jint length, jlong mrDesc, jlong srcAddress, jlong contextHandle)
 {
-void *ptr = getDirectBufferAddress(env, buffer);
+	void *ptr = getDirectBufferAddress(env, buffer);
 
-((struct fid_ep *)epHandle)->msg->recv((struct fid_ep *)epHandle, &ptr, length, (void *)mrDesc, srcAddress, (void *)contextHandle);
+	((struct fid_ep *)epHandle)->msg->recv((struct fid_ep *)epHandle, &ptr, length, (void *)mrDesc, srcAddress, (void *)contextHandle);
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_recv5
@@ -78,15 +78,25 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_accept
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_connect
-	(JNIEnv *env, jobject jthis, jlong epHandle, jstring addr)
+	(JNIEnv *env, jobject jthis, jlong epHandle, jbyteArray addr)
 {
-	char *addrStr;
+fprintf(stderr, "in connect\n");
+	jsize len = (*env)->GetArrayLength(env, addr);
 	
-	convertJNIString(env, &addrStr, addr);
+	char *cAddr;// = (char *)calloc(len, sizeof(char));
+	(*env)->GetByteArrayRegion(env, addr, 0, len, (jbyte *)cAddr);
 	
-	((struct fid_ep *)epHandle)->cm->connect((struct fid_ep *)epHandle, addrStr, NULL, 0);
+	int i;
+	fprintf(stderr, "DESTADDR IN CONNECT: \n");
+	for(i = 0; i < len; i++) {
+		fprintf(stderr, "    cAddr[i]: %d\n", cAddr[i]);
+	}
 	
-	free(addrStr); //actually may not want to free this
+fprintf(stderr, "after convertJNIString\n");	
+	fi_connect((struct fid_ep *)epHandle, cAddr, NULL, 0);
+
+fprintf(stderr, "after c connect\n");	
+	//free(cAddr); //actually may not want to free this
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_inject
@@ -106,5 +116,13 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_sendMessage
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_shutdown
 	(JNIEnv *env, jobject jthis, jlong handle, jlong flags)
 {
-	((struct fid_ep *)handle)->cm->shutdown((struct fid_ep *)handle, flags);
+	fi_shutdown((struct fid_ep *)handle, flags);
+}
+
+JNIEXPORT jboolean JNICALL Java_org_ofi_libjfabric_EndPoint_bind
+	(JNIEnv *env, jobject jthis, jlong thisHandle, jlong bindToHandle, jlong flags)
+{
+	int res = fi_ep_bind((struct fid_ep *)thisHandle, (struct fid *)bindToHandle, (uint64_t)flags);
+
+	return FI_SUCCESS == res;
 }

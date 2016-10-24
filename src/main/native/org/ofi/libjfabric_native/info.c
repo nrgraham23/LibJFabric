@@ -200,8 +200,25 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Info_setFabricAttr
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Info_setDestAddr
-	(JNIEnv *env, jobject jthis, jstring destAddr, jlong thisHandle)
+	(JNIEnv *env, jobject jthis, jbyteArray destAddr, jint length, jlong thisHandle)
 {
-	const char *addr = (*env)->GetStringUTFChars(env, destAddr, NULL);
-	((struct fi_info*)thisHandle)->dest_addr = (void *)*addr;
+	int i;
+	
+	if(length == 0) { //allow unset
+		((struct fi_info*)thisHandle)->dest_addr = NULL;
+		return;
+	}
+	size_t len = length;
+	jbyte *jAra = (*env)->GetByteArrayElements(env, destAddr, 0);
+	char *addr = (char *)calloc(length, sizeof(char));
+fprintf(stderr, "DESTADDR VALUE IN C:\n");	
+	//memcpy(addr, jAra, len);
+	for(i = 0; i < length; i++) {
+		addr[i] = (char)jAra[i];
+fprintf(stderr, "    addr[i]: %d    jAra[i]: %d\n", (int)addr[i], (int)jAra[i]);
+	}
+	
+	((struct fi_info*)thisHandle)->dest_addr = (void *)addr;
+	
+	(*env)->ReleaseByteArrayElements(env, destAddr, jAra, JNI_ABORT);
 }

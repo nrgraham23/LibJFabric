@@ -38,10 +38,18 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_PassiveEndPoint_listen
 {
 	int ret;
 	
-	ret = ((struct fid_pep *)handle)->cm->listen((struct fid_pep *)handle);
+	ret = fi_listen((struct fid_pep *)handle);
 	
 	if(ret) {
 		printf("listen failed with code: %d\n", ret);
 		exit(ret);
 	}
+}
+
+JNIEXPORT jboolean JNICALL Java_org_ofi_libjfabric_PassiveEndPoint_pepBind
+	(JNIEnv *env, jobject jthis, jlong thisHandle, jlong bindToHandle, jlong flags)
+{
+	int res = fi_pep_bind((struct fid_pep *)thisHandle, (struct fid *)bindToHandle, (uint64_t)flags);
+
+	return FI_SUCCESS == res;
 }

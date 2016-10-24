@@ -52,12 +52,30 @@ public class Domain extends FIDescriptor {
 	}
 	private native long cqOpen(long handle, long cqAttrHandle, long contextHandle);
 	
+	public CompletionQueue cqOpen(CQAttr cqAttr) {
+		return new CompletionQueue(cqOpen2(this.handle, cqAttr.getHandle()));
+	}
+	private native long cqOpen2(long handle, long cqAttrHandle);
+	
 	public EndPoint epOpen(Info info, Context context) {
 		return new EndPoint(epOpen(this.handle, info.getHandle(), context.getHandle()));
 	}
 	private native long epOpen(long domHandle, long infoHandle, long contextHandle);
 	
 	public EndPoint epOpen(Info info) {
+		try {
+System.err.println("info handle value: " + info.getHandle());
+System.err.println("this handle value: " + this.handle);
+		long tempHandle = epOpen2(this.handle, info.getHandle());
+System.err.println("after epOpen2");
+System.err.println("tempHandle value: " + tempHandle);
+		EndPoint ep = new EndPoint(tempHandle);
+System.err.println("created ep");
+		return ep;
+		} catch(Exception e) {
+			System.err.println("Exception in epOpen: " + e.getMessage());
+			System.exit(-1);
+		}
 		return new EndPoint(epOpen2(this.handle, info.getHandle()));
 	}
 	private native long epOpen2(long domHandle, long infoHandle);

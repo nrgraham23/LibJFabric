@@ -103,16 +103,30 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
 
 set(SOURCE_FILES
   av_type.c
+  completion_queue.c
+  constant.c
   context.c
+  cq_attr.c
+  cq_format.c
+  cq_wait_cond.c
+  domain.c
   domain_attr.c
+  endpoint.c
   ep_attr.c
+  ep_shared_ops.c
   ep_type.c
+  eq_attr.c
+  eq_event.c
+  event_queue.c
   fabric.c
   fabric_attr.c
   fi_descriptor.c
   info.c
   libfabric.c
+  memory_region.c
+  message.c
   mr_mode.c
+  passive_ep.c
   progress.c
   protocol.c
   receive_attr.c
@@ -122,21 +136,6 @@ set(SOURCE_FILES
   threading.c
   tx_attr.c
   wait_obj.c
-  endpoint.c
-  cq_format.c
-  cq_wait_cond.c
-  cq_attr.c
-  constant.c
-  passive_ep.c
-  event_queue.c
-  eq_event.c
-  memory_region.c
-  completion_queue.c
-  message.c
-  eq_attr.c
-  domain.c
-  completion_queue.c
-  ep_shared_ops.c
 )
 
 set(INTERFACE_FILES

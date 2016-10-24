@@ -33,14 +33,19 @@
 package org.ofi.libjfabric;
 
 public class EndPointSharedOps extends FIDescriptor { //TODO: find a better name for this
-	
+	//TODO: may want an abstract bind method here
 	public EndPointSharedOps(long handle) {
 		super(handle);
 	}
 	
-	//name == address.
-	public String getName(long addrLength) { //NOTE: I do not like having a length field here, but I think it is necessary based on the libfabric api
-		return getName(this.handle, addrLength);
+	public byte[] getName() {
+		byte[] temp = getName(this.handle);
+		System.err.println("VALUE ON RETURN TO JAVA:");
+		for(int i = 0; i < temp.length; i++) {
+			System.err.println("byte[i]: " + (int)temp[i]);
+		}
+		
+		return temp;
 	}
-	private native String getName(long handle, long addrLength);
+	private native byte[] getName(long handle);
 }

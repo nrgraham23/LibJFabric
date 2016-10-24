@@ -115,7 +115,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP
 			(struct fi_info *)infoHandle, &passive_ep, (void *)contextHandle);
 
 	if(res) {
-		fprintf(stderr, "Error creating passive endpoint: %s\n", fi_strerror(- res));
+		fprintf(stderr, "Error creating passive endpoint: %s\n", fi_strerror(-res));
 		exit(1);
 	}
 	return (jlong)passive_ep;
@@ -133,7 +133,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_createPassiveEP2
 			(struct fi_info *)infoHandle, &passive_ep, NULL);
 
 	if(res) {
-		fprintf(stderr, "Error creating passive endpoint: %s\n", fi_strerror(- res));
+		fprintf(stderr, "Error creating passive endpoint: %s\n", fi_strerror(-res));
 		exit(1);
 	}
 	return (jlong)passive_ep;
@@ -147,7 +147,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen
 	event_queue_list[event_queue_list_tail] = event_queue;
 	event_queue_list_tail++;
 
-	int res = ((struct fid_fabric *)fabricHandle)->ops->eq_open((struct fid_fabric *)fabricHandle,
+	int res = fi_eq_open((struct fid_fabric *)fabricHandle,
 			(struct fi_eq_attr *)eqAttrHandle, &event_queue, (void *)contextHandle);
 
 	if(res) {
@@ -165,13 +165,14 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen2
 	event_queue_list[event_queue_list_tail] = event_queue;
 	event_queue_list_tail++;
 
-	int res = ((struct fid_fabric *)fabricHandle)->ops->eq_open((struct fid_fabric *)fabricHandle,
+	int res = fi_eq_open((struct fid_fabric *)fabricHandle,
 			(struct fi_eq_attr *)eqAttrHandle, &event_queue, NULL);
 
 	if(res) {
 		printf("Error opening event queue: %d\n", res);
 		exit(1);
 	}
+fprintf(stderr, "EQ HANDLE VALUE: %p\n", event_queue);
 	return (jlong)event_queue;
 }
 

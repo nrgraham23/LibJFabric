@@ -33,6 +33,27 @@
 #include "libfabric.h"
 #include "org_ofi_libjfabric_LibFabric.h"
 
+//testcode
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <poll.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <limits.h> //end test code
+
 #define LISTSIZE 1000
 
 struct fi_domain_attr *domain_attr_list[LISTSIZE];
@@ -359,7 +380,7 @@ if(hintsHandle)
 	getInfoRet = fi_getinfo(convertedVersion, nodeName, serviceName, flags, (struct fi_info*)hintsHandle, &resultInfo);
 
 	if (getInfoRet != 0) {
-		fprintf(stderr, "getInfo error: %s\n", fi_strerror(- getInfoRet));
+		fprintf(stderr, "getInfo error: %s\n", fi_strerror(-getInfoRet));
 		exit(1);
 	}
 
@@ -393,6 +414,20 @@ JNIEXPORT jobjectArray JNICALL Java_org_ofi_libjfabric_LibFabric_getInfoJNI2(JNI
 	char *error;
 	struct fi_info *resultInfo, *curInfo;
 	jlongArray infoArray;
+	
+	if(((struct fi_info*)hintsHandle)->dest_addr != NULL)
+		fprintf(stderr, "fi_getname returned: 0x%x\n", *(uint32_t *)((struct fi_info*)hintsHandle)->dest_addr);
+	else {
+		fprintf(stderr, "DEST_ADDR NULL\n");
+	}
+	
+	int lent=20;
+	char buffer[lent];
+	
+	inet_ntop(AF_INET, &(((struct fi_info*)hintsHandle)->dest_addr), buffer, lent);
+	printf("address:%s\n",buffer);
+	
+	
 fprintf(stderr, "FI MSG VALUE: %llu\n", FI_MSG);
 	uint32_t convertedVersion= FI_VERSION((uint32_t)majorVersion, (uint32_t)minorVersion);
 	if(hintsHandle)
@@ -400,10 +435,10 @@ fprintf(stderr, "FI MSG VALUE: %llu\n", FI_MSG);
 	getInfoRet = fi_getinfo(convertedVersion, NULL, NULL, flags, (struct fi_info*)hintsHandle, &resultInfo);
 
 	if (getInfoRet != 0) {
-		fprintf(stderr, "getInfo error: %s\n", fi_strerror(- getInfoRet));
+		fprintf(stderr, "getInfo error: %s\n", fi_strerror(-getInfoRet));
 		exit(1);
 	}
-
+	
 	infoNum = getLinkedListLength(&resultInfo);
 	if(infoNum == 0) {
 		return NULL;

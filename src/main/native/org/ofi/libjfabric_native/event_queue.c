@@ -37,22 +37,27 @@
 JNIEXPORT jobject JNICALL Java_org_ofi_libjfabric_EventQueue_sread
 	(JNIEnv *env, jobject jthis, jlong eqHandle, jint timeOut, jlong flags)
 {
+fprintf(stderr, "EQ HANDLE VALUE IN SREAD: %p\n", (struct fid_eq *)eqHandle);
 	uint32_t event;
 	uint8_t *buf;
 	ssize_t length, ret;
 	struct fi_eq_entry entry;
-	
-	length = fi_eq_sread((struct fid_eq *)eqHandle, &event, &entry, sizeof(entry), -1, FI_PEEK);
-	
+fprintf(stderr, "about to sread for length\n");
+	length = fi_eq_sread((struct fid_eq *)eqHandle, &event, &entry, sizeof(entry), timeOut, FI_PEEK);
+	if(length < 0) {
+		fprintf(stderr, "Error in sread: %s\n", fi_strerror(-length));
+		exit(-1);
+	}
+fprintf(stderr, "Length: %ld\n", length);
 	buf = (uint8_t *)calloc(length, sizeof(uint8_t));
 	
 	ret = fi_eq_sread((struct fid_eq *)eqHandle, &event, buf, length, timeOut, flags);
-	if(ret < 0) { //TODO: should throw an exception back to the user.  can get from 
-		fprintf(stderr, "Error in sread: %ld\n", ret);
+	if(ret < 0) { //TODO: should throw an exception back to the user.
+		fprintf(stderr, "Error in sread: %s\n", fi_strerror(-ret));
 		free(buf);
 		exit(-1);
 	}
-	
+fprintf(stderr, "To switch\n");
 	switch(event) {
 		case FI_MR_COMPLETE:
 		case FI_AV_COMPLETE:

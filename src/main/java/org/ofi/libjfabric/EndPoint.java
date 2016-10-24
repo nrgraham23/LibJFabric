@@ -91,10 +91,10 @@ public class EndPoint extends EndPointSharedOps {
 	}
 	private native void accept(long handle);
 	
-	public void connect(String addr) { //would want a version that had the option to enter parameters (see libfabric definition)
+	public void connect(byte[] addr) { //would want a version that had the option to enter parameters (see libfabric definition)
 		connect(this.handle, addr);
 	}
-	private native void connect(long handle, String addr);
+	private native void connect(long handle, byte[] addr);
 	
 	public void inject(Buffer buffer, long destAddr) {
 		inject(this.handle, buffer, buffer.capacity(), destAddr);
@@ -110,4 +110,9 @@ public class EndPoint extends EndPointSharedOps {
 		shutdown(this.handle, flags);
 	}
 	private native void shutdown(long handle, long flags);
+	
+	public boolean bind(FIDescriptor bindTo, long flags) {
+		return bind(this.handle, bindTo.getHandle(), flags);
+	}
+	private native boolean bind(long thisHandle, long bindToHandle, long flags);
 }

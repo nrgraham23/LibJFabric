@@ -42,4 +42,9 @@ public class PassiveEndPoint extends EndPointSharedOps {
 		listen(this.handle);
 	}
 	private native void listen(long handle);
+	
+	public boolean bind(FIDescriptor bindTo, long flags) {
+		return pepBind(this.handle, bindTo.getHandle(), flags);
+	}
+	private native boolean pepBind(long thisHandle, long bindToHandle, long flags);
 }

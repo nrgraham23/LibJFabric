@@ -87,7 +87,6 @@ public class PingPongTest {
 	}*/
 	private void PP_ERR(String fmt, Object ... items) {
 		System.err.printf("[" + fmt + "]: error\n");
-		//can add something to handle variable arguments if its worth while
 	}
 
 	private static void PP_DEBUG(String fmt, String... items) {
@@ -106,7 +105,6 @@ public class PingPongTest {
 				throw new RuntimeException("too many arguments to PP_DEBUG!");
 			}
 		}
-		//can add something to handle variable arguments if its worth while
 	}
 
 	private void PP_CLOSE_FID(FIDescriptor fd) {
@@ -176,18 +174,18 @@ public class PingPongTest {
 		PP_DEBUG(" * Fabric Attributes:");
 		PP_DEBUG("  - %20s : %s", "name", ct.fi.getFabricAttr().getName());
 		PP_DEBUG("  - %20s : %s", "prov_name", ct.fi.getFabricAttr().getProviderName());
-		PP_DEBUG("  - %20s : %d", "prov_version", ct.fi.getFabricAttr().getProviderVersion().toString());
+		PP_DEBUG("  - %20s ", "prov_version", ct.fi.getFabricAttr().getProviderVersion().toString());
 		PP_DEBUG(" * Domain Attributes:\n");
 		PP_DEBUG("  - %20s : %s", "name", ct.fi.getDomainAttr().getName());
-		PP_DEBUG("  - %20s : %zu", "cq_cnt", "" + ct.fi.getDomainAttr().getCQCnt());
-		PP_DEBUG("  - %20s : %zu", "cq_data_size", "" + ct.fi.getDomainAttr().getCQDataSize());
-		PP_DEBUG("  - %20s : %zu", "ep_cnt", "" + ct.fi.getDomainAttr().getEndPointCnt());
+		PP_DEBUG("  - %20s : %s", "cq_cnt", "" + ct.fi.getDomainAttr().getCQCnt());
+		PP_DEBUG("  - %20s : %s", "cq_data_size", "" + ct.fi.getDomainAttr().getCQDataSize());
+		PP_DEBUG("  - %20s : %s", "ep_cnt", "" + ct.fi.getDomainAttr().getEndPointCnt());
 		PP_DEBUG(" * Endpoint Attributes:\n");
 		PP_DEBUG("  - %20s : msg", "type");
-		PP_DEBUG("  - %20s : %d", "protocol", ct.fi.getEndPointAttr().getProtocol().toString());
-		PP_DEBUG("  - %20s : %d", "protocol_version", "" + ct.fi.getEndPointAttr().getProtoVersion());
-		PP_DEBUG("  - %20s : %zu", "max_msg_size", "" + ct.fi.getEndPointAttr().getMaxMsgSize());
-		PP_DEBUG("  - %20s : %zu", "max_order_raw_size", "" + ct.fi.getEndPointAttr().getMaxOrderRawSize());
+		PP_DEBUG("  - %20s : %s", "protocol", ct.fi.getEndPointAttr().getProtocol().toString());
+		PP_DEBUG("  - %20s : %s", "protocol_version", "" + ct.fi.getEndPointAttr().getProtoVersion());
+		PP_DEBUG("  - %20s : %s", "max_msg_size", "" + ct.fi.getEndPointAttr().getMaxMsgSize());
+		PP_DEBUG("  - %20s : %s", "max_order_raw_size", "" + ct.fi.getEndPointAttr().getMaxOrderRawSize());
 	}
 
 	private void pp_banner_options(CTPingPong ct) {
@@ -285,8 +283,10 @@ public class PingPongTest {
 	private static void pp_ctrl_send(CTPingPong ct, byte[] buf) {
 		try {
 			if(ct.opts.isServer) {
+				System.err.println("server buf length sent: " + buf.length);
 				ct.ctrl_serverfd.getOutputStream().write(buf);
 			} else {
+				System.err.println("client buf length sent: " + buf.length);
 				ct.ctrl_clientfd.getOutputStream().write(buf);
 			}
 		} catch (IOException e) {
@@ -298,18 +298,19 @@ public class PingPongTest {
 		if (PP_ACTIVATE_DEBUG) {
 			int i;
 			for (i = 0; i < buf.length; i++) {
-				System.err.printf("%c.", buf[i]);
+				System.err.print("buf[" + i + "]: " + buf[i] + " ");
 			}
-			System.err.printf("\"\n");
+			System.err.println();
 		}
 	}
 
 	private void pp_ctrl_recv(CTPingPong ct, byte[] buf) {
 		try {
-			//TODO: exception thrown here
 			if(ct.opts.isServer) {
+				System.err.println("server buf length recv: " + buf.length);
 				ct.ctrl_serverfd.getInputStream().read(buf);
 			} else {
+				System.err.println("client buf length recv: " + buf.length);
 				ct.ctrl_clientfd.getInputStream().read(buf);
 			}
 		} catch (IOException e) {
@@ -323,53 +324,44 @@ public class PingPongTest {
 		}
 		//ret = recv(ct->ctrl_connfd, buf, size, 0);
 
-		PP_DEBUG("----> received (%s) : \"", "" + PP_MSG_LEN_PORT);
+		PP_DEBUG("----> received (%s) : \"", "" + buf.length);
 		if (PP_ACTIVATE_DEBUG) {
-			int i;
-			for (i = 0; i < buf.length; i++) {
-				System.err.printf("%c.", (char)buf[i]);
-			}
-			System.err.printf("\"\n");
+			System.err.println("Value Received: " + new String(buf));
 		}
 	}
 
 	private void pp_send_name(CTPingPong ct, EndPointSharedOps endpoint) {
-		String local_name;
-		//long addrlen;
-		//int len;
+		byte[] local_name;
 
 		PP_DEBUG("Fetching local address");
 
-		local_name = endpoint.getName(64);
+		local_name = endpoint.getName();
+		System.err.println("Local Name: " + new String(local_name));
+		PP_DEBUG("Sending name length");
 
-		//PP_DEBUG("Sending name length\n");
+		byte[] nameLength = new byte[] {(byte) local_name.length}; //wrap the length in a byte[] so we can send it using pp_ctrl_send
+		pp_ctrl_send(ct, nameLength);
 
-		//pp_ctrl_send(ct, local_name.length()); //sending name length, think i can skip this in Java
-
-		PP_DEBUG("Sending name");
-		pp_ctrl_send(ct, local_name.getBytes());
+		PP_DEBUG("Sending name: " + new String(local_name));
+		pp_ctrl_send(ct, local_name);
 		PP_DEBUG("Sent name");
 	}
 
 	private void pp_recv_name(CTPingPong ct) {
+		PP_DEBUG("Receiving name length\n");
 
-		//PP_DEBUG("Receiving name length\n"); //sending length not needed in java
-		//pp_ctrl_recv(ct, (char *) &len, sizeof(len));
+		byte[] nameLength = new byte[1];
+		pp_ctrl_recv(ct, nameLength);
 
-		//len = ntohl(len);
-
-		//if (len > sizeof(ct->rem_name)) {
-		//	PP_DEBUG("Address length exceeds address storage\n");
-		//	return -EMSGSIZE;
-		//}
+		ct.rem_name = new byte[nameLength[0]];
 
 		PP_DEBUG("Receiving name");
 		pp_ctrl_recv(ct, ct.rem_name);
-
+		String remName = new String(ct.rem_name);
 		PP_DEBUG("Received name");
-
+		System.err.println("rem_name: " + remName);
 		/* fi_freeinfo will free the dest_addr field. */
-		ct.hints.setDestAddr(ct.rem_name.toString());
+		ct.hints.setDestAddr(ct.rem_name);
 
 		ct.hints.setDestAddrLen(ct.rem_name.length);
 	}
@@ -394,9 +386,9 @@ public class PingPongTest {
 
 			PP_DEBUG("SERVER: after recv");
 
-			if (ct.ctrl_buf.toString().equals(PP_MSG_SYNC_Q)) {
-				ct.ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
-				PP_DEBUG("SERVER: sync error while acking Q: " + ct.ctrl_buf.toString() + " (len=" + ct.ctrl_buf.length + ")");
+			if (!new String(ct.ctrl_buf).equals(PP_MSG_SYNC_Q)) {
+				PP_DEBUG("SERVER: sync error while acking Q: " + new String(ct.ctrl_buf) + " (len=" + ct.ctrl_buf.length + ")");
+				System.exit(-1);
 			}
 
 			PP_DEBUG("SERVER: syncing now");
@@ -418,10 +410,9 @@ public class PingPongTest {
 			pp_ctrl_recv(ct, ct.ctrl_buf);
 			PP_DEBUG("CLIENT: after recv");
 
-			if (!ct.ctrl_buf.toString().equals(PP_MSG_SYNC_A)) {
-				//ct.ctrl_buf[PP_CTRL_BUF_LEN] = '\0';
-				PP_DEBUG("CLIENT: sync error while acking A: <%s> (len=%s)",
-						ct.ctrl_buf.toString(), "" + ct.ctrl_buf.length);
+			if (!new String(ct.ctrl_buf).equals(PP_MSG_SYNC_A)) {
+				PP_DEBUG("CLIENT: sync error while acking A: <%s> (len=%s)", new String(ct.ctrl_buf), "" + ct.ctrl_buf.length);
+				System.exit(-1);
 			}
 			PP_DEBUG("CLIENT: synced");
 		}
@@ -433,12 +424,12 @@ public class PingPongTest {
 		PP_DEBUG("Exchanging ack count");
 
 		if (ct.opts.isServer) {
-			Arrays.fill(ct.ctrl_buf, (byte)'\0');
+			// Arrays.fill(ct.ctrl_buf, (byte)'\0');
 
 			PP_DEBUG("SERVER: receiving count");
 			pp_ctrl_recv(ct, ct.ctrl_buf);
 
-			ct.cnt_ack_msg = Long.parseLong(ct.ctrl_buf.toString());
+			ct.cnt_ack_msg = Long.parseLong(new String(ct.ctrl_buf));
 
 			PP_DEBUG("SERVER: received count = <%s> (len=%s)",
 					"" + ct.cnt_ack_msg, "" + ct.ctrl_buf.length);
@@ -449,11 +440,11 @@ public class PingPongTest {
 
 			PP_DEBUG("SERVER: acked count to client");
 		} else {
-			Arrays.fill(ct.ctrl_buf, (byte)'\0');
+			//Arrays.fill(ct.ctrl_buf, (byte)'\0');
 			ct.ctrl_buf = ByteBuffer.allocate(Long.BYTES).putLong(ct.cnt_ack_msg).array(); //convert long to byte[]
 
 			PP_DEBUG("CLIENT: sending count = <%s> (len=%lu)",
-					ct.ctrl_buf.toString(), "" + ct.ctrl_buf.length);
+					new String(ct.ctrl_buf), "" + ct.ctrl_buf.length);
 			pp_ctrl_send(ct, ct.ctrl_buf);
 
 			PP_DEBUG("CLIENT: sent count");
@@ -462,7 +453,7 @@ public class PingPongTest {
 
 			if (!ct.ctrl_buf.equals(PP_MSG_CHECK_CNT_OK)); {
 				PP_DEBUG("CLIENT: error while server acking the count: <%s> (len=%lu)",
-						ct.ctrl_buf.toString(), "" + ct.ctrl_buf.length);
+						new String(ct.ctrl_buf), "" + ct.ctrl_buf.length);
 			}
 			PP_DEBUG("CLIENT: count acked by server");
 		}
@@ -613,7 +604,7 @@ void pp_process_eq_err(ssize_t rd, struct fid_eq *eq, const char *fn)
 			}
 		}
 
-		PP_DEBUG("Generated %d test sizes", "" + n);
+		PP_DEBUG("Generated %s test sizes", "" + n);
 
 		return sizes.stream().mapToInt(i -> i).toArray();
 	}
@@ -726,7 +717,7 @@ int pp_cq_readerr(struct fid_cq *cq)
 		//if (timeout >= 0)
 		//	a = System.nanoTime();
 
-		while (ct.rx_seq - ct.tx_cq_cntr > 0) {
+		while (ct.rx_seq - ct.tx_cq_cntr > 0) { //TODO: looks like infinite loop
 			try {
 				cq.read(1);
 			} catch(Exception e) {
@@ -950,32 +941,50 @@ int pp_cq_readerr(struct fid_cq *cq)
 		PP_DEBUG("Fabric resources opened");
 	}
 
-	private void pp_alloc_active_res(CTPingPong ct, Info fi) {
+	private void pp_alloc_active_res(CTPingPong ct) {
 		pp_alloc_msgs(ct);
-
+		System.err.println("after pp_alloc_msgs");
 		if (ct.cq_attr.getCQFormat() == null || ct.cq_attr.getCQFormat() == CQFormat.FI_CQ_FORMAT_UNSPEC)
 			ct.cq_attr.setCQFormat(CQFormat.FI_CQ_FORMAT_CONTEXT);
-
+		System.err.println("after conditional in pp_alloc_active_res");
 		ct.cq_attr.setWaitObj(WaitObj.WAIT_NONE);
-
-		ct.cq_attr.setSize(fi.getTransmitAttr().getSize());
-		ct.txcq = ct.domain.cqOpen(ct.cq_attr, new Context(1000)); //this is messy, but i think it will work.  See line below for C version.
+		System.err.println("after setting wait obj");
+		ct.cq_attr.setSize(ct.fi.getTransmitAttr().getSize());
+		ct.txcq = ct.domain.cqOpen(ct.cq_attr);
 		//fi_cq_open(ct->domain, &(ct->cq_attr), &(ct->txcq), &(ct->txcq));
-
-		ct.cq_attr.setSize(fi.getReceiveAttr().getSize());
-		ct.rxcq = ct.domain.cqOpen(ct.cq_attr, new Context(2000)); //same as above
+		System.err.println("cq opened");
+		ct.cq_attr.setSize(ct.fi.getReceiveAttr().getSize());
+		ct.rxcq = ct.domain.cqOpen(ct.cq_attr);
 		//fi_cq_open(ct->domain, &(ct->cq_attr), &(ct->rxcq), &(ct->rxcq));
-
-		ct.ep = ct.domain.epOpen(fi);
+		System.err.println("after 2nd cq opened");
+		ct.ep = ct.domain.epOpen(ct.fi);
+		System.err.println("ep opened, leaving pp_alloc_active_res");
 	}
 
-	private Info pp_getinfo(CTPingPong ct) {
+	private Info pp_getinfo(CTPingPong ct) { //TODO: remove debug code
 		long flags = 0;
-		System.err.println(ct.hints.getCaps());
-		System.err.println(ct.hints.getFabricAttr().getName());
-		System.err.println(ct.hints.getFabricAttr().getProviderName());
-		System.err.println(ct.hints.getFabricAttr().getProviderVersion());
-		return LibFabric.getInfo(version, flags, ct.hints)[0];
+		System.err.println("caps: " + ct.hints.getCaps());
+		System.err.println("name: " + ct.hints.getFabricAttr().getName());
+		System.err.println("prov name: " + ct.hints.getFabricAttr().getProviderName());
+		System.err.println("provider version: " + ct.hints.getFabricAttr().getProviderVersion());
+		Info[] infos = LibFabric.getInfo(version, flags, ct.hints);
+
+		for(int i = 0; i < infos.length; i++) {
+			System.err.println("addrFormat: " + infos[i].getAddrFormat());
+			System.err.println("caps: " + infos[i].getCaps());
+			System.err.println("provider name: " + infos[i].getFabricAttr().getProviderName());
+			System.err.println("provider version: " + infos[i].getFabricAttr().getProviderVersion());
+			System.err.println("provider version: " + infos[i].getDomainAttr().getName());
+
+			System.out.println("provider: " +infos[i].getFabricAttr().getProviderName());
+			System.out.println("	fabric: " + infos[i].getFabricAttr().getName());
+			System.out.println("	domain: " + infos[i].getDomainAttr().getName());
+			System.out.println("	version: " + infos[i].getFabricAttr().getProviderVersion());
+			System.out.println("	type: " + infos[i].getEndPointAttr().getEpType());
+			System.out.println("	protocol: " + infos[i].getEndPointAttr().getProtocol());
+		}
+		return infos[0];
+		//return LibFabric.getInfo(version, flags, ct.hints)[0];
 	}
 
 	private void pp_init_ep(CTPingPong ct) {
@@ -996,16 +1005,19 @@ int pp_cq_readerr(struct fid_cq *cq)
 	private void pp_exchange_names_connected(CTPingPong ct) {
 		PP_DEBUG("Connection-based endpoint: setting up connection");
 
-		pp_ctrl_sync(ct);
-System.err.println("after ctrl sync");
+		//pp_ctrl_sync(ct);
+		System.err.println("after ctrl sync");
 		if (ct.opts.isServer) {
 			pp_send_name(ct, ct.pep);
-System.err.println("after send name");
+			System.err.println("after send name");
 		} else {
 			pp_recv_name(ct);
+			System.err.println("after pp_recv_name");
 			ct.fi = pp_getinfo(ct);
+			System.err.println("after pp_getinfo");
 		}
 	}
+
 	private void pp_start_server(CTPingPong ct) {
 
 		PP_DEBUG("Connected endpoint: starting server");
@@ -1018,7 +1030,7 @@ System.err.println("after send name");
 		System.err.println("about to create pep");
 		ct.pep = ct.fabric.createPassiveEndPoint(ct.fi_pep);
 
-		ct.eq.bind(ct.pep, 0);
+		ct.pep.bind(ct.eq, 0);
 
 		ct.pep.listen();
 
@@ -1031,33 +1043,33 @@ System.err.println("after send name");
 
 		PP_DEBUG("Connected endpoint: connecting server");
 		try {
-System.err.println("entering try in pp_server_connect");
+			System.err.println("entering try in pp_server_connect");
 			pp_exchange_names_connected(ct);
-System.err.println("after exchange names");
-			pp_ctrl_sync(ct);
-System.err.println("after sync");
+			System.err.println("after exchange names");
+			//pp_ctrl_sync(ct);
+			System.err.println("after sync");
 			/* Listen */
 			eventEntry = ct.eq.sread(-1, 0);
-System.err.println("after sread");
-			if(eventEntry.getClass().isAssignableFrom(EQCMEntry.class) &&eventEntry.getEQEvent() == EQEvent.FI_CONNREQ) {
+			System.err.println("after sread");
+			if(eventEntry.getClass().isAssignableFrom(EQCMEntry.class) && eventEntry.getEQEvent() == EQEvent.FI_CONNREQ) {
 				eqCMEntry = (EQCMEntry)eventEntry;
 			} else {
 				throw new Exception("Unexpected CM event " + eventEntry.getEQEvent() + "\n");
 			}
-
+			System.err.println("after casting to EQCMEntry");
 			ct.fi = eqCMEntry.getInfo();
-System.err.println(ct.fi);
+			System.err.println("after eqCMEntry.getInfo");
 			ct.domain = ct.fabric.createDomain(ct.fi);
-
-			pp_alloc_active_res(ct, ct.fi);
-
+			System.err.println("after domain created");
+			pp_alloc_active_res(ct);
+			System.err.println("after pp_alloc_active_res");
 			pp_init_ep(ct);
 
 			PP_DEBUG("accepting");
 
 			ct.ep.accept();
 
-			pp_ctrl_sync(ct);
+			//pp_ctrl_sync(ct);
 
 			/* Accept */
 			eventEntry = ct.eq.sread(-1, 0);
@@ -1081,20 +1093,20 @@ System.err.println(ct.fi);
 		EQCMEntry entry;
 		EQEvent event = null;
 
-		pp_exchange_names_connected(ct);
+		pp_exchange_names_connected(ct); 
 
 		/* Check that the remote is still up */
-		pp_ctrl_sync(ct);
+		//pp_ctrl_sync(ct);
 
-		pp_open_fabric_res(ct);
+		pp_open_fabric_res(ct); 
 
-		pp_alloc_active_res(ct, ct.fi);
+		pp_alloc_active_res(ct);
 
-		pp_init_ep(ct);
-
-		ct.ep.connect(ct.rem_name.toString());
-
-		pp_ctrl_sync(ct);
+		pp_init_ep(ct);//JUMP
+		System.err.println("after init ep");
+		ct.ep.connect(ct.rem_name);
+		System.err.println("after ep connect");
+		//pp_ctrl_sync(ct);
 
 		/* Connect */
 		try {
@@ -1106,7 +1118,7 @@ System.err.println(ct.fi);
 				throw new Exception("Unexpected CM event " + eventEntry.getEQEvent() + "\n");
 			}
 		} catch(Exception e) {
-			System.err.println(e.getMessage());
+			System.err.println("Exception in pp_client_connect with sread: " + e.getMessage());
 			System.exit(-1);
 		}
 	}
@@ -1274,11 +1286,11 @@ System.err.println(ct.fi);
 	private void run_suite_pingpong(CTPingPong ct) {
 		int[] sizes;
 
-		pp_banner_fabric_info(ct);  //TODO: called here
+		pp_banner_fabric_info(ct);
 
 		sizes = generate_test_sizes(ct.opts, ct.tx_size);
 
-		PP_DEBUG("Count of sizes to test: %d", "" + sizes.length);
+		PP_DEBUG("Count of sizes to test: %s", "" + sizes.length);
 
 		for (int i = 0; i < sizes.length; i++) {
 			ct.opts.transfer_size = sizes[i];
@@ -1295,9 +1307,6 @@ System.err.println(ct.fi);
 
 		if (ct.opts.isServer) {
 			pp_start_server(ct);
-		}
-
-		if (ct.opts.isServer) {
 			pp_server_connect(ct);
 			PP_DEBUG("SERVER: server_connected");
 		} else {
@@ -1333,13 +1342,15 @@ System.err.println(ct.fi);
 		ct.hints.getEndPointAttr().setEpType(EPType.FI_EP_MSG);
 		ct.hints.setCaps(LibFabric.FI_MSG);
 		ct.hints.setMode(LibFabric.FI_CONTEXT | LibFabric.FI_LOCAL_MR);
-		
+		ct.hints.getFabricAttr().setProviderVersion(new Version(2, 0)); //TODO: move to better place
+		ct.hints.getFabricAttr().setProviderName("sockets");
+
 		tester.parseArgs(ct, args);
 
 		tester.pp_banner_options(ct);
 
 		tester.run_pingpong_msg(ct);
-
+		System.err.println("done!");
 		tester.freeResources(ct);
 	}
 }

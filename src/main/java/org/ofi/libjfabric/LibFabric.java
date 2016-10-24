@@ -66,6 +66,7 @@ public class LibFabric {
 		try {
 			System.loadLibrary("jfab_native");
 			init();
+			loadClasses();
 			registerNativeCleanup();
 		} catch (UnsatisfiedLinkError e) {
 			throw new RuntimeException("Could not load the libfabric native library");
@@ -76,6 +77,7 @@ public class LibFabric {
 		try {
 			System.loadLibrary("jfab_native");
 			init();
+			loadClasses();
 			registerNativeCleanup();
 			return true;
 		} catch (UnsatisfiedLinkError e) {
@@ -106,6 +108,72 @@ public class LibFabric {
 
 	private static native void deleteCachedVars();
 
+	/* During testing I discovered that the EndPoint class was
+	 * not getting loaded by the JVM after having sent control
+	 * data via sockets.  This method will ensure that all
+	 * LibJFabric classes get loaded, or the program will
+	 * terminate.  This could be modified to throw an exception
+	 * instead.
+	 */
+	private static void loadClasses() {
+		try {
+			Class.forName("org.ofi.libjfabric.AddressVector");
+			Class.forName("org.ofi.libjfabric.CompletionQueue");
+			Class.forName("org.ofi.libjfabric.Constant");
+			Class.forName("org.ofi.libjfabric.Context");
+			Class.forName("org.ofi.libjfabric.Counter");
+			Class.forName("org.ofi.libjfabric.Domain");
+			Class.forName("org.ofi.libjfabric.EndPoint");
+			Class.forName("org.ofi.libjfabric.EndPointSharedOps");
+			Class.forName("org.ofi.libjfabric.EQCMEntry");
+			Class.forName("org.ofi.libjfabric.EQEntry");
+			Class.forName("org.ofi.libjfabric.EQErrorEntry");
+			Class.forName("org.ofi.libjfabric.EventEntry");
+			Class.forName("org.ofi.libjfabric.EventQueue");
+			Class.forName("org.ofi.libjfabric.Fabric");
+			Class.forName("org.ofi.libjfabric.FIDescriptor");
+			Class.forName("org.ofi.libjfabric.Info");
+			Class.forName("org.ofi.libjfabric.LibFabric");
+			Class.forName("org.ofi.libjfabric.MemoryRegion");
+			Class.forName("org.ofi.libjfabric.Message");
+			Class.forName("org.ofi.libjfabric.PassiveEndPoint");
+			Class.forName("org.ofi.libjfabric.Poll");
+			Class.forName("org.ofi.libjfabric.ScalableEP");
+			Class.forName("org.ofi.libjfabric.TryWaitable");
+			Class.forName("org.ofi.libjfabric.Version");
+			Class.forName("org.ofi.libjfabric.Wait");
+			Class.forName("org.ofi.libjfabric.attributes.AVAttr");
+			Class.forName("org.ofi.libjfabric.attributes.CntrAttr");
+			Class.forName("org.ofi.libjfabric.attributes.CQAttr");
+			Class.forName("org.ofi.libjfabric.attributes.DomainAttr");
+			Class.forName("org.ofi.libjfabric.attributes.EndPointAttr");
+			Class.forName("org.ofi.libjfabric.attributes.EventQueueAttr");
+			Class.forName("org.ofi.libjfabric.attributes.FabricAttr");
+			Class.forName("org.ofi.libjfabric.attributes.PollAttr");
+			Class.forName("org.ofi.libjfabric.attributes.ReceiveAttr");
+			Class.forName("org.ofi.libjfabric.attributes.SpecifiedDomainAttr");
+			Class.forName("org.ofi.libjfabric.attributes.SpecifiedFabricAttr");
+			Class.forName("org.ofi.libjfabric.attributes.TransmitAttr");
+			Class.forName("org.ofi.libjfabric.attributes.WaitAttr");
+			Class.forName("org.ofi.libjfabric.enums.AVType");
+			Class.forName("org.ofi.libjfabric.enums.CQFormat");
+			Class.forName("org.ofi.libjfabric.enums.CQWaitCond");
+			Class.forName("org.ofi.libjfabric.enums.EPType");
+			Class.forName("org.ofi.libjfabric.enums.EQEvent");
+			Class.forName("org.ofi.libjfabric.enums.MRMode");
+			Class.forName("org.ofi.libjfabric.enums.Progress");
+			Class.forName("org.ofi.libjfabric.enums.Protocol");
+			Class.forName("org.ofi.libjfabric.enums.ResourceMgmt");
+			Class.forName("org.ofi.libjfabric.enums.Threading");
+			Class.forName("org.ofi.libjfabric.enums.WaitObj");
+		} catch (ClassNotFoundException e) {
+			System.err.println("Class loading exception: " + e.getMessage());
+			e.printStackTrace(System.err);
+			System.exit(-1);
+		}
+		
+	}
+	
 	public static Info[] getInfo(Version version, String node, String service, long flags, Info hints) {
 		long infoHandleArray[];
 		

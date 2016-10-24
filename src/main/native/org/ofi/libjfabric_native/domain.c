@@ -41,8 +41,26 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_cqOpen
 	cq_list[cq_list_tail] = completionQueue;
 	cq_list_tail++;
 
-	int res = ((struct fid_domain *)domHandle)->ops->cq_open((struct fid_domain *)domHandle,
+	int res = fi_cq_open((struct fid_domain *)domHandle,
 			(struct fi_cq_attr *)cqAttrHandle, &completionQueue, (void *)contextHandle);
+
+	if(res) {
+		printf("Error opening endPoint: %d\n", res);
+		exit(1);
+	}
+	return (jlong)completionQueue;
+}
+
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_cqOpen2
+	(JNIEnv *env, jobject jthis, jlong domHandle, jlong cqAttrHandle)
+{
+	struct fid_cq *completionQueue;
+
+	cq_list[cq_list_tail] = completionQueue;
+	cq_list_tail++;
+
+	int res = fi_cq_open((struct fid_domain *)domHandle,
+			(struct fi_cq_attr *)cqAttrHandle, &completionQueue, &completionQueue);
 
 	if(res) {
 		printf("Error opening endPoint: %d\n", res);
@@ -59,7 +77,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 	ep_list[ep_list_tail] = endPoint;
 	ep_list_tail++;
 
-	int res = ((struct fid_domain *)domHandle)->ops->endpoint((struct fid_domain *)domHandle,
+	int res = fi_endpoint((struct fid_domain *)domHandle,
 			(struct fi_info *)infoHandle, &endPoint, (void *)contextHandle);
 
 	if(res) {
@@ -72,12 +90,13 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen2
 	(JNIEnv *env, jobject jthis, jlong domHandle, jlong infoHandle)
 {
+fprintf(stderr, "entering epOpen2\n");
 	struct fid_ep *endPoint;
 
 	ep_list[ep_list_tail] = endPoint;
 	ep_list_tail++;
-
-	int res = ((struct fid_domain *)domHandle)->ops->endpoint((struct fid_domain *)domHandle,
+fprintf(stderr, "about to call fi_endpoint\n");
+	int res = fi_endpoint((struct fid_domain *)domHandle,
 			(struct fi_info *)infoHandle, &endPoint, NULL);
 
 	if(res) {
