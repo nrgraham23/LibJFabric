@@ -80,23 +80,12 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_accept
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_connect
 	(JNIEnv *env, jobject jthis, jlong epHandle, jbyteArray addr)
 {
-fprintf(stderr, "in connect\n");
 	jsize len = (*env)->GetArrayLength(env, addr);
 	
-	char *cAddr;// = (char *)calloc(len, sizeof(char));
+	char *cAddr;
 	(*env)->GetByteArrayRegion(env, addr, 0, len, (jbyte *)cAddr);
 	
-	int i;
-	fprintf(stderr, "DESTADDR IN CONNECT: \n");
-	for(i = 0; i < len; i++) {
-		fprintf(stderr, "    cAddr[i]: %d\n", cAddr[i]);
-	}
-	
-fprintf(stderr, "after convertJNIString\n");	
 	fi_connect((struct fid_ep *)epHandle, cAddr, NULL, 0);
-
-fprintf(stderr, "after c connect\n");	
-	//free(cAddr); //actually may not want to free this
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_inject

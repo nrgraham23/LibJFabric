@@ -55,3 +55,26 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Message_initMessage
 	
 	return (jlong)message;
 }
+
+JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Message_initMessage2
+	(JNIEnv *env, jobject jthis, jobject buffer, jint length, jint iovCount, jlong addr)
+{
+	struct iovec iov;
+
+	struct fi_msg *message = (struct fi_msg *)calloc(1, sizeof(struct fi_msg));
+
+	message_list[message_list_tail] = message;
+	message_list_tail++;
+
+	void *ptr = getDirectBufferAddress(env, buffer);
+
+	iov.iov_base = ptr;
+	iov.iov_len = length;
+
+	message->msg_iov = &iov;
+	message->iov_count = 1;
+	message->addr = addr;
+	message->context = NULL;
+
+	return (jlong)message;
+}

@@ -90,12 +90,11 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Domain_epOpen2
 	(JNIEnv *env, jobject jthis, jlong domHandle, jlong infoHandle)
 {
-fprintf(stderr, "entering epOpen2\n");
 	struct fid_ep *endPoint;
 
 	ep_list[ep_list_tail] = endPoint;
 	ep_list_tail++;
-fprintf(stderr, "about to call fi_endpoint\n");
+
 	int res = fi_endpoint((struct fid_domain *)domHandle,
 			(struct fi_info *)infoHandle, &endPoint, NULL);
 

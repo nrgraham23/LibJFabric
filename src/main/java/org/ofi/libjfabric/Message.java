@@ -44,7 +44,13 @@ public class Message {
 	}
 	private native long initMessage(Buffer buf, int length, int iovCount, long addr, long contextHandle);
 	
+	public Message(Buffer buf, int iovCount, long addr) {
+		assert(buf.isDirect());
+		this.handle = initMessage2(buf, (buf.capacity() + 1), iovCount, addr);
+	}
+	private native long initMessage2(Buffer buf, int length, int iovCount, long addr);
+	
 	public long getHandle() {
-		return this.getHandle();
+		return this.handle;
 	}
 }

@@ -36,7 +36,9 @@
 JNIEXPORT jboolean JNICALL Java_org_ofi_libjfabric_FIDescriptor_close
 	(JNIEnv *env, jobject jthis, jlong handle)
 {
-	int res = ((struct fid *)handle)->ops->close((struct fid *)handle);
+	struct fid *fid_handle = (struct fid *)handle;
+	int res = fi_close(fid_handle);
+	fid_handle = NULL;
 
 	return FI_SUCCESS == res;
 }

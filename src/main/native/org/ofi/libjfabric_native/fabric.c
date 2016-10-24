@@ -172,7 +172,7 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Fabric_eventQueueOpen2
 		printf("Error opening event queue: %d\n", res);
 		exit(1);
 	}
-fprintf(stderr, "EQ HANDLE VALUE: %p\n", event_queue);
+
 	return (jlong)event_queue;
 }
 

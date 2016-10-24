@@ -74,9 +74,11 @@ JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_initEmpty
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Info_free
 	(JNIEnv *env, jobject jthis, jlong handle)
 {
-	struct fi_info* info = (struct fi_info*)handle;
-	fi_freeinfo(info);
-	info = NULL;
+	if(handle) {
+		struct fi_info* info = (struct fi_info*)handle;
+		fi_freeinfo(info);
+		info = NULL;
+	}
 }
 
 JNIEXPORT jlong JNICALL Java_org_ofi_libjfabric_Info_getCaps
@@ -211,12 +213,8 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_Info_setDestAddr
 	size_t len = length;
 	jbyte *jAra = (*env)->GetByteArrayElements(env, destAddr, 0);
 	char *addr = (char *)calloc(length, sizeof(char));
-fprintf(stderr, "DESTADDR VALUE IN C:\n");	
-	//memcpy(addr, jAra, len);
-	for(i = 0; i < length; i++) {
-		addr[i] = (char)jAra[i];
-fprintf(stderr, "    addr[i]: %d    jAra[i]: %d\n", (int)addr[i], (int)jAra[i]);
-	}
+
+	memcpy(addr, jAra, len);
 	
 	((struct fi_info*)thisHandle)->dest_addr = (void *)addr;
 	
