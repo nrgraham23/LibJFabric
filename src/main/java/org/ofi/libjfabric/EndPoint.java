@@ -47,8 +47,10 @@ public class EndPoint extends EndPointSharedOps {
 	private native void recv(long epHandle, Buffer buffer, int length, long mrDesc, long srcAddress, long contextHandle);
 	
 	public void recv(Buffer buffer, long mrDesc, long srcAddress) {
-		throw new UnsupportedOperationException("Not implemented yet!");
+		assert(buffer.isDirect());
+		recv2(this.handle, buffer, buffer.capacity(), mrDesc, srcAddress);
 	}
+	private native void recv2(long epHandle, Buffer buffer, int length, long mrDesc, long srcAddress);
 	
 	public void recv(Buffer buffer, long srcAddress, Context context) {
 		throw new UnsupportedOperationException("Not implemented yet!");
@@ -69,8 +71,9 @@ public class EndPoint extends EndPointSharedOps {
 	private native void send(long thisHandle, Buffer buffer, int length, long mrDesc, long destAddress, long contextHandle);
 	
 	public void send(Buffer buffer, long mrDesc, long destAddress) {
-		throw new UnsupportedOperationException("Not implemented yet!");
+		send2(this.handle, buffer, buffer.capacity(), mrDesc, destAddress);
 	}
+	private native void send2(long thisHandle, Buffer buffer, int length, long mrDesc, long destAddress);
 	
 	public void send(Buffer buffer, long destAddress, Context context) {
 		throw new UnsupportedOperationException("Not implemented yet!");

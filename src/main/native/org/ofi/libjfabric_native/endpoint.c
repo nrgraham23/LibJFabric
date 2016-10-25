@@ -38,7 +38,15 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_send
 {
 	void *ptr = getDirectBufferAddress(env, buffer);
 	
-	((struct fid_ep *)epHandle)->msg->send((struct fid_ep *)epHandle, &ptr, length, (void *)mrDesc, destAddr, (void *)contextHandle);
+	fi_send((struct fid_ep *)epHandle, &ptr, length, (void *)mrDesc, destAddr, (void *)contextHandle);
+}
+
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_send2
+	(JNIEnv *env, jobject jthis, jlong epHandle, jobject buffer, jint length, jlong mrDesc, jlong destAddr)
+{
+	void *ptr = getDirectBufferAddress(env, buffer);
+
+	fi_send((struct fid_ep *)epHandle, &ptr, length, (void *)mrDesc, destAddr, NULL);
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_send4
@@ -46,7 +54,7 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_send4
 {
 	void *ptr = getDirectBufferAddress(env, buffer);
 
-	((struct fid_ep *)epHandle)->msg->send((struct fid_ep *)epHandle, &ptr, length, NULL, destAddress, NULL);
+	fi_send((struct fid_ep *)epHandle, &ptr, length, NULL, destAddress, NULL);
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_recv
@@ -55,6 +63,14 @@ JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_recv
 	void *ptr = getDirectBufferAddress(env, buffer);
 
 	((struct fid_ep *)epHandle)->msg->recv((struct fid_ep *)epHandle, &ptr, length, (void *)mrDesc, srcAddress, (void *)contextHandle);
+}
+
+JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_recv2
+	(JNIEnv *env, jobject jthis, jlong epHandle, jobject buffer, jint length, jlong mrDesc, jlong srcAddress)
+{
+	void *ptr = getDirectBufferAddress(env, buffer);
+
+	fi_recv((struct fid_ep *)epHandle, &ptr, length, (void *)mrDesc, srcAddress, NULL);
 }
 
 JNIEXPORT void JNICALL Java_org_ofi_libjfabric_EndPoint_recv5

@@ -120,8 +120,6 @@ public class PingPongTest {
 		AddressVector av;
 		EventQueue eq;
 
-		Context tx_ctx, rx_ctx;
-
 		long tx_seq, rx_seq, tx_cq_cntr;
 
 		long remote_fi_addr;
@@ -430,7 +428,6 @@ public class PingPongTest {
 			PP_DEBUG("SERVER: received count = <%s> (len=%s)", "" + ct.cnt_ack_msg, "" + ct.ctrl_buf.length);
 
 			ct.ctrl_buf = PP_MSG_CHECK_CNT_OK.getBytes();
-
 			pp_ctrl_send(ct, ct.ctrl_buf);
 
 			PP_DEBUG("SERVER: acked count to client");
@@ -442,9 +439,10 @@ public class PingPongTest {
 
 			PP_DEBUG("CLIENT: sent count");
 
+			ct.ctrl_buf = new byte[6]; //prepare for message from server
 			pp_ctrl_recv(ct, ct.ctrl_buf);
 
-			if (!ct.ctrl_buf.equals(PP_MSG_CHECK_CNT_OK)); {
+			if (!(new String(ct.ctrl_buf).equals(PP_MSG_CHECK_CNT_OK))) {
 				PP_DEBUG("CLIENT: error while server acking the count: <%s> (len=%s)",
 						new String(ct.ctrl_buf), "" + ct.ctrl_buf.length);
 			}
@@ -604,7 +602,7 @@ public class PingPongTest {
 		if (fraction != 0)
 			str = "" + (size / base) + "." + fraction + mag;
 		else
-			str = "" + (size / base) + "." + mag;
+			str = "" + (size / base) + mag;
 
 		return str;
 	}
@@ -625,31 +623,31 @@ public class PingPongTest {
 	}
 
 	private void show_perf(int tsize, int sent, long acked, long start, long end, int xfers_per_iter) {
-		long elapsed = end - start; //TODO: format better
+		long elapsed = (end - start) / 1000; //comes in as nanoseconds, convert to micro
 		long bytes = sent * tsize * xfers_per_iter;
 		float usec_per_xfer;
 
 		if (sent == 0)
 			return;
 
-		System.out.printf("%8s%8s%9s%8s%8s %10s%13s%13s\n", "bytes",
-				"#sent", "#ack", "total", "time", "MB/sec",
-				"usec/xfer", "Mxfers/sec");
-
-		System.out.printf("%8s", size_str(tsize));
+		if(tsize < 1000) {
+			System.out.printf("%8s", size_str(tsize));
+		} else {
+			System.out.printf("%7s", size_str(tsize));
+		}
 		System.out.printf("%8s", cnt_str(sent));
 
 		if (sent == acked)
-			System.out.printf("=%8s", cnt_str(acked));
+			System.out.printf("%8s=%s", "", cnt_str(acked));
 		else if (sent < acked)
-			System.out.printf("-%8s", cnt_str(acked - sent));
+			System.out.printf("%8s", cnt_str(acked - sent));
 		else
 			System.out.printf("+%8s", cnt_str(sent - acked));
 
 		System.out.printf("%8s", size_str(bytes));
 
 		usec_per_xfer = ((float)elapsed / sent / xfers_per_iter);
-		System.out.printf("%8.2fs%10.2f%11.2f%11.2f\n", elapsed / 1000000.0,
+		System.out.printf("%8.2fs%10.2f%11.2f%11.3f\n", elapsed / 1000000.0,
 				bytes / (1.0 * elapsed), usec_per_xfer, 1.0 / usec_per_xfer);
 	}
 
@@ -683,9 +681,9 @@ public class PingPongTest {
 		}
 	}
 
-	private void pp_post_tx(CTPingPong ct, EndPoint ep, Context ctx) {
+	private void pp_post_tx(CTPingPong ct, EndPoint ep) {
 		try {
-			ep.send(ct.tx_buf, ct.mr.getDesc(), ct.remote_fi_addr, ctx);
+			ep.send(ct.tx_buf, ct.mr.getDesc(), ct.remote_fi_addr);
 		} catch(Exception e) {
 			System.err.println("Error in ep.send: " + e.getMessage());
 			System.exit(-1);
@@ -697,7 +695,7 @@ public class PingPongTest {
 		if (pp_check_opts(ct, PP_OPT_VERIFY_DATA | PP_OPT_ACTIVE))
 			pp_fill_buf(ct.tx_buf);
 
-		pp_post_tx(ct, ep, ct.tx_ctx);
+		pp_post_tx(ct, ep);
 
 		pp_get_tx_comp(ct, ct.tx_seq);
 	}
@@ -719,9 +717,10 @@ public class PingPongTest {
 
 		pp_post_inject(ct, ep, size);
 	}
-	private void pp_post_rx(CTPingPong ct, EndPoint ep, Context ctx) {
+
+	private void pp_post_rx(CTPingPong ct, EndPoint ep) {
 		try {
-			ep.recv(ct.rx_buf, ct.mr.getDesc(), 0, ctx);
+			ep.recv(ct.rx_buf, ct.mr.getDesc(), 0);
 		} catch (Exception e) {
 			System.err.println("Error in ep recv: " + e.getMessage());
 			System.exit(-1);
@@ -742,7 +741,7 @@ public class PingPongTest {
 		 * before message size is updated. The recvs posted are always for the
 		 * next incoming message.
 		 */
-		pp_post_rx(ct, ct.ep, ct.rx_ctx);
+		pp_post_rx(ct, ct.ep);
 		ct.cnt_ack_msg++;
 	}
 
@@ -791,15 +790,15 @@ public class PingPongTest {
 
 	private void pp_alloc_active_res(CTPingPong ct) {
 		pp_alloc_msgs(ct);
-		
+
 		if (ct.cq_attr.getCQFormat() == null || ct.cq_attr.getCQFormat() == CQFormat.FI_CQ_FORMAT_UNSPEC)
 			ct.cq_attr.setCQFormat(CQFormat.FI_CQ_FORMAT_CONTEXT);
-		
+
 		ct.cq_attr.setWaitObj(WaitObj.WAIT_NONE);
-		
+
 		ct.cq_attr.setSize(ct.fi.getTransmitAttr().getSize());
 		ct.txcq = ct.domain.cqOpen(ct.cq_attr);
-		
+
 		ct.cq_attr.setSize(ct.fi.getReceiveAttr().getSize());
 		ct.rxcq = ct.domain.cqOpen(ct.cq_attr);
 
@@ -820,7 +819,7 @@ public class PingPongTest {
 
 		ct.ep.enable();
 
-		pp_post_rx(ct, ct.ep, ct.rx_ctx);
+		pp_post_rx(ct, ct.ep);
 
 		PP_DEBUG("Endpoint initialzed");
 	}
@@ -833,6 +832,7 @@ public class PingPongTest {
 		} else {
 			pp_recv_name(ct);
 			ct.fi = pp_getinfo(ct);
+			ct.fi.setMode(LibFabric.FI_LOCAL_MR);
 		}
 	}
 
@@ -861,7 +861,7 @@ public class PingPongTest {
 		PP_DEBUG("Connected endpoint: connecting server");
 		try {
 			pp_exchange_names_connected(ct);
-			
+
 			/* Listen */
 			eventEntry = ct.eq.sread(-1, 0);
 
@@ -872,6 +872,7 @@ public class PingPongTest {
 			}
 
 			ct.fi = eqCMEntry.getInfo();
+			ct.fi.setMode(LibFabric.FI_LOCAL_MR);
 
 			ct.domain = ct.fabric.createDomain(ct.fi);
 
@@ -1092,6 +1093,9 @@ public class PingPongTest {
 		sizes = generate_test_sizes(ct.opts, ct.tx_size);
 
 		PP_DEBUG("Count of sizes to test: %s", "" + sizes.length);
+
+		System.out.printf("%8s%8s%9s%8s%8s %10s%13s%13s\n", "bytes", "#sent", "#ack", "total",
+				"time", "MB/sec", "usec/xfer", "Mxfers/sec");
 
 		for (int i = 0; i < sizes.length; i++) {
 			ct.opts.transfer_size = sizes[i];
